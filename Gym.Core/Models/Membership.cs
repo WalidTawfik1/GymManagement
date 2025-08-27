@@ -13,8 +13,9 @@ namespace Gym.Core.Models
         public Trainee Trainee { get; set; }
 
         public string MembershipType { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+
+        public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        public DateOnly EndDate { get; set; } = DateOnly.FromDateTime(DateTime.Now.AddMonths(1));
 
         public int? RemainingSessions { get; set; }
 

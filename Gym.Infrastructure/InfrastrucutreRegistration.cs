@@ -1,5 +1,7 @@
 ﻿using DotNetEnv;
+using Gym.Core.Interfaces;
 using Gym.Infrastructure.Data;
+using Gym.Infrastructure.Repositores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +20,10 @@ namespace Gym.Infrastructure
             Env.Load();
             string connStr = Environment.GetEnvironmentVariable("MambelaDatabase")
                ?? throw new InvalidOperationException("Connection string not found in environment variables.");
+
+
+            services.AddScoped<IUnitofWork, UnitofWork>();
+
 
             services.AddDbContext<MambelaDbContext>((options) =>
             {

@@ -8,5 +8,8 @@ namespace Gym.Core.Interfaces
 {
     public interface IUnitofWork
     {
+        ITraineeRepository TraineeRepository { get; }
+        IMembershipRepository MembershipRepository { get; }
+        IVisitRepository VisitRepository { get; }
     }
 }
