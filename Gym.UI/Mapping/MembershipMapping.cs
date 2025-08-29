@@ -14,7 +14,9 @@ namespace Gym.UI.Mapping
         public MembershipMapping()
         {
             CreateMap<Membership,AddMembershipDTO>().ReverseMap();
-            CreateMap<Membership, MembershipDTO>().ReverseMap();
+            CreateMap<Membership, MembershipDTO>()
+                .ForMember(dest => dest.TraineeName, opt => opt.MapFrom(src => src.Trainee != null ? src.Trainee.FullName : string.Empty))
+                .ReverseMap();
         }
     }
 }

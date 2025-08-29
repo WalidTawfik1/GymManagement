@@ -4,9 +4,69 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Gym.UI"
+        xmlns:views="clr-namespace:Gym.UI.Views"
+        xmlns:viewModels="clr-namespace:Gym.UI.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="{Binding Title}" Height="750" Width="1200" WindowState="Maximized"
+        FlowDirection="{Binding FlowDirection}">
+    <Window.Resources>
+        <local:MembershipTypeDisplayConverter x:Key="MembershipTypeDisplayConverter"/>
+        <local:BoolToFlowDirectionConverter x:Key="BoolToFlowDirectionConverter"/>
+    </Window.Resources>
     <Grid>
-
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Language Switch Bar -->
+        <Border Grid.Row="0" Background="#1ABC9C" Padding="10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <TextBlock Text="{Binding LanguageLabel}" 
+                           Foreground="White" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <Button Content="{Binding ArabicLabel}" 
+                        Command="{Binding SetLanguageCommand}" CommandParameter="ar"
+                        Padding="15,5" Margin="5,0" Background="#16A085" Foreground="White" 
+                        BorderThickness="0" FontSize="12" FontWeight="Bold"/>
+                <Button Content="{Binding EnglishLabel}" 
+                        Command="{Binding SetLanguageCommand}" CommandParameter="en"
+                        Padding="15,5" Margin="5,0" Background="#16A085" Foreground="White" 
+                        BorderThickness="0" FontSize="12" FontWeight="Bold"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Navigation Bar -->
+        <Border Grid.Row="1" Background="#34495E" Padding="10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="{Binding TraineesLabel}" 
+                        Command="{Binding ShowTraineesCommand}" 
+                        Padding="20,10" Margin="5" Background="#2C3E50" Foreground="White" 
+                        BorderThickness="0" FontSize="14" FontWeight="Bold"/>
+                <Button Content="{Binding MembershipsLabel}" 
+                        Command="{Binding ShowMembershipsCommand}" 
+                        Padding="20,10" Margin="5" Background="#8E44AD" Foreground="White" 
+                        BorderThickness="0" FontSize="14" FontWeight="Bold"/>
+                <Button Content="{Binding VisitsLabel}" 
+                        Command="{Binding ShowVisitsCommand}" 
+                        Padding="20,10" Margin="5" Background="#E67E22" Foreground="White" 
+                        BorderThickness="0" FontSize="14" FontWeight="Bold"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Content Area -->
+        <ContentControl Grid.Row="2" Content="{Binding CurrentViewModel}">
+            <ContentControl.Resources>
+                <DataTemplate DataType="{x:Type viewModels:TraineeViewModel}">
+                    <views:TraineeView/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewModels:MembershipViewModel}">
+                    <views:MembershipView/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewModels:VisitViewModel}">
+                    <views:VisitView/>
+                </DataTemplate>
+            </ContentControl.Resources>
+        </ContentControl>
     </Grid>
 </Window>

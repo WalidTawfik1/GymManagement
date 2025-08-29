@@ -16,6 +16,7 @@ namespace Gym.Core.DTO
     {
         public int Id { get; set; }
         public int TraineeId { get; set; }
+        public string TraineeName { get; set; }
         public string MembershipType { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }

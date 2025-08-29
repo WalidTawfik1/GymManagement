@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Gym.Core.DTO;
 using Gym.Core.Interfaces;
 using Gym.Core.Models;
 using Gym.Infrastructure.Data;
@@ -77,7 +78,7 @@ namespace Gym.Infrastructure.Repositores
                 return false; // No active membership found
             }
 
-            if (membership.MembershipType == "محدود" && membership.RemainingSessions.HasValue)
+            if ((membership.MembershipType == "محدود" || membership.MembershipType == "Limit")  && membership.RemainingSessions.HasValue)
             {
                 membership.RemainingSessions -= 1;
                 if (membership.RemainingSessions <= 0)

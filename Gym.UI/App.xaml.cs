@@ -1,5 +1,7 @@
 ﻿using DotNetEnv;
 using Gym.Infrastructure;
+using Gym.UI.Services;
+using Gym.UI.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,40 +21,57 @@ namespace Gym.UI
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            base.OnStartup(e);
+            try
+            {
+                base.OnStartup(e);
 
-            // Load environment variables
-            Env.Load();
+                // Load environment variables
+                Env.Load();
 
-            // Build configuration
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .Build();
+                // Build configuration
+                var configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .Build();
 
-            // Create host and configure services
-            _host = Host.CreateDefaultBuilder()
-                .ConfigureServices((context, services) =>
-                {
-                    // Register infrastructure services
-                    services.InfrastructureConfiguration(configuration);
-
-                    // Register AutoMapper services
-                    services.AddAutoMapper(cfg =>
+                // Create host and configure services
+                _host = Host.CreateDefaultBuilder()
+                    .ConfigureServices((context, services) =>
                     {
-                        cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies());
-                    });
+                        // Register infrastructure services
+                        services.InfrastructureConfiguration(configuration);
 
-                    // Register UI services
-                    services.AddTransient<MainWindow>();
-                })
-                .Build();
+                        // Register AutoMapper services
+                        services.AddAutoMapper(cfg =>
+                        {
+                            cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies());
+                        });
 
-            // Start the host
-            _host.Start();
+                        // Register localization service
+                        services.AddSingleton<ILocalizationService, LocalizationService>();
 
-            // Get MainWindow from DI container
-            var mainWindow = _host.Services.GetRequiredService<MainWindow>();
-            mainWindow.Show();
+                        // Register ViewModels
+                        services.AddTransient<MainViewModel>();
+                        
+                        // Register UI services
+                        services.AddTransient<MainWindow>();
+                    })
+                    .Build();
+
+                // Start the host
+                _host.Start();
+
+                // Get MainWindow from DI container and set up DataContext
+                var mainWindow = _host.Services.GetRequiredService<MainWindow>();
+                var mainViewModel = _host.Services.GetRequiredService<MainViewModel>();
+                mainWindow.DataContext = mainViewModel;
+                mainWindow.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Application startup failed: {ex.Message}\n\nStack Trace:\n{ex.StackTrace}", 
+                               "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Shutdown();
+            }
         }
 
         protected override void OnExit(ExitEventArgs e)

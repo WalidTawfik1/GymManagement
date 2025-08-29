@@ -23,13 +23,13 @@ namespace Gym.Infrastructure.Repositores
 
         public async Task<bool> AddMembership(AddMembershipDTO membershipDTO)
         {
-            if (membershipDTO.MembershipType == "محدود")
+            if (membershipDTO.MembershipType == "محدود" || membershipDTO.MembershipType == "Limit")
             {
                 var membership = new Membership
                 {
                     TraineeId = membershipDTO.TraineeId,
                     MembershipType = membershipDTO.MembershipType,
-                    RemainingSessions = 11,
+                    RemainingSessions = 12,
                     IsActive = true
                 };
                 await _context.Memberships.AddAsync(membership);
