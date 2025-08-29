@@ -52,6 +52,9 @@ namespace Gym.UI.ViewModels
         private int _selectedTraineeId;
 
         [ObservableProperty]
+        private string _traineeIdInput = string.Empty;
+
+        [ObservableProperty]
         private string _membershipType = string.Empty;
 
         [ObservableProperty]
@@ -84,8 +87,7 @@ namespace Gym.UI.ViewModels
             try
             {
                 IsBusy = true;
-                var memberships = await _unitOfWork.MembershipRepository.GetAllAsync();
-                var membershipDTOs = _mapper.Map<List<MembershipDTO>>(memberships.Where(m => !m.IsDeleted));
+                var membershipDTOs = await _unitOfWork.MembershipRepository.GetAllMembershipsAsync();
                 
                 Memberships.Clear();
                 foreach (var membershipDTO in membershipDTOs)
@@ -124,25 +126,50 @@ namespace Gym.UI.ViewModels
         [RelayCommand]
         private async Task AddMembership()
         {
-            if (SelectedTraineeId == 0 || string.IsNullOrWhiteSpace(MembershipType))
+            // Determine trainee ID from input or selection
+            int traineeId = 0;
+            if (!string.IsNullOrWhiteSpace(TraineeIdInput))
             {
-                MessageBox.Show("Please select a trainee and membership type.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                if (!int.TryParse(TraineeIdInput, out traineeId))
+                {
+                    MessageBox.Show("Please enter a valid trainee ID number.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
+            else if (SelectedTraineeId > 0)
+            {
+                traineeId = SelectedTraineeId;
+            }
+
+            if (traineeId == 0 || string.IsNullOrWhiteSpace(MembershipType))
+            {
+                MessageBox.Show("Please enter trainee ID and select membership type.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             try
             {
                 IsBusy = true;
+                
+                // Check if trainee exists
+                var trainee = await _unitOfWork.TraineeRepository.GetByIdAsync(traineeId);
+                if (trainee == null || trainee.IsDeleted)
+                {
+                    MessageBox.Show("Trainee not found. Please check the trainee ID.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 var membershipDto = new AddMembershipDTO
                 {
-                    TraineeId = SelectedTraineeId,
+                    TraineeId = traineeId,
                     MembershipType = MembershipType
                 };
 
                 var success = await _unitOfWork.MembershipRepository.AddMembership(membershipDto);
                 if (success)
                 {
-                    MessageBox.Show("Membership added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var sessionInfo = MembershipType == "محدود" ? " (12 حصة)" : " (مفتوح)";
+                    MessageBox.Show($"تم إضافة العضوية بنجاح{sessionInfo}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     ClearForm();
                     await LoadMemberships();
                 }
@@ -264,6 +291,7 @@ namespace Gym.UI.ViewModels
             IsEditMode = false;
             EditMembershipId = 0;
             SelectedTraineeId = 0;
+            TraineeIdInput = string.Empty;
             MembershipType = string.Empty;
             StartDate = DateOnly.FromDateTime(DateTime.Now);
             EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(1));

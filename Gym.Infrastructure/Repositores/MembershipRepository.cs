@@ -3,6 +3,7 @@ using Gym.Core.DTO;
 using Gym.Core.Interfaces;
 using Gym.Core.Models;
 using Gym.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,8 @@ namespace Gym.Infrastructure.Repositores
                 {
                     TraineeId = membershipDTO.TraineeId,
                     MembershipType = membershipDTO.MembershipType,
+                    StartDate = DateOnly.FromDateTime(DateTime.Now),
+                    EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
                     RemainingSessions = 12,
                     IsActive = true
                 };
@@ -40,6 +43,9 @@ namespace Gym.Infrastructure.Repositores
                 {
                     TraineeId = membershipDTO.TraineeId,
                     MembershipType = membershipDTO.MembershipType,
+                    StartDate = DateOnly.FromDateTime(DateTime.Now),
+                    EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+                    RemainingSessions = null,
                     IsActive = true
                 };
                 await _context.Memberships.AddAsync(membership);
@@ -47,6 +53,26 @@ namespace Gym.Infrastructure.Repositores
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<IReadOnlyList<MembershipDTO>> GetAllMembershipsAsync()
+        {
+            var memberships = await _context.Memberships
+                .Include(m => m.Trainee)
+                .Where(m => !m.IsDeleted)
+                .ToListAsync();
+            var membershipsDTO = _mapper.Map<IReadOnlyList<MembershipDTO>>(memberships);
+            return membershipsDTO;
+        }
+
+        public async Task<MembershipDTO?> GetMembershipByTraineeIdAsync(int id)
+        {
+            var membership = await _context.Memberships
+                .Include(m => m.Trainee)
+                .Where(m => !m.IsDeleted && m.TraineeId == id)
+                .FirstOrDefaultAsync();
+            var membershipDTO = _mapper.Map<MembershipDTO>(membership);
+            return membershipDTO;
         }
 
         public async Task<bool> UpdateMembership(MembershipDTO membershipDTO)

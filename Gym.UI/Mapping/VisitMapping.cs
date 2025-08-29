@@ -9,15 +9,13 @@ using System.Threading.Tasks;
 
 namespace Gym.UI.Mapping
 {
-    public class MembershipMapping:Profile
+    public class VisitMapping: Profile
     {
-        public MembershipMapping()
+        public VisitMapping()
         {
-            CreateMap<Membership,AddMembershipDTO>().ReverseMap();
-            CreateMap<Membership, MembershipDTO>()
+            CreateMap<Visit, VisitDTO>()
                 .ForMember(dest => dest.TraineeName, opt => opt.MapFrom(src => src.Trainee != null ? src.Trainee.FullName : string.Empty))
                 .ReverseMap();
-
         }
     }
 }

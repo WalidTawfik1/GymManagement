@@ -49,7 +49,7 @@ namespace Gym.UI.Services
                 ["ar"] = new Dictionary<string, string>
                 {
                     // General
-                    ["AppTitle"] = "نظام إدارة الصالة الرياضية",
+                    ["AppTitle"] = "Mambela Gym",
                     ["Language"] = "اللغة:",
                     ["Arabic"] = "عربي",
                     ["English"] = "الإنجليزية",
@@ -157,7 +157,7 @@ namespace Gym.UI.Services
                 ["en"] = new Dictionary<string, string>
                 {
                     // General
-                    ["AppTitle"] = "Gym Management System",
+                    ["AppTitle"] = "Mambela Gym",
                     ["Language"] = "Language:",
                     ["Arabic"] = "Arabic",
                     ["English"] = "English",

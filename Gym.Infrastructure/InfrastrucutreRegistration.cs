@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +18,24 @@ namespace Gym.Infrastructure
     {
         public static IServiceCollection InfrastructureConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            Env.Load();
+            // Try to load .env file from multiple possible locations
+            var envPaths = new[]
+            {
+                ".env",
+                "../.env",
+                "../../.env",
+                "../../../.env"
+            };
+
+            foreach (var path in envPaths)
+            {
+                if (File.Exists(path))
+                {
+                    Env.Load(path);
+                    break;
+                }
+            }
+
             string connStr = Environment.GetEnvironmentVariable("MambelaDatabase")
                ?? throw new InvalidOperationException("Connection string not found in environment variables.");
 

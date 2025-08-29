@@ -361,4 +361,13 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Environment files containing sensitive information
+.env
+*.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
 /Gym.UI/.env

@@ -15,13 +15,15 @@ namespace Gym.Infrastructure.Repositores
     public class VisitRepository : GenericRepository<Visit>, IVisitRepository
     {
         private readonly MambelaDbContext _context;
+        private readonly IMapper _mapper;
 
-        public VisitRepository(MambelaDbContext context) : base(context)
+        public VisitRepository(MambelaDbContext context, IMapper mapper) : base(context)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<bool> AddVisitAsync(int traineeId)
+        public async Task<VisitResponseDTO?> AddVisitAsync(int traineeId)
         {
             // Use transaction to ensure data consistency
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -29,13 +31,29 @@ namespace Gym.Infrastructure.Repositores
             {
                 if (await IsTraineeCheckedInAsync(traineeId))
                 {
-                    return false; // Trainee has already checked in today
+                    return new VisitResponseDTO
+                    {
+                        TraineeName = "",
+                        MembershipType = "",
+                        RemainingSessions = null,
+                        IsActive = false,
+                        VisitDate = DateTime.Now,
+                        Message = "المتدرب قام بتسجيل الدخول اليوم بالفعل"
+                    };
                 }
 
                 // Check if trainee has active membership before creating visit
                 if (!await HasActiveMembershipAsync(traineeId))
                 {
-                    return false; // No active membership
+                    return new VisitResponseDTO
+                    {
+                        TraineeName = "",
+                        MembershipType = "",
+                        RemainingSessions = null,
+                        IsActive = false,
+                        VisitDate = DateTime.Now,
+                        Message = "لا يوجد اشتراك نشط"
+                    };
                 }
 
                 var visit = new Visit
@@ -46,24 +64,71 @@ namespace Gym.Infrastructure.Repositores
                 
                 await _context.Visits.AddAsync(visit);
 
-                if (!await DecrementRemainingSessionsAsync(traineeId))
+                // Get membership info before updating sessions
+                var membership = await _context.Memberships
+                    .Include(m => m.Trainee)
+                    .Where(m => m.TraineeId == traineeId && 
+                               m.EndDate >= DateOnly.FromDateTime(DateTime.Now) && 
+                               m.IsActive && 
+                               !m.IsDeleted)
+                    .OrderBy(m => m.EndDate)
+                    .FirstOrDefaultAsync();
+
+                if (membership == null)
                 {
                     await transaction.RollbackAsync();
-                    return false;
+                    return new VisitResponseDTO
+                    {
+                        TraineeName = "",
+                        MembershipType = "",
+                        RemainingSessions = null,
+                        IsActive = false,
+                        VisitDate = DateTime.Now,
+                        Message = "لم يتم العثور على اشتراك نشط"
+                    };
+                }
+
+                // Decrement sessions directly on the membership entity we already have
+                if ((membership.MembershipType == "محدود" || membership.MembershipType == "Limit") && membership.RemainingSessions.HasValue)
+                {
+                    membership.RemainingSessions -= 1;
+                    if (membership.RemainingSessions <= 0)
+                    {
+                        membership.IsActive = false; // Deactivate membership if no sessions left
+                    }
+                    membership.UpdatedAt = DateTime.Now;
+                    _context.Memberships.Update(membership);
                 }
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
-                return true;
+                
+                return new VisitResponseDTO
+                {
+                    TraineeName = membership.Trainee?.FullName ?? "",
+                    MembershipType = membership.MembershipType,
+                    RemainingSessions = membership.RemainingSessions,
+                    IsActive = membership.IsActive,
+                    VisitDate = visit.VisitDate,
+                    Message = "تم تسجيل الزيارة بنجاح"
+                };
             }
-            catch
+            catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return false;
+                return new VisitResponseDTO
+                {
+                    TraineeName = "",
+                    MembershipType = "",
+                    RemainingSessions = null,
+                    IsActive = false,
+                    VisitDate = DateTime.Now,
+                    Message = $"خطأ في تسجيل الزيارة: {ex.Message}"
+                };
             }
         }
 
-        public async Task<bool> DecrementRemainingSessionsAsync(int traineeId)
+        public async Task<bool> DecrementRemainingSessionsAsync(int traineeId, bool saveChanges = true)
         {
             var membership = await _context.Memberships
                 .Where(m => m.TraineeId == traineeId && 
@@ -85,10 +150,16 @@ namespace Gym.Infrastructure.Repositores
                 {
                     membership.IsActive = false; // Deactivate membership if no sessions left
                 }
+                membership.UpdatedAt = DateTime.Now;
                 _context.Memberships.Update(membership);
+                
+                if (saveChanges)
+                {
+                    await _context.SaveChangesAsync(); // Save changes to database only if requested
+                }
                 return true;
             }
-            else if (membership.MembershipType == "مفتوح")
+            else if (membership.MembershipType == "مفتوح" || membership.MembershipType == "Open")
             {
                 // For unlimited memberships, just check if it's still valid
                 // If we reach here, the membership is active and valid (checked above)
@@ -149,6 +220,61 @@ namespace Gym.Infrastructure.Repositores
                 _context.Memberships.UpdateRange(expiredMemberships);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<IReadOnlyList<VisitDTO>> GetAllVisitsAsync()
+        {
+            var visits = await _context.Visits
+                .Include(v => v.Trainee)
+                .Where(v => !v.IsDeleted)
+                .OrderByDescending(v => v.VisitDate)
+                .ToListAsync();
+            return _mapper.Map<IReadOnlyList<VisitDTO>>(visits);
+        }
+
+        public async Task<IReadOnlyList<VisitResponseDTO>> GetAllVisitsWithResponseAsync()
+        {
+            var visits = await _context.Visits
+                .Include(v => v.Trainee)
+                .ThenInclude(t => t.Memberships.Where(m => m.IsActive && !m.IsDeleted))
+                .Where(v => !v.IsDeleted)
+                .OrderByDescending(v => v.VisitDate)
+                .ToListAsync();
+
+            var visitResponses = new List<VisitResponseDTO>();
+
+            foreach (var visit in visits)
+            {
+                var activeMembership = visit.Trainee?.Memberships
+                    .Where(m => m.IsActive && !m.IsDeleted && m.EndDate >= DateOnly.FromDateTime(DateTime.Now))
+                    .OrderBy(m => m.EndDate)
+                    .FirstOrDefault();
+
+                var response = new VisitResponseDTO
+                {
+                    TraineeName = visit.Trainee?.FullName ?? "غير محدد",
+                    MembershipType = activeMembership?.MembershipType ?? "لا يوجد اشتراك",
+                    RemainingSessions = activeMembership?.RemainingSessions,
+                    IsActive = activeMembership?.IsActive ?? false,
+                    VisitDate = visit.VisitDate,
+                    Message = activeMembership != null ? "زيارة مسجلة" : "لا يوجد اشتراك نشط"
+                };
+
+                visitResponses.Add(response);
+            }
+
+            return visitResponses;
+        }
+
+        public async Task<IReadOnlyList<VisitDTO>> GetTodayVisits(DateOnly today)
+        {
+            var visits = await _context.Visits
+                .Include(v => v.Trainee)
+                .Where(v => DateOnly.FromDateTime(v.VisitDate) == today && !v.IsDeleted)
+                .OrderByDescending(v => v.VisitDate)
+                .ToListAsync();
+            return _mapper.Map<IReadOnlyList<VisitDTO>>(visits);
+
         }
     }
 }

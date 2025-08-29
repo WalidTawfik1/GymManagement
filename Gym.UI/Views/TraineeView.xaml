@@ -25,15 +25,18 @@
             
             <!-- Trainee List -->
             <Border Grid.Column="0" Background="White" BorderBrush="#BDC3C7" BorderThickness="1" CornerRadius="5" Margin="0,0,10,0">
-                <Grid Margin="15">
+                <Grid Margin="15" FlowDirection="{Binding FlowDirection}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                        <TextBlock Text="{Binding TraineesListLabel}" FontSize="18" FontWeight="Bold" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                        <Button Content="{Binding RefreshLabel}" Command="{Binding LoadTraineesCommand}" Padding="10,5" Background="#3498DB" Foreground="White" BorderThickness="0"/>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10" 
+                                HorizontalAlignment="{Binding RightAlignment}"
+                                FlowDirection="RightToLeft">
+                        <TextBlock Text="{Binding TraineesListLabel}" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <Button Content="{Binding RefreshLabel}" Command="{Binding LoadTraineesCommand}" 
+                                Padding="10,5" Background="#3498DB" Foreground="White" BorderThickness="0"/>
                     </StackPanel>
                     
                     <DataGrid Grid.Row="1" 
@@ -43,16 +46,75 @@
                               CanUserAddRows="False"
                               GridLinesVisibility="Horizontal"
                               HeadersVisibility="Column"
-                              Background="White">
+                              Background="White"
+                              FlowDirection="{Binding FlowDirection}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="{Binding DataContext.FullNameLabel, RelativeSource={RelativeSource AncestorType=UserControl}}" Binding="{Binding FullName}" Width="*" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="{Binding DataContext.PhoneNumberLabel, RelativeSource={RelativeSource AncestorType=UserControl}}" Binding="{Binding PhoneNumber}" Width="120" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="{Binding DataContext.JoinDateLabel, RelativeSource={RelativeSource AncestorType=UserControl}}" Binding="{Binding JoinDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="140" IsReadOnly="True"/>
-                            <DataGridTemplateColumn Header="{Binding DataContext.ActionsLabel, RelativeSource={RelativeSource AncestorType=UserControl}}" Width="150">
+                            <DataGridTextColumn Header="الرقم" Binding="{Binding Id}" Width="50" IsReadOnly="True">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextAlignment" Value="Right"/>
+                                        <Setter Property="Margin" Value="5"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="الاسم الكامل" Binding="{Binding FullName}" Width="*" IsReadOnly="True">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextAlignment" Value="Right"/>
+                                        <Setter Property="Margin" Value="5"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="رقم الهاتف" Binding="{Binding PhoneNumber}" Width="120" IsReadOnly="True">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextAlignment" Value="Right"/>
+                                        <Setter Property="Margin" Value="5"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="تاريخ الانضمام" Binding="{Binding JoinDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="140" IsReadOnly="True">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextAlignment" Value="Right"/>
+                                        <Setter Property="Margin" Value="5"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn Header="الإجراءات" Width="150">
+                                <DataGridTemplateColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                    </Style>
+                                </DataGridTemplateColumn.HeaderStyle>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" FlowDirection="LeftToRight">
                                             <Button Content="{Binding DataContext.EditLabel, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                     Command="{Binding DataContext.EditTraineeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                     CommandParameter="{Binding}"
@@ -72,7 +134,7 @@
             
             <!-- Add/Edit Form -->
             <Border Grid.Column="1" Background="White" BorderBrush="#BDC3C7" BorderThickness="1" CornerRadius="5">
-                <Grid Margin="15">
+                <Grid Margin="15" FlowDirection="{Binding FlowDirection}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -85,13 +147,13 @@
                     <TextBlock Grid.Row="0" Text="{Binding AddNewTraineeLabel}" FontSize="16" FontWeight="Bold" Margin="0,0,0,15" HorizontalAlignment="Center"/>
                     
                     <StackPanel Grid.Row="1" Margin="0,0,0,10">
-                        <TextBlock Text="{Binding FullNameLabel}" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <TextBox Text="{Binding FullName, UpdateSourceTrigger=PropertyChanged}" Padding="8" BorderBrush="#BDC3C7"/>
+                        <TextBlock Text="{Binding FullNameLabel}" FontWeight="Bold" Margin="0,0,0,5" HorizontalAlignment="Right"/>
+                        <TextBox Text="{Binding FullName, UpdateSourceTrigger=PropertyChanged}" Padding="8" BorderBrush="#BDC3C7" FlowDirection="{Binding FlowDirection}"/>
                     </StackPanel>
                     
                     <StackPanel Grid.Row="2" Margin="0,0,0,15">
-                        <TextBlock Text="{Binding PhoneNumberLabel}" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <TextBox Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" Padding="8" BorderBrush="#BDC3C7"/>
+                        <TextBlock Text="{Binding PhoneNumberLabel}" FontWeight="Bold" Margin="0,0,0,5" HorizontalAlignment="Right"/>
+                        <TextBox Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" Padding="8" BorderBrush="#BDC3C7" FlowDirection="LeftToRight"/>
                     </StackPanel>
                     
                     <StackPanel Grid.Row="3" Margin="0,0,0,10">

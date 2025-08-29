@@ -29,7 +29,7 @@ namespace Gym.Infrastructure.Repositores
 
             TraineeRepository = new TraineeRepository(_mapper, _context);
             MembershipRepository = new MembershipRepository(_context, _mapper);
-            VisitRepository = new VisitRepository(_context);
+            VisitRepository = new VisitRepository(_context, _mapper);
         }
 
 

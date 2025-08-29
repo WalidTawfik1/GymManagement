@@ -3,6 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Gym.UI">
     <Application.Resources>
-         
+        <local:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <local:BooleanToColorConverter x:Key="BooleanToColorConverter"/>
+        <local:BoolToStringConverter x:Key="BoolToStringConverter"/>
+        <local:MembershipTypeDisplayConverter x:Key="MembershipTypeDisplayConverter"/>
+        <local:BoolToFlowDirectionConverter x:Key="BoolToFlowDirectionConverter"/>
     </Application.Resources>
 </Application>
