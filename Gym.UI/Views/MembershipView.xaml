@@ -8,194 +8,235 @@
              d:DesignHeight="600" d:DesignWidth="900"
              FlowDirection="{Binding FlowDirection}">
     <UserControl.Resources>
-        <local:MembershipTypeDisplayConverter x:Key="MembershipTypeDisplayConverter"/>
-        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-        <local:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/ModernStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <local:MembershipTypeDisplayConverter x:Key="MembershipTypeDisplayConverter"/>
+        </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Margin="10">
+    <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <!-- Header -->
-        <Border Grid.Row="0" Background="#8E44AD" Padding="15" CornerRadius="5" Margin="0,0,0,10">
-            <TextBlock Text="{Binding MembershipManagementLabel}" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+        <!-- Modern Header -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryGradientBrush}" 
+                Style="{StaticResource ModernCardStyle}" Margin="0,0,0,24">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Width="32" Height="32" Fill="White" Opacity="0.9" Margin="0,0,16,0"/>
+                    <TextBlock Text="{Binding MembershipManagementLabel}" 
+                               FontSize="24" FontWeight="Bold" 
+                               Foreground="White" VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Border Background="White" CornerRadius="20" Padding="12,8" Opacity="0.9">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="8" Height="8" Fill="{StaticResource PrimaryBrush}" Margin="0,0,8,0"/>
+                            <TextBlock Text="إدارة العضويات" FontSize="12" FontWeight="SemiBold" 
+                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
         </Border>
         
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             
-            <!-- Membership List -->
-            <Border Grid.Column="0" Background="White" BorderBrush="#BDC3C7" BorderThickness="1" CornerRadius="5" Margin="0,0,10,0">
-                <Grid Margin="15" FlowDirection="{Binding FlowDirection}">
+            <!-- Membership List Card -->
+            <Border Grid.Column="0" Style="{StaticResource ModernCardStyle}">
+                <Grid FlowDirection="{Binding FlowDirection}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10" 
-                                HorizontalAlignment="{Binding RightAlignment}"
-                                FlowDirection="RightToLeft">
-                        <TextBlock Text="قائمة العضويات" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        <Button Content="تحديث" Command="{Binding LoadMembershipsCommand}" 
-                                Padding="10,5" Background="#8E44AD" Foreground="White" BorderThickness="0"/>
-                    </StackPanel>
+                    <!-- List Header -->
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="20" Height="20" Fill="{StaticResource PrimaryBrush}" Margin="0,0,12,0"/>
+                            <TextBlock Text="قائمة العضويات" FontSize="18" FontWeight="Bold" 
+                                       Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <Button Grid.Column="1" Content="تحديث" Command="{Binding LoadMembershipsCommand}" 
+                                Style="{StaticResource ModernButtonStyle}" Background="{StaticResource InfoBrush}"
+                                Padding="16,8" FontSize="12">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" 
+                                            CornerRadius="20" 
+                                            Padding="{TemplateBinding Padding}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse Width="12" Height="12" Fill="White" Margin="0,0,6,0"/>
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#0891B2"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
                     
+                    <!-- Modern DataGrid -->
                     <DataGrid Grid.Row="1" 
                               ItemsSource="{Binding Memberships}" 
                               SelectedItem="{Binding SelectedMembership}"
+                              Style="{StaticResource ModernDataGridStyle}"
                               AutoGenerateColumns="False" 
                               CanUserAddRows="False"
-                              GridLinesVisibility="Horizontal"
-                              HeadersVisibility="Column"
-                              Background="White"
                               FlowDirection="{Binding FlowDirection}">
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridHeaderStyle}"/>
+                        </DataGrid.Resources>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="الرقم" Binding="{Binding Id}" Width="50" IsReadOnly="True">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn Header="الرقم" Binding="{Binding Id}" Width="60" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="TextAlignment" Value="Right"/>
-                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="TextAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn Header="المتدرب" Binding="{Binding TraineeName}" Width="120" IsReadOnly="True">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
+                            
+                            <DataGridTextColumn Header="المتدرب" Binding="{Binding TraineeName}" Width="140" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Right"/>
-                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Foreground" Value="#1F2937"/>
+                                        <Setter Property="Margin" Value="16,0"/>
+                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn Header="النوع" Binding="{Binding MembershipType, Converter={StaticResource MembershipTypeDisplayConverter}}" Width="140" IsReadOnly="True">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
+                            
+                            <DataGridTextColumn Header="النوع" Binding="{Binding MembershipType, Converter={StaticResource MembershipTypeDisplayConverter}}" Width="120" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="TextAlignment" Value="Right"/>
-                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="TextAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="FontWeight" Value="Medium"/>
+                                        <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn Header="البداية" Binding="{Binding StartDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="90" IsReadOnly="True">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
+                            
+                            <DataGridTextColumn Header="البداية" Binding="{Binding StartDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="100" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="TextAlignment" Value="Right"/>
-                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="TextAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn Header="النهاية" Binding="{Binding EndDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="90" IsReadOnly="True">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
+                            
+                            <DataGridTextColumn Header="النهاية" Binding="{Binding EndDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="100" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="TextAlignment" Value="Right"/>
-                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="TextAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn Header="الحصص" Binding="{Binding RemainingSessions}" Width="70" IsReadOnly="True">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
+                            
+                            <DataGridTextColumn Header="الحصص" Binding="{Binding RemainingSessions}" Width="80" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="TextAlignment" Value="Right"/>
-                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="TextAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTemplateColumn Header="نشط" Width="80">
-                                <DataGridTemplateColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
-                                    </Style>
-                                </DataGridTemplateColumn.HeaderStyle>
+                            
+                            <DataGridTemplateColumn Header="الحالة" Width="80">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <CheckBox IsChecked="{Binding IsActive}" IsEnabled="False" 
-                                                  HorizontalAlignment="Center" FlowDirection="LeftToRight">
-                                            <CheckBox.Template>
-                                                <ControlTemplate TargetType="{x:Type CheckBox}">
-                                                    <Border x:Name="border" BorderBrush="#BDC3C7" 
-                                                            BorderThickness="1" Background="White" 
-                                                            Width="16" Height="16" VerticalAlignment="Center"
-                                                            HorizontalAlignment="Center">
-                                                        <Path x:Name="checkMark" 
-                                                              Data="M 0 2 L 0 4.8 L 4 8.8 L 12 0.8 L 12 0 L 4.5 7.5 Z"
-                                                              Fill="White" Visibility="Collapsed" 
-                                                              Stretch="Fill" Margin="2"/>
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsChecked" Value="True">
-                                                            <Setter TargetName="checkMark" Property="Visibility" Value="Visible"/>
-                                                            <Setter TargetName="border" Property="Background" Value="#27AE60"/>
-                                                            <Setter TargetName="border" Property="BorderBrush" Value="#27AE60"/>
-                                                        </Trigger>
-                                                        <Trigger Property="IsChecked" Value="False">
-                                                            <Setter TargetName="border" Property="Background" Value="White"/>
-                                                            <Setter TargetName="border" Property="BorderBrush" Value="#BDC3C7"/>
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </CheckBox.Template>
-                                        </CheckBox>
+                                        <Border CornerRadius="12" Padding="8,4" HorizontalAlignment="Center"
+                                                Background="{Binding IsActive, Converter={x:Static local:BooleanToColorConverter.Instance}}">
+                                            <TextBlock Text="{Binding IsActive, Converter={x:Static local:BooleanToStatusTextConverter.Instance}}" 
+                                                       Foreground="White" FontSize="11" FontWeight="SemiBold" TextAlignment="Center"/>
+                                        </Border>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="الإجراءات" Width="150">
-                                <DataGridTemplateColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
-                                    </Style>
-                                </DataGridTemplateColumn.HeaderStyle>
+                            
+                            <DataGridTemplateColumn Header="الإجراءات" Width="120">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" FlowDirection="LeftToRight">
-                                            <Button Content="تعديل" 
-                                                    Command="{Binding DataContext.EditMembershipCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Command="{Binding DataContext.EditMembershipCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                     CommandParameter="{Binding}"
-                                                    Margin="2" Padding="8,3" Background="#F39C12" Foreground="White" BorderThickness="0"/>
-                                            <Button Content="حذف" 
-                                                    Command="{Binding DataContext.DeleteMembershipCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                    Style="{StaticResource AccentButtonStyle}"
+                                                    Padding="8,4" Margin="2" FontSize="11">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border Background="{StaticResource AccentBrush}" 
+                                                                CornerRadius="6" 
+                                                                Padding="{TemplateBinding Padding}">
+                                                            <TextBlock Text="تعديل" Foreground="White" 
+                                                                       FontSize="11" FontWeight="SemiBold" 
+                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="#D97706"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                            
+                                            <Button Command="{Binding DataContext.DeleteMembershipCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                     CommandParameter="{Binding}"
-                                                    Margin="2" Padding="8,3" Background="#E74C3C" Foreground="White" BorderThickness="0"/>
+                                                    Style="{StaticResource DangerButtonStyle}"
+                                                    Padding="8,4" Margin="2" FontSize="11">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border Background="{StaticResource DangerBrush}" 
+                                                                CornerRadius="6" 
+                                                                Padding="{TemplateBinding Padding}">
+                                                            <TextBlock Text="حذف" Foreground="White" 
+                                                                       FontSize="11" FontWeight="SemiBold" 
+                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="#DC2626"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -205,144 +246,111 @@
                 </Grid>
             </Border>
             
-            <!-- Add/Edit Form -->
-            <Border Grid.Column="1" Background="White" BorderBrush="#BDC3C7" BorderThickness="1" CornerRadius="5">
-                <Grid Margin="15" FlowDirection="{Binding FlowDirection}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+            <!-- Add/Edit Form Card -->
+            <Border Grid.Column="2" Style="{StaticResource ModernCardStyle}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12,0,24,0">
+                    <Grid FlowDirection="{Binding FlowDirection}" Margin="0,0,0,16">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
                     
-                    <TextBlock Grid.Row="0" Text="إضافة عضوية جديدة" FontSize="16" FontWeight="Bold" 
-                               Margin="0,0,0,15" 
-                               HorizontalAlignment="{Binding CenterAlignment}"
-                               FlowDirection="{Binding FlowDirection}"/>
-                    
-                    <StackPanel Grid.Row="1" Margin="0,0,0,10" FlowDirection="{Binding FlowDirection}">
-                        <TextBlock Text="رقم المتدرب:" FontWeight="Bold" Margin="0,0,0,5" 
-                                   HorizontalAlignment="{Binding RightAlignment}"/>
+                        <!-- Form Header -->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,24" HorizontalAlignment="Center">
+                            <Ellipse Width="24" Height="24" Fill="#6366F1" Margin="0,0,12,0"/>
+                            <TextBlock Text="إضافة عضوية جديدة" FontSize="18" FontWeight="Bold" 
+                                       Foreground="#1F2937" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    <!-- Trainee ID Input (Add Mode) / Trainee Combo (Edit Mode) -->
+                    <StackPanel Grid.Row="1" Margin="0,0,0,16">
+                        <TextBlock Text="رقم المتدرب:" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="#1F2937" Margin="0,0,0,8"/>
                         <TextBox Text="{Binding TraineeIdInput, UpdateSourceTrigger=PropertyChanged}" 
-                                 Padding="8" BorderBrush="#BDC3C7"
-                                 TextAlignment="{Binding TextAlignment}"
-                                 FlowDirection="{Binding FlowDirection}"
+                                 Style="{StaticResource ModernTextBoxStyle}"
                                  Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                         <ComboBox ItemsSource="{Binding Trainees}" 
-                                  SelectedValue="{Binding SelectedTraineeId}"
+                                  SelectedValue="{Binding SelectedTraineeId, Mode=TwoWay}"
                                   SelectedValuePath="Id"
                                   DisplayMemberPath="FullName"
-                                  Padding="8"
-                                  FlowDirection="{Binding FlowDirection}"
-                                  Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                  Style="{StaticResource ModernComboBoxStyle}"
+                                  Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     </StackPanel>
                     
-                    <StackPanel Grid.Row="2" Margin="0,0,0,15" FlowDirection="{Binding FlowDirection}">
-                        <TextBlock Text="نوع العضوية:" FontWeight="Bold" Margin="0,0,0,5" 
-                                   HorizontalAlignment="{Binding RightAlignment}"/>
+                    <!-- Membership Type -->
+                    <StackPanel Grid.Row="2" Margin="0,0,0,16">
+                        <TextBlock Text="نوع العضوية:" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="#1F2937" Margin="0,0,0,8"/>
                         <ComboBox ItemsSource="{Binding MembershipTypes}" 
-                                  SelectedItem="{Binding MembershipType}"
-                                  Padding="8"
-                                  FlowDirection="{Binding FlowDirection}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Converter={StaticResource MembershipTypeDisplayConverter}}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
+                                  SelectedItem="{Binding MembershipType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Style="{StaticResource ModernComboBoxStyle}"/>
                     </StackPanel>
                     
-                    <StackPanel Grid.Row="3" Margin="0,0,0,10" 
-                                FlowDirection="{Binding FlowDirection}"
-                                Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <TextBlock Text="تاريخ البداية:" FontWeight="Bold" Margin="0,0,0,5" 
-                                   HorizontalAlignment="{Binding RightAlignment}"/>
+                    <!-- Start Date (Edit Mode Only) -->
+                    <StackPanel Grid.Row="3" Margin="0,0,0,16" 
+                                Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Text="تاريخ البداية:" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="#1F2937" Margin="0,0,0,8"/>
                         <TextBox Text="{Binding StartDate, StringFormat='{}{0:dd/MM/yyyy}'}" 
-                                 Padding="8" BorderBrush="#BDC3C7"
-                                 TextAlignment="{Binding TextAlignment}"
-                                 FlowDirection="{Binding FlowDirection}"/>
+                                 Style="{StaticResource ModernTextBoxStyle}"/>
                     </StackPanel>
                     
-                    <StackPanel Grid.Row="4" Margin="0,0,0,10" 
-                                FlowDirection="{Binding FlowDirection}"
-                                Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <TextBlock Text="تاريخ النهاية:" FontWeight="Bold" Margin="0,0,0,5" 
-                                   HorizontalAlignment="{Binding RightAlignment}"/>
+                    <!-- End Date (Edit Mode Only) -->
+                    <StackPanel Grid.Row="4" Margin="0,0,0,16" 
+                                Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Text="تاريخ النهاية:" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="#1F2937" Margin="0,0,0,8"/>
                         <TextBox Text="{Binding EndDate, StringFormat='{}{0:dd/MM/yyyy}'}" 
-                                 Padding="8" BorderBrush="#BDC3C7"
-                                 TextAlignment="{Binding TextAlignment}"
-                                 FlowDirection="{Binding FlowDirection}"/>
+                                 Style="{StaticResource ModernTextBoxStyle}"/>
                     </StackPanel>
                     
-                    <StackPanel Grid.Row="5" Margin="0,0,0,10" 
-                                FlowDirection="{Binding FlowDirection}"
-                                Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <TextBlock Text="الحصص المتبقية:" FontWeight="Bold" Margin="0,0,0,5" 
-                                   HorizontalAlignment="{Binding RightAlignment}"/>
+                    <!-- Remaining Sessions (Edit Mode Only) -->
+                    <StackPanel Grid.Row="5" Margin="0,0,0,16" 
+                                Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Text="الحصص المتبقية:" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="#1F2937" Margin="0,0,0,8"/>
                         <TextBox Text="{Binding RemainingSessions, UpdateSourceTrigger=PropertyChanged}" 
-                                 Padding="8" BorderBrush="#BDC3C7"
-                                 TextAlignment="{Binding TextAlignment}"
-                                 FlowDirection="{Binding FlowDirection}"/>
+                                 Style="{StaticResource ModernTextBoxStyle}"/>
                     </StackPanel>
                     
-                    <StackPanel Grid.Row="6" Margin="0,0,0,15" 
-                                FlowDirection="{Binding FlowDirection}"
-                                Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <CheckBox IsChecked="{Binding IsActive}" FontWeight="Bold" 
-                                  HorizontalAlignment="{Binding RightAlignment}"
-                                  FlowDirection="LeftToRight">
-                            <CheckBox.Template>
-                                <ControlTemplate TargetType="{x:Type CheckBox}">
-                                    <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
-                                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" 
-                                                BorderThickness="{TemplateBinding BorderThickness}" 
-                                                Background="{TemplateBinding Background}" 
-                                                Width="16" Height="16" VerticalAlignment="Center">
-                                            <Path x:Name="checkMark" 
-                                                  Data="M 0 2 L 0 4.8 L 4 8.8 L 12 0.8 L 12 0 L 4.5 7.5 Z"
-                                                  Fill="White" Visibility="Collapsed" 
-                                                  Stretch="Fill" Margin="2"/>
-                                        </Border>
-                                        <ContentPresenter Margin="5,0,0,0" VerticalAlignment="Center" 
-                                                          Content="نشط" FlowDirection="RightToLeft"/>
-                                    </StackPanel>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsChecked" Value="True">
-                                            <Setter TargetName="checkMark" Property="Visibility" Value="Visible"/>
-                                            <Setter TargetName="border" Property="Background" Value="#27AE60"/>
-                                        </Trigger>
-                                        <Trigger Property="IsChecked" Value="False">
-                                            <Setter TargetName="border" Property="Background" Value="White"/>
-                                            <Setter TargetName="border" Property="BorderBrush" Value="#BDC3C7"/>
-                                            <Setter TargetName="border" Property="BorderThickness" Value="1"/>
-                                        </Trigger>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="border" Property="BorderBrush" Value="#8E44AD"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </CheckBox.Template>
-                        </CheckBox>
+                    <!-- Active Status (Edit Mode Only) -->
+                    <StackPanel Grid.Row="6" Margin="0,0,0,20" 
+                                Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <CheckBox IsChecked="{Binding IsActive}" Style="{StaticResource ModernCheckBoxStyle}"
+                                  Content="نشط" FontWeight="SemiBold" FontSize="14"/>
                     </StackPanel>
                     
-                    <StackPanel Grid.Row="7" Margin="0,0,0,10" FlowDirection="LeftToRight">
+                    <!-- Action Buttons -->
+                    <StackPanel Grid.Row="7" Margin="0,0,0,16">
                         <Button Content="إضافة عضوية" Command="{Binding AddMembershipCommand}" 
+                                Style="{StaticResource SecondaryButtonStyle}"
                                 Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVisibilityConverter}}"
-                                Padding="15,8" Margin="0,0,0,5" Background="#27AE60" Foreground="White" BorderThickness="0"/>
+                                Padding="20,12" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                        
                         <Button Content="تحديث عضوية" Command="{Binding UpdateMembershipCommand}" 
-                                Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}"
-                                Padding="15,8" Margin="0,0,0,5" Background="#F39C12" Foreground="White" BorderThickness="0"/>
+                                Style="{StaticResource AccentButtonStyle}"
+                                Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                Padding="20,12" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                        
                         <Button Content="مسح النموذج" Command="{Binding ClearFormCommand}" 
-                                Padding="15,8" Background="#95A5A6" Foreground="White" BorderThickness="0"/>
+                                Background="{StaticResource TextMutedBrush}" Foreground="White"
+                                Style="{StaticResource ModernButtonStyle}"
+                                Padding="20,12" FontSize="14" FontWeight="SemiBold"/>
                     </StackPanel>
                     
-                    <ProgressBar Grid.Row="8" IsIndeterminate="{Binding IsBusy}" Height="4" Margin="0,10"/>
-                </Grid>
+                    <!-- Progress Bar -->
+                    <ProgressBar Grid.Row="8" IsIndeterminate="{Binding IsBusy}" 
+                                 Style="{StaticResource ModernProgressBarStyle}" 
+                                 Margin="0,16,0,0"/>
+                    </Grid>
+                </ScrollViewer>
             </Border>
         </Grid>
     </Grid>

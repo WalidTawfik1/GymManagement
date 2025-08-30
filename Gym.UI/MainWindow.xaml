@@ -8,65 +8,149 @@
         xmlns:viewModels="clr-namespace:Gym.UI.ViewModels"
         mc:Ignorable="d"
         Title="{Binding Title}" Height="750" Width="1200" WindowState="Maximized"
+        Background="#F8FAFC"
         FlowDirection="{Binding FlowDirection}">
     <Window.Resources>
-        <local:MembershipTypeDisplayConverter x:Key="MembershipTypeDisplayConverter"/>
-        <local:BoolToFlowDirectionConverter x:Key="BoolToFlowDirectionConverter"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/ModernStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <local:MembershipTypeDisplayConverter x:Key="MembershipTypeDisplayConverter"/>
+            <local:BoolToFlowDirectionConverter x:Key="BoolToFlowDirectionConverter"/>
+        </ResourceDictionary>
     </Window.Resources>
-    <Grid>
+    <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <!-- Language Switch Bar -->
-        <Border Grid.Row="0" Background="#1ABC9C" Padding="10">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                <TextBlock Text="{Binding LanguageLabel}" 
-                           Foreground="White" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <Button Content="{Binding ArabicLabel}" 
-                        Command="{Binding SetLanguageCommand}" CommandParameter="ar"
-                        Padding="15,5" Margin="5,0" Background="#16A085" Foreground="White" 
-                        BorderThickness="0" FontSize="12" FontWeight="Bold"/>
-                <Button Content="{Binding EnglishLabel}" 
-                        Command="{Binding SetLanguageCommand}" CommandParameter="en"
-                        Padding="15,5" Margin="5,0" Background="#16A085" Foreground="White" 
-                        BorderThickness="0" FontSize="12" FontWeight="Bold"/>
+        <!-- Modern Header with Language Controls -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryGradientBrush}" Padding="24,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- App Title -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Width="32" Height="32" Fill="White" Opacity="0.9" Margin="0,0,12,0"/>
+                    <TextBlock Text="Mambela Gym"
+                               FontSize="20" FontWeight="Bold" 
+                               Foreground="White" VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <!-- Language Controls -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding LanguageLabel}" 
+                               Foreground="White" FontWeight="SemiBold" 
+                               VerticalAlignment="Center" Margin="0,0,16,0" Opacity="0.9"/>
+                    <Border Background="White" CornerRadius="20" Padding="4">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{Binding ArabicLabel}" 
+                                    Command="{Binding SetLanguageCommand}" CommandParameter="ar"
+                                    Style="{StaticResource ModernButtonStyle}"
+                                    Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}"
+                                    Padding="16,8" Margin="2" FontSize="12" FontWeight="SemiBold">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" 
+                                                CornerRadius="16" 
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#F1F5F9"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                            <Button Content="{Binding EnglishLabel}" 
+                                    Command="{Binding SetLanguageCommand}" CommandParameter="en"
+                                    Style="{StaticResource ModernButtonStyle}"
+                                    Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}"
+                                    Padding="16,8" Margin="2" FontSize="12" FontWeight="SemiBold">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" 
+                                                CornerRadius="16" 
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#F1F5F9"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Modern Navigation Bar -->
+        <Border Grid.Row="1" Background="White" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="0,0,0,1">
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.05" Color="#000000"/>
+            </Border.Effect>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="24,16">
+                <!-- Trainees Button -->
+                <Button Command="{Binding ShowTraineesCommand}" 
+                        Style="{StaticResource ModernButtonStyle}"
+                        Background="{StaticResource SecondaryGradientBrush}"
+                        Margin="8,0" Padding="24,12">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="20" Height="20" Fill="White" Opacity="0.9" Margin="0,0,8,0"/>
+                        <TextBlock Text="{Binding TraineesLabel}" FontSize="14" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
+                
+                <!-- Memberships Button -->
+                <Button Command="{Binding ShowMembershipsCommand}" 
+                        Style="{StaticResource ModernButtonStyle}"
+                        Background="{StaticResource PrimaryGradientBrush}"
+                        Margin="8,0" Padding="24,12">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="20" Height="20" Fill="White" Opacity="0.9" Margin="0,0,8,0"/>
+                        <TextBlock Text="{Binding MembershipsLabel}" FontSize="14" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
+                
+                <!-- Visits Button -->
+                <Button Command="{Binding ShowVisitsCommand}" 
+                        Style="{StaticResource ModernButtonStyle}"
+                        Background="{StaticResource AccentGradientBrush}"
+                        Margin="8,0" Padding="24,12">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="20" Height="20" Fill="White" Opacity="0.9" Margin="0,0,8,0"/>
+                        <TextBlock Text="{Binding VisitsLabel}" FontSize="14" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Border>
         
-        <!-- Navigation Bar -->
-        <Border Grid.Row="1" Background="#34495E" Padding="10">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="{Binding TraineesLabel}" 
-                        Command="{Binding ShowTraineesCommand}" 
-                        Padding="20,10" Margin="5" Background="#2C3E50" Foreground="White" 
-                        BorderThickness="0" FontSize="14" FontWeight="Bold"/>
-                <Button Content="{Binding MembershipsLabel}" 
-                        Command="{Binding ShowMembershipsCommand}" 
-                        Padding="20,10" Margin="5" Background="#8E44AD" Foreground="White" 
-                        BorderThickness="0" FontSize="14" FontWeight="Bold"/>
-                <Button Content="{Binding VisitsLabel}" 
-                        Command="{Binding ShowVisitsCommand}" 
-                        Padding="20,10" Margin="5" Background="#E67E22" Foreground="White" 
-                        BorderThickness="0" FontSize="14" FontWeight="Bold"/>
-            </StackPanel>
+        <!-- Content Area with Modern Layout -->
+        <Border Grid.Row="2" Background="{StaticResource BackgroundBrush}" Padding="24">
+            <ContentControl Content="{Binding CurrentViewModel}">
+                <ContentControl.Resources>
+                    <DataTemplate DataType="{x:Type viewModels:TraineeViewModel}">
+                        <views:TraineeView/>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:MembershipViewModel}">
+                        <views:MembershipView/>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:VisitViewModel}">
+                        <views:VisitView/>
+                    </DataTemplate>
+                </ContentControl.Resources>
+            </ContentControl>
         </Border>
-        
-        <!-- Content Area -->
-        <ContentControl Grid.Row="2" Content="{Binding CurrentViewModel}">
-            <ContentControl.Resources>
-                <DataTemplate DataType="{x:Type viewModels:TraineeViewModel}">
-                    <views:TraineeView/>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type viewModels:MembershipViewModel}">
-                    <views:MembershipView/>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type viewModels:VisitViewModel}">
-                    <views:VisitView/>
-                </DataTemplate>
-            </ContentControl.Resources>
-        </ContentControl>
     </Grid>
 </Window>

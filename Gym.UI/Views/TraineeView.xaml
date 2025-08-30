@@ -6,123 +6,201 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="900"
              FlowDirection="{Binding FlowDirection}">
-    <Grid Margin="10">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/ModernStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <!-- Header -->
-        <Border Grid.Row="0" Background="#2C3E50" Padding="15" CornerRadius="5" Margin="0,0,0,10">
-            <TextBlock Text="{Binding TraineeManagementLabel}" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+        <!-- Modern Header -->
+        <Border Grid.Row="0" Background="{StaticResource SecondaryGradientBrush}" 
+                Style="{StaticResource ModernCardStyle}" Margin="0,0,0,24">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Width="32" Height="32" Fill="White" Opacity="0.9" Margin="0,0,16,0"/>
+                    <TextBlock Text="{Binding TraineeManagementLabel}" 
+                               FontSize="24" FontWeight="Bold" 
+                               Foreground="White" VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Border Background="White" CornerRadius="20" Padding="12,8" Opacity="0.9">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="8" Height="8" Fill="{StaticResource SecondaryBrush}" Margin="0,0,8,0"/>
+                            <TextBlock Text="إدارة المتدربين" FontSize="12" FontWeight="SemiBold" 
+                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
         </Border>
         
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             
-            <!-- Trainee List -->
-            <Border Grid.Column="0" Background="White" BorderBrush="#BDC3C7" BorderThickness="1" CornerRadius="5" Margin="0,0,10,0">
-                <Grid Margin="15" FlowDirection="{Binding FlowDirection}">
+            <!-- Trainee List Card -->
+            <Border Grid.Column="0" Style="{StaticResource ModernCardStyle}">
+                <Grid FlowDirection="{Binding FlowDirection}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10" 
-                                HorizontalAlignment="{Binding RightAlignment}"
-                                FlowDirection="RightToLeft">
-                        <TextBlock Text="{Binding TraineesListLabel}" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        <Button Content="{Binding RefreshLabel}" Command="{Binding LoadTraineesCommand}" 
-                                Padding="10,5" Background="#3498DB" Foreground="White" BorderThickness="0"/>
-                    </StackPanel>
+                    <!-- List Header -->
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="20" Height="20" Fill="{StaticResource SecondaryBrush}" Margin="0,0,12,0"/>
+                            <TextBlock Text="{Binding TraineesListLabel}" FontSize="18" FontWeight="Bold" 
+                                       Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <Button Grid.Column="1" Content="{Binding RefreshLabel}" Command="{Binding LoadTraineesCommand}" 
+                                Style="{StaticResource ModernButtonStyle}" Background="{StaticResource InfoBrush}"
+                                Padding="16,8" FontSize="12">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" 
+                                            CornerRadius="20" 
+                                            Padding="{TemplateBinding Padding}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse Width="12" Height="12" Fill="White" Margin="0,0,6,0"/>
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#0891B2"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </Grid>
                     
+                    <!-- Modern DataGrid -->
                     <DataGrid Grid.Row="1" 
                               ItemsSource="{Binding Trainees}" 
                               SelectedItem="{Binding SelectedTrainee}"
+                              Style="{StaticResource ModernDataGridStyle}"
                               AutoGenerateColumns="False" 
                               CanUserAddRows="False"
-                              GridLinesVisibility="Horizontal"
-                              HeadersVisibility="Column"
-                              Background="White"
                               FlowDirection="{Binding FlowDirection}">
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridHeaderStyle}"/>
+                        </DataGrid.Resources>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="الرقم" Binding="{Binding Id}" Width="50" IsReadOnly="True">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
+                            <DataGridTextColumn Header="الرقم" Binding="{Binding Id}" Width="60" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="TextAlignment" Value="Right"/>
-                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="TextAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
+                            
                             <DataGridTextColumn Header="الاسم الكامل" Binding="{Binding FullName}" Width="*" IsReadOnly="True">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Right"/>
-                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Foreground" Value="#1F2937"/>
+                                        <Setter Property="Margin" Value="16,0"/>
+                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn Header="رقم الهاتف" Binding="{Binding PhoneNumber}" Width="120" IsReadOnly="True">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
+                            
+                            <DataGridTextColumn Header="رقم الهاتف" Binding="{Binding PhoneNumber}" Width="140" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="TextAlignment" Value="Right"/>
-                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="TextAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="FontWeight" Value="Medium"/>
+                                        <Setter Property="Foreground" Value="#6B7280"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn Header="تاريخ الانضمام" Binding="{Binding JoinDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="140" IsReadOnly="True">
-                                <DataGridTextColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
-                                    </Style>
-                                </DataGridTextColumn.HeaderStyle>
+                            
+                            <DataGridTextColumn Header="تاريخ الانضمام" Binding="{Binding JoinDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="120" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="TextAlignment" Value="Right"/>
-                                        <Setter Property="Margin" Value="5"/>
+                                        <Setter Property="TextAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+                                        <Setter Property="FontWeight" Value="Medium"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTemplateColumn Header="الإجراءات" Width="150">
-                                <DataGridTemplateColumn.HeaderStyle>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
-                                    </Style>
-                                </DataGridTemplateColumn.HeaderStyle>
+                            
+                            <DataGridTemplateColumn Header="الإجراءات" Width="140">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" FlowDirection="LeftToRight">
-                                            <Button Content="{Binding DataContext.EditLabel, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                                    Command="{Binding DataContext.EditTraineeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Command="{Binding DataContext.EditTraineeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                     CommandParameter="{Binding}"
-                                                    Margin="2" Padding="8,3" Background="#F39C12" Foreground="White" BorderThickness="0"/>
-                                            <Button Content="{Binding DataContext.DeleteLabel, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                                    Command="{Binding DataContext.DeleteTraineeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                    Content="{Binding DataContext.EditLabel, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    Style="{StaticResource AccentButtonStyle}"
+                                                    Padding="8,4" Margin="2" FontSize="11">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border Background="{StaticResource AccentBrush}" 
+                                                                CornerRadius="6" 
+                                                                Padding="{TemplateBinding Padding}">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="#D97706"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                            
+                                            <Button Command="{Binding DataContext.DeleteTraineeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                     CommandParameter="{Binding}"
-                                                    Margin="2" Padding="8,3" Background="#E74C3C" Foreground="White" BorderThickness="0"/>
+                                                    Content="{Binding DataContext.DeleteLabel, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    Style="{StaticResource DangerButtonStyle}"
+                                                    Padding="8,4" Margin="2" FontSize="11">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border Background="{StaticResource DangerBrush}" 
+                                                                CornerRadius="6" 
+                                                                Padding="{TemplateBinding Padding}">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="#DC2626"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -132,9 +210,9 @@
                 </Grid>
             </Border>
             
-            <!-- Add/Edit Form -->
-            <Border Grid.Column="1" Background="White" BorderBrush="#BDC3C7" BorderThickness="1" CornerRadius="5">
-                <Grid Margin="15" FlowDirection="{Binding FlowDirection}">
+            <!-- Add/Edit Form Card -->
+            <Border Grid.Column="2" Style="{StaticResource ModernCardStyle}">
+                <Grid FlowDirection="{Binding FlowDirection}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -144,28 +222,49 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
-                    <TextBlock Grid.Row="0" Text="{Binding AddNewTraineeLabel}" FontSize="16" FontWeight="Bold" Margin="0,0,0,15" HorizontalAlignment="Center"/>
-                    
-                    <StackPanel Grid.Row="1" Margin="0,0,0,10">
-                        <TextBlock Text="{Binding FullNameLabel}" FontWeight="Bold" Margin="0,0,0,5" HorizontalAlignment="Right"/>
-                        <TextBox Text="{Binding FullName, UpdateSourceTrigger=PropertyChanged}" Padding="8" BorderBrush="#BDC3C7" FlowDirection="{Binding FlowDirection}"/>
+                    <!-- Form Header -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,24" HorizontalAlignment="Center">
+                        <Ellipse Width="24" Height="24" Fill="{StaticResource SecondaryBrush}" Margin="0,0,12,0"/>
+                        <TextBlock Text="{Binding AddNewTraineeLabel}" FontSize="18" FontWeight="Bold" 
+                                   Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     </StackPanel>
                     
-                    <StackPanel Grid.Row="2" Margin="0,0,0,15">
-                        <TextBlock Text="{Binding PhoneNumberLabel}" FontWeight="Bold" Margin="0,0,0,5" HorizontalAlignment="Right"/>
-                        <TextBox Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" Padding="8" BorderBrush="#BDC3C7" FlowDirection="LeftToRight"/>
+                    <!-- Full Name Input -->
+                    <StackPanel Grid.Row="1" Margin="0,0,0,16">
+                        <TextBlock Text="{Binding FullNameLabel}" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding FullName, UpdateSourceTrigger=PropertyChanged}" 
+                                 Style="{StaticResource ModernTextBoxStyle}"/>
                     </StackPanel>
                     
-                    <StackPanel Grid.Row="3" Margin="0,0,0,10">
+                    <!-- Phone Number Input -->
+                    <StackPanel Grid.Row="2" Margin="0,0,0,20">
+                        <TextBlock Text="{Binding PhoneNumberLabel}" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" 
+                                 Style="{StaticResource ModernTextBoxStyle}"/>
+                    </StackPanel>
+                    
+                    <!-- Action Buttons -->
+                    <StackPanel Grid.Row="3" Margin="0,0,0,16">
                         <Button Content="{Binding AddTraineeLabel}" Command="{Binding AddTraineeCommand}" 
-                                Padding="15,8" Margin="0,0,0,5" Background="#27AE60" Foreground="White" BorderThickness="0"/>
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Padding="20,12" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                        
                         <Button Content="{Binding UpdateTraineeLabel}" Command="{Binding UpdateTraineeCommand}" 
-                                Padding="15,8" Margin="0,0,0,5" Background="#F39C12" Foreground="White" BorderThickness="0"/>
+                                Style="{StaticResource AccentButtonStyle}"
+                                Padding="20,12" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                        
                         <Button Content="{Binding ClearFormLabel}" Command="{Binding ClearFormCommand}" 
-                                Padding="15,8" Background="#95A5A6" Foreground="White" BorderThickness="0"/>
+                                Background="{StaticResource TextMutedBrush}" Foreground="White"
+                                Style="{StaticResource ModernButtonStyle}"
+                                Padding="20,12" FontSize="14" FontWeight="SemiBold"/>
                     </StackPanel>
                     
-                    <ProgressBar Grid.Row="4" IsIndeterminate="{Binding IsBusy}" Height="4" Margin="0,10"/>
+                    <!-- Progress Bar -->
+                    <ProgressBar Grid.Row="4" IsIndeterminate="{Binding IsBusy}" 
+                                 Style="{StaticResource ModernProgressBarStyle}" 
+                                 Margin="0,16,0,0"/>
                 </Grid>
             </Border>
         </Grid>

@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:Gym.UI">
     <Application.Resources>
         <local:BoolToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <local:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <local:BooleanToColorConverter x:Key="BooleanToColorConverter"/>
         <local:BoolToStringConverter x:Key="BoolToStringConverter"/>

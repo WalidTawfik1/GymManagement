@@ -42,8 +42,8 @@ namespace Gym.UI.ViewModels
             UpdateLocalizedLabels();
         }
 
-        [ObservableProperty]
-        private ObservableCollection<Trainee> _trainees = new();
+    [ObservableProperty]
+    private ObservableCollection<Trainee> _trainees = new();
 
         [ObservableProperty]
         private MembershipDTO? _selectedMembership;
@@ -299,5 +299,6 @@ namespace Gym.UI.ViewModels
             IsActive = true;
             SelectedMembership = null;
         }
+
     }
 }

@@ -25,6 +25,19 @@ namespace Gym.UI
             {
                 base.OnStartup(e);
 
+                // Capture unhandled UI exceptions to diagnose crashes
+                this.DispatcherUnhandledException += (sender, args) =>
+                {
+                    try
+                    {
+                        var logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "error.log");
+                        File.AppendAllText(logPath, $"===== {DateTime.Now} =====\n{args.Exception}\n\n");
+                    }
+                    catch { }
+                    MessageBox.Show($"Unhandled exception: {args.Exception.Message}\n(Logged to error.log)", "Unhandled Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    args.Handled = true; // prevent silent crash so we can continue diagnosis
+                };
+
                 // Load environment variables
                 Env.Load();
 
