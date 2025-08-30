@@ -69,7 +69,7 @@ namespace Gym.Infrastructure.Repositores
         {
             var membership = await _context.Memberships
                 .Include(m => m.Trainee)
-                .Where(m => !m.IsDeleted && m.TraineeId == id)
+                .Where(m => !m.IsDeleted && m.IsActive && m.TraineeId == id)
                 .FirstOrDefaultAsync();
             var membershipDTO = _mapper.Map<MembershipDTO>(membership);
             return membershipDTO;

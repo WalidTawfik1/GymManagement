@@ -45,6 +45,14 @@
                                        Foreground="{StaticResource TextPrimaryBrush}"/>
                         </StackPanel>
                     </Border>
+                    <!-- Search Bar -->
+                    <StackPanel Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBox Width="140" FlowDirection="RightToLeft"
+                                 Text="{Binding SearchTraineeId, UpdateSourceTrigger=PropertyChanged}" 
+                                 Style="{StaticResource ModernTextBoxStyle}" Padding="10,6"/>
+                        <Button Content="بحث" Command="{Binding SearchMembershipCommand}" Margin="8,0,0,0" 
+                                Style="{StaticResource ModernButtonStyle}" Padding="16,8"/>
+                    </StackPanel>
                 </StackPanel>
             </Grid>
         </Border>
@@ -279,9 +287,15 @@
                         <ComboBox ItemsSource="{Binding Trainees}" 
                                   SelectedValue="{Binding SelectedTraineeId, Mode=TwoWay}"
                                   SelectedValuePath="Id"
-                                  DisplayMemberPath="FullName"
                                   Style="{StaticResource ModernComboBoxStyle}"
-                                  Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                  FlowDirection="RightToLeft"
+                                  Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding FullName}" TextAlignment="Right"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                     </StackPanel>
                     
                     <!-- Membership Type -->
@@ -290,7 +304,13 @@
                                    Foreground="#1F2937" Margin="0,0,0,8"/>
                         <ComboBox ItemsSource="{Binding MembershipTypes}" 
                                   SelectedItem="{Binding MembershipType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  Style="{StaticResource ModernComboBoxStyle}"/>
+                                  Style="{StaticResource ModernComboBoxStyle}" FlowDirection="RightToLeft">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource MembershipTypeDisplayConverter}}" TextAlignment="Right"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                     </StackPanel>
                     
                     <!-- Start Date (Edit Mode Only) -->

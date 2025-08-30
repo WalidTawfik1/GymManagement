@@ -75,6 +75,10 @@ namespace Gym.UI.ViewModels
         [ObservableProperty]
         private int _editMembershipId;
 
+    // Search input for trainee ID
+    [ObservableProperty]
+    private string _searchTraineeId = string.Empty;
+
         public List<string> MembershipTypes { get; } = new()
         {
             "مفتوح",
@@ -298,6 +302,53 @@ namespace Gym.UI.ViewModels
             RemainingSessions = null;
             IsActive = true;
             SelectedMembership = null;
+        }
+
+        [RelayCommand]
+        private async Task SearchMembership()
+        {
+            if (string.IsNullOrWhiteSpace(SearchTraineeId))
+            {
+                MessageBox.Show("أدخل رقم المتدرب للبحث", "تنبيه", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (!int.TryParse(SearchTraineeId.Trim(), out var traineeId))
+            {
+                MessageBox.Show("رقم متدرب غير صالح", "خطأ", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                IsBusy = true;
+                var membership = await _unitOfWork.MembershipRepository.GetMembershipByTraineeIdAsync(traineeId);
+                if (membership == null)
+                {
+                    MessageBox.Show("لا توجد عضوية نشطة لهذا المتدرب", "نتيجة البحث", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                // Ensure memberships list contains the found membership (reload if needed)
+                var existing = Memberships.FirstOrDefault(m => m.Id == membership.Id);
+                if (existing == null)
+                {
+                    // Option 1: add directly
+                    Memberships.Add(membership);
+                }
+                SelectedMembership = Memberships.First(m => m.Id == membership.Id);
+
+                // Switch to edit mode pre-filled
+                EditMembership(SelectedMembership);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"خطأ أثناء البحث: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
     }
