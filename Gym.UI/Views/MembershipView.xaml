@@ -13,6 +13,7 @@
                 <ResourceDictionary Source="../Resources/ModernStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <local:MembershipTypeDisplayConverter x:Key="MembershipTypeDisplayConverter"/>
+            <local:DateOnlyToStringConverter x:Key="DateOnlyToStringConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Margin="0">
@@ -322,7 +323,7 @@
                                 Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TextBlock Text="تاريخ البداية:" FontWeight="SemiBold" FontSize="14"
                                    Foreground="#1F2937" Margin="0,0,0,8"/>
-                        <TextBox Text="{Binding StartDate, StringFormat='{}{0:dd/MM/yyyy}'}" 
+                        <TextBox Text="{Binding StartDate, Mode=TwoWay, Converter={StaticResource DateOnlyToStringConverter}, UpdateSourceTrigger=PropertyChanged}" 
                                  Style="{StaticResource ModernTextBoxStyle}"/>
                     </StackPanel>
                     
@@ -331,7 +332,7 @@
                                 Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TextBlock Text="تاريخ النهاية:" FontWeight="SemiBold" FontSize="14"
                                    Foreground="#1F2937" Margin="0,0,0,8"/>
-                        <TextBox Text="{Binding EndDate, StringFormat='{}{0:dd/MM/yyyy}'}" 
+                        <TextBox Text="{Binding EndDate, Mode=TwoWay, Converter={StaticResource DateOnlyToStringConverter}, UpdateSourceTrigger=PropertyChanged}" 
                                  Style="{StaticResource ModernTextBoxStyle}"/>
                     </StackPanel>
                     

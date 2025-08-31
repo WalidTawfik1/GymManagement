@@ -157,4 +157,46 @@ namespace Gym.UI
             throw new NotImplementedException();
         }
     }
+
+    // Two-way converter for DateOnly <-> string in format dd/MM/yyyy
+    public class DateOnlyToStringConverter : IValueConverter
+    {
+        private static readonly string[] Formats = new[] { "dd/MM/yyyy", "d/M/yyyy", "dd-MM-yyyy", "d-M-yyyy" };
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is DateOnly d)
+            {
+                return d.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
+            }
+            return string.Empty;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string s)
+            {
+                s = s.Trim();
+                if (string.IsNullOrEmpty(s))
+                    return Binding.DoNothing; // ignore empty edits
+
+                if (DateOnly.TryParseExact(s, Formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+                    return date;
+
+                // If user typed with slashes but swapped order (MM/dd/yyyy), attempt manual swap when obvious
+                // Split and reorder if first part > 12 (likely day already) but parse failed
+                var parts = s.Replace('-', '/').Split('/');
+                if (parts.Length == 3 && int.TryParse(parts[0], out int p0) && int.TryParse(parts[1], out int p1) && int.TryParse(parts[2], out int p2))
+                {
+                    if (p0 > 12 && p1 <= 12) // user wrote dd/MM but culture parse expected otherwise
+                    {
+                        var reordered = $"{parts[0]}/{parts[1]}/{parts[2]}"; // already dd/MM/yyyy
+                        if (DateOnly.TryParseExact(reordered, Formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date2))
+                            return date2;
+                    }
+                }
+            }
+            return Binding.DoNothing; // keep previous value if invalid
+        }
+    }
 }
