@@ -124,7 +124,6 @@
                             <DataGridTextColumn Header="الاسم الكامل" Binding="{Binding FullName}" Width="*" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="TextAlignment" Value="Right"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="FontWeight" Value="SemiBold"/>
                                         <Setter Property="Foreground" Value="#1F2937"/>
@@ -137,10 +136,10 @@
                             <DataGridTextColumn Header="رقم الهاتف" Binding="{Binding PhoneNumber}" Width="140" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="TextAlignment" Value="Center"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="FontWeight" Value="Medium"/>
                                         <Setter Property="Foreground" Value="#6B7280"/>
+                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>

@@ -140,7 +140,6 @@
                             <DataGridTextColumn Header="المتدرب" Binding="{Binding TraineeName}" Width="*" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="TextAlignment" Value="Right"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="FontWeight" Value="SemiBold"/>
                                         <Setter Property="Foreground" Value="#1F2937"/>
@@ -153,7 +152,7 @@
                             <DataGridTextColumn Header="تاريخ الزيارة" Binding="{Binding VisitDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="160" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="TextAlignment" Value="Center"/>
+                                        <Setter Property="TextAlignment" Value="Left"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
                                         <Setter Property="FontWeight" Value="Medium"/>
