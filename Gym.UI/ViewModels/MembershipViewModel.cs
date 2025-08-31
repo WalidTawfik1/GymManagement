@@ -5,6 +5,7 @@ using Gym.Core.DTO;
 using Gym.Core.Interfaces;
 using Gym.Core.Models;
 using Gym.UI.Services;
+using Gym.UI.Services.Dialogs;
 using System.Collections.ObjectModel;
 using System.Windows;
 
@@ -13,13 +14,15 @@ namespace Gym.UI.ViewModels
     public partial class MembershipViewModel : BaseViewModel
     {
         private readonly IUnitofWork _unitOfWork;
-        private readonly IMapper _mapper;
+    private readonly IMapper _mapper;
+    private readonly IDialogService _dialog;
 
-        public MembershipViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService) 
+        public MembershipViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService, IDialogService dialog) 
             : base(localizationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _dialog = dialog;
             UpdateLocalizedLabels();
         }
 
@@ -107,7 +110,7 @@ namespace Gym.UI.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading memberships: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                await _dialog.ShowAsync($"Error loading memberships: {ex.Message}", "Error", DialogType.Error);
             }
             finally
             {
@@ -129,7 +132,7 @@ namespace Gym.UI.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading trainees: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                await _dialog.ShowAsync($"Error loading trainees: {ex.Message}", "Error", DialogType.Error);
             }
         }
 
@@ -142,7 +145,7 @@ namespace Gym.UI.ViewModels
             {
                 if (!int.TryParse(TraineeIdInput, out traineeId))
                 {
-                    MessageBox.Show("Please enter a valid trainee ID number.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    await _dialog.ShowAsync(GetLocalizedString("EnterValidTraineeId"), GetLocalizedString("ValidationErrorTitle"), DialogType.Warning);
                     return;
                 }
             }
@@ -153,7 +156,7 @@ namespace Gym.UI.ViewModels
 
             if (traineeId == 0 || string.IsNullOrWhiteSpace(MembershipType))
             {
-                MessageBox.Show("Please enter trainee ID and select membership type.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                await _dialog.ShowAsync(GetLocalizedString("EnterTraineeIdAndType"), GetLocalizedString("ValidationErrorTitle"), DialogType.Warning);
                 return;
             }
 
@@ -165,7 +168,7 @@ namespace Gym.UI.ViewModels
                 var trainee = await _unitOfWork.TraineeRepository.GetByIdAsync(traineeId);
                 if (trainee == null || trainee.IsDeleted)
                 {
-                    MessageBox.Show("Trainee not found. Please check the trainee ID.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    await _dialog.ShowAsync(GetLocalizedString("TraineeNotFound"), GetLocalizedString("ValidationErrorTitle"), DialogType.Warning);
                     return;
                 }
 
@@ -178,19 +181,19 @@ namespace Gym.UI.ViewModels
                 var success = await _unitOfWork.MembershipRepository.AddMembership(membershipDto);
                 if (success)
                 {
-                    var sessionInfo = MembershipType == "محدود" ? " (12 حصة)" : " (مفتوح)";
-                    MessageBox.Show($"تم إضافة العضوية بنجاح{sessionInfo}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var successKey = MembershipType == "محدود" ? "MembershipAddedSuccessLimited" : "MembershipAddedSuccessOpen";
+                    await _dialog.ShowAsync(GetLocalizedString(successKey), GetLocalizedString("SuccessTitle"), DialogType.Success);
                     ClearForm();
                     await LoadMemberships();
                 }
                 else
                 {
-                    MessageBox.Show("Failed to add membership.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    await _dialog.ShowAsync(GetLocalizedString("FailedAddMembershipGeneric"), GetLocalizedString("ErrorTitle"), DialogType.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error adding membership: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                await _dialog.ShowAsync($"Error adding membership: {ex.Message}", "Error", DialogType.Error);
             }
             finally
             {
@@ -203,7 +206,7 @@ namespace Gym.UI.ViewModels
         {
             if (SelectedTraineeId == 0 || string.IsNullOrWhiteSpace(MembershipType))
             {
-                MessageBox.Show("Please fill in all required fields.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                await _dialog.ShowAsync(GetLocalizedString("EnterAllRequiredFields"), GetLocalizedString("ValidationErrorTitle"), DialogType.Warning);
                 return;
             }
 
@@ -224,18 +227,18 @@ namespace Gym.UI.ViewModels
                 var success = await _unitOfWork.MembershipRepository.UpdateMembership(membershipDto);
                 if (success)
                 {
-                    MessageBox.Show("Membership updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    await _dialog.ShowAsync(GetLocalizedString("MembershipUpdatedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
                     ClearForm();
                     await LoadMemberships();
                 }
                 else
                 {
-                    MessageBox.Show("Failed to update membership.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    await _dialog.ShowAsync(GetLocalizedString("FailedUpdateMembershipGeneric"), GetLocalizedString("ErrorTitle"), DialogType.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating membership: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                await _dialog.ShowAsync($"Error updating membership: {ex.Message}", "Error", DialogType.Error);
             }
             finally
             {
@@ -248,10 +251,8 @@ namespace Gym.UI.ViewModels
         {
             if (membershipDto == null) return;
 
-            var result = MessageBox.Show($"Are you sure you want to delete this membership?", 
-                "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
+            var confirm = await _dialog.ConfirmAsync(GetLocalizedString("ConfirmDeleteMembership"), GetLocalizedString("ConfirmTitle"));
+            if (confirm)
             {
                 try
                 {
@@ -265,13 +266,13 @@ namespace Gym.UI.ViewModels
                         membership.UpdatedAt = DateTime.Now;
                         await _unitOfWork.MembershipRepository.UpdateAsync(membership);
                         
-                        MessageBox.Show("Membership deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        await _dialog.ShowAsync(GetLocalizedString("MembershipDeletedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
                         await LoadMemberships();
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error deleting membership: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    await _dialog.ShowAsync(string.Format(GetLocalizedString("ErrorDeletingMembership"), ex.Message), GetLocalizedString("ErrorTitle"), DialogType.Error);
                 }
                 finally
                 {
@@ -315,13 +316,13 @@ namespace Gym.UI.ViewModels
         {
             if (string.IsNullOrWhiteSpace(SearchTraineeId))
             {
-                MessageBox.Show("أدخل رقم المتدرب للبحث", "تنبيه", MessageBoxButton.OK, MessageBoxImage.Information);
+                await _dialog.ShowAsync(GetLocalizedString("EnterTraineeIdToSearch"), GetLocalizedString("NotificationTitle"), DialogType.Info);
                 return;
             }
 
             if (!int.TryParse(SearchTraineeId.Trim(), out var traineeId))
             {
-                MessageBox.Show("رقم متدرب غير صالح", "خطأ", MessageBoxButton.OK, MessageBoxImage.Warning);
+                await _dialog.ShowAsync(GetLocalizedString("InvalidTraineeNumber"), GetLocalizedString("WarningTitle"), DialogType.Warning);
                 return;
             }
 
@@ -331,7 +332,7 @@ namespace Gym.UI.ViewModels
                 var membership = await _unitOfWork.MembershipRepository.GetMembershipByTraineeIdAsync(traineeId);
                 if (membership == null)
                 {
-                    MessageBox.Show("لا توجد عضوية نشطة لهذا المتدرب", "نتيجة البحث", MessageBoxButton.OK, MessageBoxImage.Information);
+                    await _dialog.ShowAsync(GetLocalizedString("NoActiveMembership"), GetLocalizedString("SearchResultTitle"), DialogType.Info);
                     return;
                 }
 
@@ -349,7 +350,7 @@ namespace Gym.UI.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"خطأ أثناء البحث: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                await _dialog.ShowAsync($"خطأ أثناء البحث: {ex.Message}", "Error", DialogType.Error);
             }
             finally
             {

@@ -5,6 +5,7 @@ using Gym.Core.DTO;
 using Gym.Core.Interfaces;
 using Gym.Core.Models;
 using Gym.UI.Services;
+using Gym.UI.Services.Dialogs;
 using System.Collections.ObjectModel;
 using System.Windows;
 
@@ -13,13 +14,15 @@ namespace Gym.UI.ViewModels
     public partial class TraineeViewModel : BaseViewModel
     {
         private readonly IUnitofWork _unitOfWork;
-        private readonly IMapper _mapper;
+    private readonly IMapper _mapper;
+    private readonly IDialogService _dialog;
 
-        public TraineeViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService) 
+        public TraineeViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService, IDialogService dialog) 
             : base(localizationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _dialog = dialog;
             UpdateLocalizedLabels();
         }
 
@@ -125,7 +128,7 @@ namespace Gym.UI.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show(string.Format(GetLocalizedString("ErrorLoadingTrainees"), ex.Message), GetLocalizedString("ErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
+                await _dialog.ShowAsync(string.Format(GetLocalizedString("ErrorLoadingTrainees"), ex.Message), GetLocalizedString("ErrorTitle"), DialogType.Error);
             }
             finally
             {
@@ -138,7 +141,7 @@ namespace Gym.UI.ViewModels
         {
             if (string.IsNullOrWhiteSpace(FullName) || string.IsNullOrWhiteSpace(PhoneNumber))
             {
-                MessageBox.Show(GetLocalizedString("FillRequiredFields"), GetLocalizedString("WarningTitle"), MessageBoxButton.OK, MessageBoxImage.Warning);
+                await _dialog.ShowAsync(GetLocalizedString("FillRequiredFields"), GetLocalizedString("WarningTitle"), DialogType.Warning);
                 return;
             }
 
@@ -154,18 +157,18 @@ namespace Gym.UI.ViewModels
                 var success = await _unitOfWork.TraineeRepository.AddTraineeAsync(traineeDto);
                 if (success)
                 {
-                    MessageBox.Show(GetLocalizedString("TraineeAddedSuccess"), GetLocalizedString("SuccessTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    await _dialog.ShowAsync(GetLocalizedString("TraineeAddedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
                     ClearForm();
                     await LoadTrainees();
                 }
                 else
                 {
-                    MessageBox.Show(GetLocalizedString("FailedAddTrainee"), GetLocalizedString("ErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    await _dialog.ShowAsync(GetLocalizedString("FailedAddTrainee"), GetLocalizedString("ErrorTitle"), DialogType.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(string.Format(GetLocalizedString("ErrorAddingTrainee"), ex.Message), GetLocalizedString("ErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
+                await _dialog.ShowAsync(string.Format(GetLocalizedString("ErrorAddingTrainee"), ex.Message), GetLocalizedString("ErrorTitle"), DialogType.Error);
             }
             finally
             {
@@ -178,7 +181,7 @@ namespace Gym.UI.ViewModels
         {
             if (string.IsNullOrWhiteSpace(FullName) || string.IsNullOrWhiteSpace(PhoneNumber))
             {
-                MessageBox.Show("Please fill in all required fields.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                await _dialog.ShowAsync(GetLocalizedString("EnterAllRequiredFields"), GetLocalizedString("ValidationErrorTitle"), DialogType.Warning);
                 return;
             }
 
@@ -195,18 +198,18 @@ namespace Gym.UI.ViewModels
                 var success = await _unitOfWork.TraineeRepository.UpdateTraineeAsync(updateDto);
                 if (success)
                 {
-                    MessageBox.Show("Trainee updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    await _dialog.ShowAsync(GetLocalizedString("TraineeUpdatedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
                     ClearForm();
                     await LoadTrainees();
                 }
                 else
                 {
-                    MessageBox.Show("Failed to update trainee.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    await _dialog.ShowAsync(GetLocalizedString("FailedUpdateTrainee"), GetLocalizedString("ErrorTitle"), DialogType.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating trainee: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                await _dialog.ShowAsync(string.Format(GetLocalizedString("ErrorUpdatingTrainee"), ex.Message), GetLocalizedString("ErrorTitle"), DialogType.Error);
             }
             finally
             {
@@ -219,10 +222,9 @@ namespace Gym.UI.ViewModels
         {
             if (trainee == null) return;
 
-            var result = MessageBox.Show($"Are you sure you want to delete {trainee.FullName}?", 
-                "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
+        // Localized confirm delete message
+        var confirm = await _dialog.ConfirmAsync(string.Format(GetLocalizedString("ConfirmDelete"), trainee.FullName), GetLocalizedString("ConfirmTitle"));
+        if (confirm)
             {
                 try
                 {
@@ -230,13 +232,12 @@ namespace Gym.UI.ViewModels
                     trainee.IsDeleted = true;
                     trainee.UpdatedAt = DateTime.Now;
                     await _unitOfWork.TraineeRepository.UpdateAsync(trainee);
-                    
-                    MessageBox.Show("Trainee deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            await _dialog.ShowAsync(GetLocalizedString("TraineeDeletedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
                     await LoadTrainees();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error deleting trainee: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            await _dialog.ShowAsync(string.Format(GetLocalizedString("ErrorDeletingTrainee"), ex.Message), GetLocalizedString("ErrorTitle"), DialogType.Error);
                 }
                 finally
                 {

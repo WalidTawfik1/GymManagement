@@ -132,7 +132,7 @@
                                         <Setter Property="TextAlignment" Value="Center"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="FontWeight" Value="SemiBold"/>
-                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                        <Setter Property="Foreground" Value="#1F2937"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
@@ -154,7 +154,7 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Left"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+                                        <Setter Property="Foreground" Value="#1F2937"/>
                                         <Setter Property="FontWeight" Value="Medium"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>

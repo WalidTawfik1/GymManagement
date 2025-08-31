@@ -5,6 +5,7 @@ using Gym.Core.DTO;
 using Gym.Core.Interfaces;
 using Gym.Core.Models;
 using Gym.UI.Services;
+using Gym.UI.Services.Dialogs;
 using System.Collections.ObjectModel;
 using System.Windows;
 
@@ -13,13 +14,15 @@ namespace Gym.UI.ViewModels
     public partial class VisitViewModel : BaseViewModel
     {
         private readonly IUnitofWork _unitOfWork;
-        private readonly IMapper _mapper;
+    private readonly IMapper _mapper;
+    private readonly IDialogService _dialog;
 
-        public VisitViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService) 
+        public VisitViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService, IDialogService dialog) 
             : base(localizationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _dialog = dialog;
             UpdateLocalizedLabels();
         }
 
@@ -98,8 +101,7 @@ namespace Gym.UI.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show(GetLocalizedString("ErrorLoadingVisits").Replace("{0}", ex.Message), 
-                    GetLocalizedString("ErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
+                await _dialog.ShowAsync(GetLocalizedString("ErrorLoadingVisits").Replace("{0}", ex.Message), GetLocalizedString("ErrorTitle"), DialogType.Error);
             }
             finally
             {
@@ -112,15 +114,13 @@ namespace Gym.UI.ViewModels
         {
             if (string.IsNullOrWhiteSpace(TraineeId))
             {
-                MessageBox.Show(GetLocalizedString("PleaseEnterTraineeId"), 
-                    GetLocalizedString("WarningTitle"), MessageBoxButton.OK, MessageBoxImage.Warning);
+                await _dialog.ShowAsync(GetLocalizedString("PleaseEnterTraineeId"), GetLocalizedString("WarningTitle"), DialogType.Warning);
                 return;
             }
 
             if (!int.TryParse(TraineeId, out int traineeIdInt))
             {
-                MessageBox.Show("Please enter a valid trainee ID.", 
-                    GetLocalizedString("WarningTitle"), MessageBoxButton.OK, MessageBoxImage.Warning);
+                await _dialog.ShowAsync(GetLocalizedString("EnterValidTraineeIdShort"), GetLocalizedString("WarningTitle"), DialogType.Warning);
                 return;
             }
 
@@ -144,22 +144,19 @@ namespace Gym.UI.ViewModels
                     TraineeId = string.Empty;
                     VisitDate = DateTime.Now;
 
-                    MessageBox.Show(visitResponse.Message, 
-                        GetLocalizedString("SuccessTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
+                    await _dialog.ShowAsync(visitResponse.Message, GetLocalizedString("SuccessTitle"), DialogType.Success);
                     
                     // Reload visits to show the new visit
                     await LoadVisits();
                 }
                 else
                 {
-                    MessageBox.Show(GetLocalizedString("ErrorRecordingVisit"), 
-                        GetLocalizedString("ErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    await _dialog.ShowAsync(GetLocalizedString("ErrorRecordingVisit"), GetLocalizedString("ErrorTitle"), DialogType.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(GetLocalizedString("ErrorRecordingVisit").Replace("{0}", ex.Message), 
-                    GetLocalizedString("ErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
+                await _dialog.ShowAsync(GetLocalizedString("ErrorRecordingVisit").Replace("{0}", ex.Message), GetLocalizedString("ErrorTitle"), DialogType.Error);
             }
             finally
             {
@@ -172,10 +169,8 @@ namespace Gym.UI.ViewModels
         {
             if (visitDto == null) return;
 
-            var result = MessageBox.Show(GetLocalizedString("ConfirmDeleteVisit"), 
-                GetLocalizedString("ConfirmTitle"), MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
+            var confirm = await _dialog.ConfirmAsync(GetLocalizedString("ConfirmDeleteVisit"), GetLocalizedString("ConfirmTitle"));
+            if (confirm)
             {
                 try
                 {
@@ -189,15 +184,13 @@ namespace Gym.UI.ViewModels
                         visit.UpdatedAt = DateTime.Now;
                         await _unitOfWork.VisitRepository.UpdateAsync(visit);
                         
-                        MessageBox.Show(GetLocalizedString("VisitDeletedSuccess"), 
-                            GetLocalizedString("SuccessTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
+                        await _dialog.ShowAsync(GetLocalizedString("VisitDeletedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
                         await LoadVisits();
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(GetLocalizedString("ErrorDeletingVisit").Replace("{0}", ex.Message), 
-                        GetLocalizedString("ErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
+                    await _dialog.ShowAsync(GetLocalizedString("ErrorDeletingVisit").Replace("{0}", ex.Message), GetLocalizedString("ErrorTitle"), DialogType.Error);
                 }
                 finally
                 {

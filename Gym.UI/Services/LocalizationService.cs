@@ -152,7 +152,25 @@ namespace Gym.UI.Services
                     ["FailedAddTrainee"] = "فشل في إضافة المتدرب.",
                     ["FailedUpdateTrainee"] = "فشل في تحديث المتدرب.",
                     ["FailedAddMembership"] = "فشل في إضافة العضوية.",
-                    ["FailedUpdateMembership"] = "فشل في تحديث العضوية."
+                    ["FailedUpdateMembership"] = "فشل في تحديث العضوية.",
+                    ["PleaseEnterTraineeId"] = "يرجى إدخال رقم المتدرب",
+                    ["ValidationErrorTitle"] = "خطأ في التحقق",
+                    ["EnterValidTraineeId"] = "يرجى إدخال رقم متدرب صالح.",
+                    ["EnterTraineeIdAndType"] = "يرجى إدخال رقم المتدرب واختيار نوع العضوية.",
+                    ["TraineeNotFound"] = "المتدرب غير موجود. يرجى التحقق من رقم المتدرب.",
+                    ["FailedAddMembershipGeneric"] = "فشل في إضافة العضوية.",
+                    ["FailedUpdateMembershipGeneric"] = "فشل في تحديث العضوية.",
+                    ["MembershipUpdatedSuccess"] = "تم تحديث العضوية بنجاح!",
+                    ["MembershipAddedSuccessOpen"] = "تم إضافة العضوية بنجاح (مفتوح)",
+                    ["MembershipAddedSuccessLimited"] = "تم إضافة العضوية بنجاح (12 حصة)",
+                    ["EnterAllRequiredFields"] = "يرجى ملء جميع الحقول المطلوبة.",
+                    ["EnterTraineeIdToSearch"] = "أدخل رقم المتدرب للبحث",
+                    ["InvalidTraineeNumber"] = "رقم متدرب غير صالح",
+                    ["NoActiveMembership"] = "لا توجد عضوية نشطة لهذا المتدرب",
+                    ["SearchResultTitle"] = "نتيجة البحث",
+                    ["NotificationTitle"] = "تنبيه",
+                    ["DeleteMembershipConfirmTitle"] = "تأكيد", // uses ConfirmTitle existing
+                    ["EnterValidTraineeIdShort"] = "يرجى إدخال رقم متدرب صالح"
                 },
                 ["en"] = new Dictionary<string, string>
                 {
@@ -261,6 +279,23 @@ namespace Gym.UI.Services
                     ["FailedUpdateTrainee"] = "Failed to update trainee.",
                     ["FailedAddMembership"] = "Failed to add membership.",
                     ["FailedUpdateMembership"] = "Failed to update membership."
+                    , ["PleaseEnterTraineeId"] = "Please enter trainee ID"
+                    , ["ValidationErrorTitle"] = "Validation Error"
+                    , ["EnterValidTraineeId"] = "Please enter a valid trainee ID number."
+                    , ["EnterTraineeIdAndType"] = "Please enter trainee ID and select membership type."
+                    , ["TraineeNotFound"] = "Trainee not found. Please check the trainee ID."
+                    , ["FailedAddMembershipGeneric"] = "Failed to add membership."
+                    , ["FailedUpdateMembershipGeneric"] = "Failed to update membership."
+                    , ["MembershipUpdatedSuccess"] = "Membership updated successfully!"
+                    , ["MembershipAddedSuccessOpen"] = "Membership added successfully (Open)."
+                    , ["MembershipAddedSuccessLimited"] = "Membership added successfully (12 Sessions)."
+                    , ["EnterAllRequiredFields"] = "Please fill in all required fields."
+                    , ["EnterTraineeIdToSearch"] = "Enter trainee ID to search"
+                    , ["InvalidTraineeNumber"] = "Invalid trainee number"
+                    , ["NoActiveMembership"] = "No active membership for this trainee"
+                    , ["SearchResultTitle"] = "Search Result"
+                    , ["NotificationTitle"] = "Notice"
+                    , ["EnterValidTraineeIdShort"] = "Please enter a valid trainee ID."
                 }
             };
         }

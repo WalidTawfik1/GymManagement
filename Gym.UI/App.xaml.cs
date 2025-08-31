@@ -1,6 +1,7 @@
 ﻿using DotNetEnv;
 using Gym.Infrastructure;
 using Gym.UI.Services;
+using Gym.UI.Services.Dialogs;
 using Gym.UI.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -61,6 +62,9 @@ namespace Gym.UI
 
                         // Register localization service
                         services.AddSingleton<ILocalizationService, LocalizationService>();
+
+                        // Register dialog service
+                        services.AddSingleton<IDialogService, DialogService>();
 
                         // Register ViewModels
                         services.AddTransient<MainViewModel>();

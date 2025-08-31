@@ -116,7 +116,7 @@
                                         <Setter Property="TextAlignment" Value="Center"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="FontWeight" Value="SemiBold"/>
-                                        <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                        <Setter Property="Foreground" Value="#1F2937"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
@@ -138,7 +138,7 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="FontWeight" Value="Medium"/>
-                                        <Setter Property="Foreground" Value="#6B7280"/>
+                                        <Setter Property="Foreground" Value="#1F2937"/>
                                         <Setter Property="FlowDirection" Value="RightToLeft"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
@@ -149,7 +149,7 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Center"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+                                        <Setter Property="Foreground" Value="#1F2937"/>
                                         <Setter Property="FontWeight" Value="Medium"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>

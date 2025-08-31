@@ -11,7 +11,7 @@ namespace Gym.UI.ViewModels
         private readonly IUnitofWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public MainViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService) 
+        public MainViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService, Gym.UI.Services.Dialogs.IDialogService dialog) 
             : base(localizationService)
         {
             _unitOfWork = unitOfWork;
@@ -19,9 +19,9 @@ namespace Gym.UI.ViewModels
             UpdateLocalizedLabels();
             
             // Initialize ViewModels
-            TraineeViewModel = new TraineeViewModel(_unitOfWork, _mapper, _localizationService);
-            MembershipViewModel = new MembershipViewModel(_unitOfWork, _mapper, _localizationService);
-            VisitViewModel = new VisitViewModel(_unitOfWork, _mapper, _localizationService);
+            TraineeViewModel = new TraineeViewModel(_unitOfWork, _mapper, _localizationService, dialog);
+            MembershipViewModel = new MembershipViewModel(_unitOfWork, _mapper, _localizationService, dialog);
+            VisitViewModel = new VisitViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             
             // Set default active view
             CurrentViewModel = TraineeViewModel;
