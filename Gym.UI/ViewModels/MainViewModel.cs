@@ -30,6 +30,15 @@ namespace Gym.UI.ViewModels
             _localizationService.LanguageChanged += OnLanguageChanged;
         }
 
+        // Called after construction (from App.xaml.cs) to load data sequentially and avoid parallel DbContext operations
+        public async Task InitializeAsync()
+        {
+            // Load in sequence to prevent EF Core concurrency on a single scoped DbContext
+            await TraineeViewModel.InitializeAsync();
+            await MembershipViewModel.InitializeAsync();
+            await VisitViewModel.InitializeAsync();
+        }
+
         [ObservableProperty]
         private BaseViewModel _currentViewModel;
 

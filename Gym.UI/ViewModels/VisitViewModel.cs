@@ -21,7 +21,6 @@ namespace Gym.UI.ViewModels
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             UpdateLocalizedLabels();
-            _ = LoadVisits();
         }
 
         [ObservableProperty]
@@ -42,6 +41,12 @@ namespace Gym.UI.ViewModels
         protected override void OnLanguageChanged()
         {
             UpdateLocalizedLabels();
+        }
+
+        // Explicit initialization instead of fire-and-forget in constructor to avoid concurrent DbContext use
+        public async Task InitializeAsync()
+        {
+            await LoadVisits();
         }
 
         [ObservableProperty]

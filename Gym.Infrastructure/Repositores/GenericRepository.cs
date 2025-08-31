@@ -23,6 +23,8 @@ namespace Gym.Infrastructure.Repositores
         {
             await _context.Set<T>().AddAsync(entity);
             await _context.SaveChangesAsync();
+            // Detach to prevent long-lived tracked instances (desktop app single scope)
+            _context.Entry(entity).State = EntityState.Detached;
         }
 
         public async Task<int> CountAsync()
@@ -60,13 +62,13 @@ namespace Gym.Infrastructure.Repositores
             return await query.ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T?> GetByIdAsync(int id)
         {
             var entity = await _context.Set<T>().FindAsync(id);
             return entity;
         }
 
-        public async Task<T> GetByIdAsync(int id, params System.Linq.Expressions.Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetByIdAsync(int id, params System.Linq.Expressions.Expression<Func<T, object>>[] includes)
         {
             var query = _context.Set<T>().AsQueryable();
             foreach (var include in includes)
@@ -78,14 +80,53 @@ namespace Gym.Infrastructure.Repositores
                             ?.Properties
                             ?.FirstOrDefault()
                             ?.Name;
-            var entity = await query.FirstOrDefaultAsync(x => EF.Property<int>(x, keyName).Equals(id));
+            if (string.IsNullOrEmpty(keyName))
+            {
+                return null;
+            }
+            var entity = await query.FirstOrDefaultAsync(x => EF.Property<int>(x, keyName) == id);
             return entity;
         }
 
         public async Task UpdateAsync(T entity)
         {
+            var entry = _context.Entry(entity);
+            if (entry.State == EntityState.Detached)
+            {
+                // Try to locate already tracked entity with same key to avoid tracking conflict
+                var entityType = _context.Model.FindEntityType(typeof(T));
+                var keyProp = entityType?.FindPrimaryKey()?.Properties.FirstOrDefault();
+                if (keyProp != null)
+                {
+                    var keyValue = typeof(T).GetProperty(keyProp.Name)?.GetValue(entity);
+                    if (keyValue != null)
+                    {
+                        var tracked = await _context.Set<T>().FindAsync(keyValue);
+                        if (tracked != null && !ReferenceEquals(tracked, entity))
+                        {
+                            // Copy values into tracked instance
+                            _context.Entry(tracked).CurrentValues.SetValues(entity);
+                            entity = tracked; // ensure we save tracked instance
+                        }
+                        else
+                        {
+                            _context.Attach(entity);
+                        }
+                    }
+                    else
+                    {
+                        _context.Attach(entity);
+                    }
+                }
+                else
+                {
+                    _context.Attach(entity);
+                }
+            }
             _context.Entry(entity).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+            // Optionally detach after update to keep context lean
+            _context.Entry(entity).State = EntityState.Detached;
         }
     }
 }

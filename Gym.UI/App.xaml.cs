@@ -76,6 +76,21 @@ namespace Gym.UI
                 // Get MainWindow from DI container and set up DataContext
                 var mainWindow = _host.Services.GetRequiredService<MainWindow>();
                 var mainViewModel = _host.Services.GetRequiredService<MainViewModel>();
+
+                // Initialize data sequentially to avoid "second operation" DbContext errors
+                // (cannot 'await' directly in OnStartup, so use async void pattern via dispatcher)
+                mainWindow.Loaded += async (_, __) =>
+                {
+                    try
+                    {
+                        await mainViewModel.InitializeAsync();
+                    }
+                    catch (Exception initEx)
+                    {
+                        MessageBox.Show($"Initialization failed: {initEx.Message}", "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                };
+
                 mainWindow.DataContext = mainViewModel;
                 mainWindow.Show();
             }

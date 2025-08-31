@@ -21,8 +21,6 @@ namespace Gym.UI.ViewModels
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             UpdateLocalizedLabels();
-            _ = LoadMemberships();
-            _ = LoadTrainees();
         }
 
         [ObservableProperty]
@@ -35,6 +33,14 @@ namespace Gym.UI.ViewModels
         {
             Title = GetLocalizedString("MembershipManagement");
             MembershipManagementLabel = GetLocalizedString("MembershipManagement");
+        }
+
+        // Explicit initialization to avoid starting concurrent DbContext operations in constructor
+        public async Task InitializeAsync()
+        {
+            // Run sequentially to prevent EF Core "second operation started" errors on the same context
+            await LoadMemberships();
+            await LoadTrainees();
         }
 
         protected override void OnLanguageChanged()

@@ -21,7 +21,6 @@ namespace Gym.UI.ViewModels
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             UpdateLocalizedLabels();
-            _ = LoadTrainees();
         }
 
         [ObservableProperty]
@@ -103,6 +102,12 @@ namespace Gym.UI.ViewModels
         protected override void OnLanguageChanged()
         {
             UpdateLocalizedLabels();
+        }
+
+        // Explicit initialization to load data sequentially outside constructor
+        public async Task InitializeAsync()
+        {
+            await LoadTrainees();
         }
 
         [RelayCommand]
