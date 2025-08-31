@@ -45,14 +45,6 @@
                                        Foreground="{StaticResource TextPrimaryBrush}"/>
                         </StackPanel>
                     </Border>
-                    <!-- Search Bar -->
-                    <StackPanel Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
-                        <TextBox Width="140" FlowDirection="RightToLeft"
-                                 Text="{Binding SearchTraineeId, UpdateSourceTrigger=PropertyChanged}" 
-                                 Style="{StaticResource ModernTextBoxStyle}" Padding="10,6"/>
-                        <Button Content="بحث" Command="{Binding SearchMembershipCommand}" Margin="8,0,0,0" 
-                                Style="{StaticResource ModernButtonStyle}" Padding="16,8"/>
-                    </StackPanel>
                 </StackPanel>
             </Grid>
         </Border>
@@ -72,28 +64,24 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
-                    <!-- List Header -->
-                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                    <!-- List Header (single clean version) -->
+                    <Grid Grid.Row="0" Margin="0,0,0,20" FlowDirection="LeftToRight">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>   <!-- Refresh -->
+                            <ColumnDefinition Width="*"/>      <!-- Spacer -->
+                            <ColumnDefinition Width="Auto"/>   <!-- Search -->
+                            <ColumnDefinition Width="*"/>      <!-- Spacer -->
+                            <ColumnDefinition Width="Auto"/>   <!-- Title -->
                         </Grid.ColumnDefinitions>
-                        
-                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Ellipse Width="20" Height="20" Fill="{StaticResource PrimaryBrush}" Margin="0,0,12,0"/>
-                            <TextBlock Text="قائمة العضويات" FontSize="18" FontWeight="Bold" 
-                                       Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                        
-                        <Button Grid.Column="1" Content="تحديث" Command="{Binding LoadMembershipsCommand}" 
-                                Style="{StaticResource ModernButtonStyle}" Background="{StaticResource InfoBrush}"
-                                Padding="16,8" FontSize="12">
+
+                        <!-- Refresh (Left) -->
+            <Button Grid.Column="0" Content="تحديث" Command="{Binding LoadMembershipsCommand}"
+                Style="{StaticResource ModernButtonStyle}" Background="{StaticResource InfoBrush}"
+                Padding="16,8" FontSize="12" VerticalAlignment="Center">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
-                                    <Border Background="{TemplateBinding Background}" 
-                                            CornerRadius="20" 
-                                            Padding="{TemplateBinding Padding}">
-                                        <StackPanel Orientation="Horizontal">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="20" Padding="{TemplateBinding Padding}">
+                                        <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
                                             <Ellipse Width="12" Height="12" Fill="White" Margin="0,0,6,0"/>
                                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </StackPanel>
@@ -106,9 +94,25 @@
                                 </ControlTemplate>
                             </Button.Template>
                         </Button>
+
+                        <!-- Centered Search -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBox Width="240" Height="40" FlowDirection="RightToLeft"
+                                     Text="{Binding SearchTraineeId, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource ModernTextBoxStyle}" Padding="8,4" Tag="ادخل رقم المتدرب"/>
+                            <Button Content="بحث" Command="{Binding SearchMembershipCommand}" Margin="8,0,0,0"
+                                    Style="{StaticResource ModernButtonStyle}" Height="32" Padding="16,4"/>
+                        </StackPanel>
+
+                        <!-- Title (Right) -->
+                        <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="قائمة العضويات" FontSize="18" FontWeight="Bold"
+                                       Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <Ellipse Width="20" Height="20" Fill="{StaticResource PrimaryBrush}"/>
+                        </StackPanel>
                     </Grid>
-                    
-                    <!-- Modern DataGrid -->
+
+                    <!-- DataGrid -->
                     <DataGrid Grid.Row="1" 
                               ItemsSource="{Binding Memberships}" 
                               SelectedItem="{Binding SelectedMembership}"

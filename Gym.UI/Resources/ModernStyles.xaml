@@ -185,9 +185,19 @@
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="8"
                             Padding="{TemplateBinding Padding}">
-                        <ScrollViewer x:Name="PART_ContentHost"/>
+                        <Grid>
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                            <!-- Placeholder watermark -->
+                            <TextBlock x:Name="Placeholder" Text="{TemplateBinding Tag}" Visibility="Collapsed"
+                                       Foreground="{StaticResource TextSecondaryBrush}" Opacity="0.6"
+                                       IsHitTestVisible="False" Margin="4,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <!-- Show placeholder when empty -->
+                        <Trigger Property="Text" Value="">
+                            <Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/>
+                        </Trigger>
                         <Trigger Property="IsFocused" Value="True">
                             <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
                         </Trigger>
