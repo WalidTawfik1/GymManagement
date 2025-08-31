@@ -171,6 +171,9 @@ namespace Gym.UI.Services
                     ["NotificationTitle"] = "تنبيه",
                     ["DeleteMembershipConfirmTitle"] = "تأكيد", // uses ConfirmTitle existing
                     ["EnterValidTraineeIdShort"] = "يرجى إدخال رقم متدرب صالح"
+                    , ["EnterTraineeNameToSearch"] = "أدخل اسم المتدرب للبحث"
+                    , ["EnterTraineeName"] = "ادخل اسم المتدرب"
+                    , ["NoTraineesFound"] = "لا توجد نتائج"
                 },
                 ["en"] = new Dictionary<string, string>
                 {
@@ -296,6 +299,9 @@ namespace Gym.UI.Services
                     , ["SearchResultTitle"] = "Search Result"
                     , ["NotificationTitle"] = "Notice"
                     , ["EnterValidTraineeIdShort"] = "Please enter a valid trainee ID."
+                    , ["EnterTraineeNameToSearch"] = "Enter trainee name to search"
+                    , ["EnterTraineeName"] = "Enter trainee name"
+                    , ["NoTraineesFound"] = "No trainees found."
                 }
             };
         }

@@ -35,6 +35,14 @@ namespace Gym.Infrastructure.Repositores
             return true;
         }
 
+        public async Task<IReadOnlyList<Trainee>> GetTraineeByNameAsync(string name)
+        {
+            return await context.Trainees
+                .Where(t => t.FullName.Contains(name) && !t.IsDeleted)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<bool> UpdateTraineeAsync(UpdateTraineeDTO trainee)
         {
             var entity = await context.Trainees.FindAsync(trainee.Id);

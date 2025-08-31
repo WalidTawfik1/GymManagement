@@ -84,6 +84,10 @@ namespace Gym.UI.ViewModels
         [ObservableProperty]
         private string _clearFormLabel = string.Empty;
 
+    // Search input binding
+    [ObservableProperty]
+    private string _searchTraineeName = string.Empty;
+
         private void UpdateLocalizedLabels()
         {
             Title = GetLocalizedString("TraineeManagement");
@@ -111,6 +115,38 @@ namespace Gym.UI.ViewModels
         public async Task InitializeAsync()
         {
             await LoadTrainees();
+        }
+
+        [RelayCommand]
+        private async Task SearchTrainees()
+        {
+            if (string.IsNullOrWhiteSpace(SearchTraineeName))
+            {
+                await _dialog.ShowAsync(GetLocalizedString("EnterTraineeNameToSearch"), GetLocalizedString("NotificationTitle"), DialogType.Info);
+                return;
+            }
+            try
+            {
+                IsBusy = true;
+                var list = await _unitOfWork.TraineeRepository.GetTraineeByNameAsync(SearchTraineeName.Trim());
+                Trainees.Clear();
+                foreach (var t in list)
+                {
+                    Trainees.Add(t);
+                }
+                if (Trainees.Count == 0)
+                {
+                    await _dialog.ShowAsync(GetLocalizedString("NoTraineesFound"), GetLocalizedString("NotificationTitle"), DialogType.Info);
+                }
+            }
+            catch (Exception ex)
+            {
+                await _dialog.ShowAsync(string.Format(GetLocalizedString("ErrorLoadingTrainees"), ex.Message), GetLocalizedString("ErrorTitle"), DialogType.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         [RelayCommand]

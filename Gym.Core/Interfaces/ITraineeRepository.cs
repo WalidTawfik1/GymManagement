@@ -12,5 +12,6 @@ namespace Gym.Core.Interfaces
     {
         Task<bool> AddTraineeAsync(TraineeDTO trainee);
         Task<bool> UpdateTraineeAsync(UpdateTraineeDTO trainee);
+        Task<IReadOnlyList<Trainee>> GetTraineeByNameAsync(string name);
     }
 }

@@ -190,13 +190,23 @@
                             <!-- Placeholder watermark -->
                             <TextBlock x:Name="Placeholder" Text="{TemplateBinding Tag}" Visibility="Collapsed"
                                        Foreground="{StaticResource TextSecondaryBrush}" Opacity="0.6"
-                                       IsHitTestVisible="False" Margin="4,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                       IsHitTestVisible="False" Margin="0" VerticalAlignment="Center"
+                                       FlowDirection="{TemplateBinding FlowDirection}" TextAlignment="Right" HorizontalAlignment="Stretch"/>
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
                         <!-- Show placeholder when empty -->
                         <Trigger Property="Text" Value="">
                             <Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <!-- LTR / RTL alignment handling for placeholder -->
+                        <Trigger Property="FlowDirection" Value="LeftToRight">
+                            <Setter TargetName="Placeholder" Property="TextAlignment" Value="Left"/>
+                            <Setter TargetName="Placeholder" Property="Margin" Value="4,0,0,0"/>
+                        </Trigger>
+                        <Trigger Property="FlowDirection" Value="RightToLeft">
+                            <Setter TargetName="Placeholder" Property="TextAlignment" Value="Right"/>
+                            <Setter TargetName="Placeholder" Property="Margin" Value="0,0,4,0"/>
                         </Trigger>
                         <Trigger Property="IsFocused" Value="True">
                             <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
