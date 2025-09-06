@@ -22,28 +22,70 @@
     <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <!-- Modern Header with Language Controls -->
+        <!-- Simplified Header -->
         <Border Grid.Row="0" Background="{StaticResource PrimaryGradientBrush}" Padding="24,16">
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 
+                <!-- Modern Rounded Back Button -->
+                <Button Grid.Column="0" Command="{Binding ShowMainMenuCommand}" 
+                        Visibility="{Binding IsNotMainMenu, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Width="60" Height="40" Margin="0,0,20,0" Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="White" CornerRadius="20" Padding="0">
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="3" BlurRadius="12" Opacity="0.3" Color="#000000"/>
+                                </Border.Effect>
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Path Data="M12,20 L4,12 L12,4" 
+                                              Stroke="#F5B800" StrokeThickness="2.5" 
+                                              StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                              Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Back" FontSize="12" FontWeight="Bold" 
+                                                   Foreground="#F5B800" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#FFF8E1"/>
+                                    <Setter Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect ShadowDepth="4" BlurRadius="16" Opacity="0.4" Color="#F5B800"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="RenderTransform">
+                                        <Setter.Value>
+                                            <ScaleTransform ScaleX="0.96" ScaleY="0.96"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                
                 <!-- App Title -->
-                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
                     <Ellipse Width="32" Height="32" Fill="White" Opacity="0.9" Margin="0,0,12,0"/>
-                    <TextBlock Text="Mambela Gym"
+                    <TextBlock Text="Champions Mambela Gym"
                                FontSize="20" FontWeight="Bold" 
                                Foreground="White" VerticalAlignment="Center"/>
                 </StackPanel>
                 
                 <!-- Language Controls -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="{Binding LanguageLabel}" 
                                Foreground="White" FontWeight="SemiBold" 
                                VerticalAlignment="Center" Margin="0,0,16,0" Opacity="0.9"/>
@@ -95,60 +137,8 @@
             </Grid>
         </Border>
         
-        <!-- Modern Navigation Bar -->
-        <Border Grid.Row="1" Background="White" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="0,0,0,1">
-            <Border.Effect>
-                <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.05" Color="#000000"/>
-            </Border.Effect>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="24,16">
-                <!-- Home Button -->
-                <Button Command="{Binding ShowMainMenuCommand}" 
-                        Style="{StaticResource ModernButtonStyle}"
-                        Background="{StaticResource ChampionGradientBrush}"
-                        Margin="8,0" Padding="24,12">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="🏠" FontSize="16" Margin="0,0,8,0"/>
-                        <TextBlock Text="Home" FontSize="14" FontWeight="SemiBold"/>
-                    </StackPanel>
-                </Button>
-                
-                <!-- Trainees Button -->
-                <Button Command="{Binding ShowTraineesCommand}" 
-                        Style="{StaticResource ModernButtonStyle}"
-                        Background="{StaticResource SecondaryGradientBrush}"
-                        Margin="8,0" Padding="24,12">
-                    <StackPanel Orientation="Horizontal">
-                        <Ellipse Width="20" Height="20" Fill="White" Opacity="0.9" Margin="0,0,8,0"/>
-                        <TextBlock Text="{Binding TraineesLabel}" FontSize="14" FontWeight="SemiBold"/>
-                    </StackPanel>
-                </Button>
-                
-                <!-- Memberships Button -->
-                <Button Command="{Binding ShowMembershipsCommand}" 
-                        Style="{StaticResource ModernButtonStyle}"
-                        Background="{StaticResource PrimaryGradientBrush}"
-                        Margin="8,0" Padding="24,12">
-                    <StackPanel Orientation="Horizontal">
-                        <Ellipse Width="20" Height="20" Fill="White" Opacity="0.9" Margin="0,0,8,0"/>
-                        <TextBlock Text="{Binding MembershipsLabel}" FontSize="14" FontWeight="SemiBold"/>
-                    </StackPanel>
-                </Button>
-                
-                <!-- Visits Button -->
-                <Button Command="{Binding ShowVisitsCommand}" 
-                        Style="{StaticResource ModernButtonStyle}"
-                        Background="{StaticResource AccentGradientBrush}"
-                        Margin="8,0" Padding="24,12">
-                    <StackPanel Orientation="Horizontal">
-                        <Ellipse Width="20" Height="20" Fill="White" Opacity="0.9" Margin="0,0,8,0"/>
-                        <TextBlock Text="{Binding VisitsLabel}" FontSize="14" FontWeight="SemiBold"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Border>
-        
-        <!-- Content Area with Modern Layout -->
-        <Border Grid.Row="2" Background="{StaticResource BackgroundBrush}" Padding="24">
+        <!-- Content Area -->
+        <Border Grid.Row="1" Background="{StaticResource BackgroundBrush}" Padding="24">
             <ContentControl Content="{Binding CurrentViewModel}">
                 <ContentControl.Resources>
                     <DataTemplate DataType="{x:Type viewModels:MainMenuViewModel}">

@@ -23,7 +23,7 @@
         </Grid.RowDefinitions>
         
         <!-- Modern Header -->
-        <Border Grid.Row="0" Background="{StaticResource PrimaryGradientBrush}" 
+        <Border Grid.Row="0" Background="Black" 
                 Style="{StaticResource ModernCardStyle}" Margin="0,0,0,24">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -41,7 +41,7 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <Border Background="White" CornerRadius="20" Padding="12,8" Opacity="0.9">
                         <StackPanel Orientation="Horizontal">
-                            <Ellipse Width="8" Height="8" Fill="{StaticResource PrimaryBrush}" Margin="0,0,8,0"/>
+                            <Ellipse Width="8" Height="8" Fill="Black" Margin="0,0,8,0"/>
                             <TextBlock Text="إدارة العضويات" FontSize="12" FontWeight="SemiBold" 
                                        Foreground="{StaticResource TextPrimaryBrush}"/>
                         </StackPanel>
@@ -84,7 +84,7 @@
                                     <Border Background="{TemplateBinding Background}" CornerRadius="20" Padding="{TemplateBinding Padding}">
                                         <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
                                             <Ellipse Width="12" Height="12" Fill="White" Margin="0,0,6,0"/>
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextBlock.Foreground="White"/>
                                         </StackPanel>
                                     </Border>
                                     <ControlTemplate.Triggers>
@@ -109,7 +109,7 @@
                         <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="قائمة العضويات" FontSize="18" FontWeight="Bold"
                                        Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <Ellipse Width="20" Height="20" Fill="{StaticResource PrimaryBrush}"/>
+                            <Ellipse Width="20" Height="20" Fill="Black"/>
                         </StackPanel>
                     </Grid>
 
@@ -279,7 +279,7 @@
                     
                         <!-- Form Header -->
                         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,24" HorizontalAlignment="Center">
-                            <Ellipse Width="24" Height="24" Fill="#6366F1" Margin="0,0,12,0"/>
+                            <Ellipse Width="24" Height="24" Fill="Black" Margin="0,0,12,0"/>
                             <TextBlock Text="إضافة عضوية جديدة" FontSize="18" FontWeight="Bold" 
                                        Foreground="#1F2937" VerticalAlignment="Center"/>
                         </StackPanel>

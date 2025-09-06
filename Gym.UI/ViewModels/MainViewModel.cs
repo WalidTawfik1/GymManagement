@@ -46,6 +46,9 @@ namespace Gym.UI.ViewModels
         [ObservableProperty]
         private BaseViewModel _currentViewModel;
 
+        [ObservableProperty]
+        private bool _isNotMainMenu = false;
+
         // Localized Labels
         [ObservableProperty]
         private string _languageLabel = string.Empty;
@@ -97,24 +100,28 @@ namespace Gym.UI.ViewModels
         private void ShowMainMenu()
         {
             CurrentViewModel = MainMenuViewModel;
+            IsNotMainMenu = false;
         }
 
         [RelayCommand]
         private void ShowTrainees()
         {
             CurrentViewModel = TraineeViewModel;
+            IsNotMainMenu = true;
         }
 
         [RelayCommand]
         private void ShowMemberships()
         {
             CurrentViewModel = MembershipViewModel;
+            IsNotMainMenu = true;
         }
 
         [RelayCommand]
         private void ShowVisits()
         {
             CurrentViewModel = VisitViewModel;
+            IsNotMainMenu = true;
         }
 
         [RelayCommand]

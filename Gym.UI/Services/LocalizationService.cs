@@ -73,6 +73,12 @@ namespace Gym.UI.Services
                     ["Trainees"] = "المتدربين",
                     ["Memberships"] = "العضويات", 
                     ["Visits"] = "الزيارات",
+                    ["TraineeManagementTitle"] = "إدارة المتدربين",
+                    ["MembershipManagementTitle"] = "إدارة العضويات", 
+                    ["VisitManagementTitle"] = "إدارة الزيارات",
+                    ["TraineeManagementDesc"] = "إدارة معلومات أعضاء النادي والمتدربين",
+                    ["MembershipManagementDesc"] = "إدارة الاشتراكات وخطط العضوية",
+                    ["VisitManagementDesc"] = "تتبع زيارات النادي وسجلات الحضور",
                     
                     // Trainee Management
                     ["TraineeManagement"] = "إدارة المتدربين",
@@ -202,6 +208,12 @@ namespace Gym.UI.Services
                     ["Trainees"] = "Trainees",
                     ["Memberships"] = "Memberships",
                     ["Visits"] = "Visits",
+                    ["TraineeManagementTitle"] = "Trainee Management",
+                    ["MembershipManagementTitle"] = "Membership Management", 
+                    ["VisitManagementTitle"] = "Visit Management",
+                    ["TraineeManagementDesc"] = "Manage gym members and trainee information",
+                    ["MembershipManagementDesc"] = "Handle subscriptions and membership plans",
+                    ["VisitManagementDesc"] = "Track gym visits and attendance records",
                     
                     // Trainee Management
                     ["TraineeManagement"] = "Trainee Management",

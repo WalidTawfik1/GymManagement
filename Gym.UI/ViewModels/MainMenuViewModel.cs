@@ -9,9 +9,46 @@ namespace Gym.UI.ViewModels
     {
         public event Action<string>? NavigationRequested;
 
+        [ObservableProperty]
+        private string _traineeManagementTitle = string.Empty;
+        
+        [ObservableProperty]
+        private string _membershipManagementTitle = string.Empty;
+        
+        [ObservableProperty]
+        private string _visitManagementTitle = string.Empty;
+        
+        [ObservableProperty]
+        private string _traineeManagementDesc = string.Empty;
+        
+        [ObservableProperty]
+        private string _membershipManagementDesc = string.Empty;
+        
+        [ObservableProperty]
+        private string _visitManagementDesc = string.Empty;
+
         public MainMenuViewModel(ILocalizationService localizationService) : base(localizationService)
         {
             Title = GetLocalizedString("MainMenu");
+            UpdateLocalizedLabels();
+            
+            // Subscribe to language changes
+            _localizationService.LanguageChanged += OnLanguageChangedEvent;
+        }
+
+        private void OnLanguageChangedEvent(object? sender, EventArgs e)
+        {
+            UpdateLocalizedLabels();
+        }
+
+        private void UpdateLocalizedLabels()
+        {
+            TraineeManagementTitle = GetLocalizedString("TraineeManagementTitle");
+            MembershipManagementTitle = GetLocalizedString("MembershipManagementTitle");
+            VisitManagementTitle = GetLocalizedString("VisitManagementTitle");
+            TraineeManagementDesc = GetLocalizedString("TraineeManagementDesc");
+            MembershipManagementDesc = GetLocalizedString("MembershipManagementDesc");
+            VisitManagementDesc = GetLocalizedString("VisitManagementDesc");
         }
 
         [RelayCommand]
@@ -35,6 +72,7 @@ namespace Gym.UI.ViewModels
         protected override void OnLanguageChanged()
         {
             Title = GetLocalizedString("MainMenu");
+            UpdateLocalizedLabels();
         }
     }
 }

@@ -24,7 +24,7 @@
         </Grid.RowDefinitions>
         
         <!-- Modern Header -->
-        <Border Grid.Row="0" Background="{StaticResource AccentGradientBrush}" 
+        <Border Grid.Row="0" Background="Black" 
                 Style="{StaticResource ModernCardStyle}" Margin="0,0,0,24">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -42,7 +42,7 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <Border Background="White" CornerRadius="20" Padding="12,8" Opacity="0.9">
                         <StackPanel Orientation="Horizontal">
-                            <Ellipse Width="8" Height="8" Fill="{StaticResource AccentBrush}" Margin="0,0,8,0"/>
+                            <Ellipse Width="8" Height="8" Fill="Black" Margin="0,0,8,0"/>
                             <TextBlock Text="إدارة الزيارات" FontSize="12" FontWeight="SemiBold" 
                                        Foreground="{StaticResource TextPrimaryBrush}"/>
                         </StackPanel>
@@ -75,7 +75,7 @@
                         </Grid.ColumnDefinitions>
                         
                         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Ellipse Width="20" Height="20" Fill="{StaticResource AccentBrush}" Margin="0,0,12,0"/>
+                            <Ellipse Width="20" Height="20" Fill="Black" Margin="0,0,12,0"/>
                             <TextBlock Text="زيارات اليوم" FontSize="18" FontWeight="Bold" 
                                        Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -101,7 +101,7 @@
                                             Padding="{TemplateBinding Padding}">
                                         <StackPanel Orientation="Horizontal">
                                             <Ellipse Width="12" Height="12" Fill="White" Margin="0,0,6,0"/>
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextBlock.Foreground="White"/>
                                         </StackPanel>
                                     </Border>
                                     <ControlTemplate.Triggers>
@@ -206,7 +206,7 @@
                     
                     <!-- Form Header -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,24" HorizontalAlignment="Center">
-                        <Ellipse Width="24" Height="24" Fill="{StaticResource AccentBrush}" Margin="0,0,12,0"/>
+                        <Ellipse Width="24" Height="24" Fill="Black" Margin="0,0,12,0"/>
                         <TextBlock Text="تسجيل زيارة" FontSize="18" FontWeight="Bold" 
                                    Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                     </StackPanel>
@@ -239,7 +239,7 @@
                         <StackPanel>
                             <!-- Info Header -->
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,16" HorizontalAlignment="Center">
-                                <Ellipse Width="16" Height="16" Fill="{StaticResource InfoBrush}" Margin="0,0,8,0"/>
+                                <Ellipse Width="16" Height="16" Fill="Black" Margin="0,0,8,0"/>
                                 <TextBlock Text="معلومات العضوية" FontSize="14" FontWeight="Bold" 
                                            Foreground="{StaticResource TextPrimaryBrush}"/>
                             </StackPanel>
