@@ -289,8 +289,19 @@
                                 </Border>
                                 
                                 <!-- Status Message -->
-                                <Border Grid.Row="3" Background="{Binding LastVisitIsActive, Converter={StaticResource BooleanToColorConverter}}" 
-                                        CornerRadius="8" Padding="12,8">
+                                <Border Grid.Row="3" CornerRadius="8" Padding="12,8">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <!-- Default background based on active membership -->
+                                            <Setter Property="Background" Value="{Binding LastVisitIsActive, Converter={StaticResource BooleanToColorConverter}}"/>
+                                            <Style.Triggers>
+                                                <!-- Show red when trainee already checked in today -->
+                                                <DataTrigger Binding="{Binding LastVisitMessage}" Value="المتدرب قام بتسجيل الدخول اليوم بالفعل">
+                                                    <Setter Property="Background" Value="{StaticResource DangerBrush}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                     <TextBlock Text="{Binding LastVisitMessage}" FontSize="12" FontWeight="SemiBold"
                                                Foreground="White" TextWrapping="Wrap" TextAlignment="Center"/>
                                 </Border>

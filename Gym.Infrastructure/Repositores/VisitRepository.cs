@@ -29,26 +29,45 @@ namespace Gym.Infrastructure.Repositores
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                // Ensure expired memberships are deactivated first (important business rule)
+                var hasActive = await HasActiveMembershipAsync(traineeId); // also deactivates expired ones
+
+                // Pre-load active membership & trainee (used also for failure responses)
+                var activeMembership = hasActive
+                    ? await _context.Memberships
+                        .Include(m => m.Trainee)
+                        .Where(m => m.TraineeId == traineeId &&
+                                   m.EndDate >= DateOnly.FromDateTime(DateTime.Now) &&
+                                   m.IsActive &&
+                                   !m.IsDeleted)
+                        .OrderBy(m => m.EndDate)
+                        .FirstOrDefaultAsync()
+                    : null;
+
+                var traineeEntity = activeMembership?.Trainee ?? await _context.Trainees.FindAsync(traineeId);
+
                 if (await IsTraineeCheckedInAsync(traineeId))
                 {
+                    // Already checked in today – still return membership details so UI can display them
                     return new VisitResponseDTO
                     {
-                        TraineeName = "",
-                        MembershipType = "",
-                        RemainingSessions = null,
-                        IsActive = false,
+                        TraineeName = traineeEntity?.FullName ?? string.Empty,
+                        MembershipType = activeMembership?.MembershipType ?? string.Empty,
+                        RemainingSessions = activeMembership?.RemainingSessions,
+                        IsActive = activeMembership?.IsActive ?? false,
                         VisitDate = DateTime.Now,
                         Message = "المتدرب قام بتسجيل الدخول اليوم بالفعل"
                     };
                 }
 
-                // Check if trainee has active membership before creating visit
-                if (!await HasActiveMembershipAsync(traineeId))
+                // No active membership (after pre-load) => return trainee name if available
+                if (activeMembership == null)
                 {
+                    // Ensure we reflect current active membership state (none)
                     return new VisitResponseDTO
                     {
-                        TraineeName = "",
-                        MembershipType = "",
+                        TraineeName = traineeEntity?.FullName ?? string.Empty,
+                        MembershipType = string.Empty,
                         RemainingSessions = null,
                         IsActive = false,
                         VisitDate = DateTime.Now,
@@ -63,41 +82,16 @@ namespace Gym.Infrastructure.Repositores
                 };
                 
                 await _context.Visits.AddAsync(visit);
-
-                // Get membership info before updating sessions
-                var membership = await _context.Memberships
-                    .Include(m => m.Trainee)
-                    .Where(m => m.TraineeId == traineeId && 
-                               m.EndDate >= DateOnly.FromDateTime(DateTime.Now) && 
-                               m.IsActive && 
-                               !m.IsDeleted)
-                    .OrderBy(m => m.EndDate)
-                    .FirstOrDefaultAsync();
-
-                if (membership == null)
+                // Decrement sessions directly on the active membership entity we already have
+                if ((activeMembership.MembershipType == "محدود" || activeMembership.MembershipType == "Limit") && activeMembership.RemainingSessions.HasValue)
                 {
-                    await transaction.RollbackAsync();
-                    return new VisitResponseDTO
+                    activeMembership.RemainingSessions -= 1;
+                    if (activeMembership.RemainingSessions <= 0)
                     {
-                        TraineeName = "",
-                        MembershipType = "",
-                        RemainingSessions = null,
-                        IsActive = false,
-                        VisitDate = DateTime.Now,
-                        Message = "لم يتم العثور على اشتراك نشط"
-                    };
-                }
-
-                // Decrement sessions directly on the membership entity we already have
-                if ((membership.MembershipType == "محدود" || membership.MembershipType == "Limit") && membership.RemainingSessions.HasValue)
-                {
-                    membership.RemainingSessions -= 1;
-                    if (membership.RemainingSessions <= 0)
-                    {
-                        membership.IsActive = false; // Deactivate membership if no sessions left
+                        activeMembership.IsActive = false; // Deactivate membership if no sessions left
                     }
-                    membership.UpdatedAt = DateTime.Now;
-                    _context.Memberships.Update(membership);
+                    activeMembership.UpdatedAt = DateTime.Now;
+                    _context.Memberships.Update(activeMembership);
                 }
 
                 await _context.SaveChangesAsync();
@@ -105,10 +99,10 @@ namespace Gym.Infrastructure.Repositores
                 
                 return new VisitResponseDTO
                 {
-                    TraineeName = membership.Trainee?.FullName ?? "",
-                    MembershipType = membership.MembershipType,
-                    RemainingSessions = membership.RemainingSessions,
-                    IsActive = membership.IsActive,
+                    TraineeName = activeMembership.Trainee?.FullName ?? "",
+                    MembershipType = activeMembership.MembershipType,
+                    RemainingSessions = activeMembership.RemainingSessions,
+                    IsActive = activeMembership.IsActive,
                     VisitDate = visit.VisitDate,
                     Message = "تم تسجيل الزيارة بنجاح"
                 };

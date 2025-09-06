@@ -101,6 +101,17 @@
                 <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.05" Color="#000000"/>
             </Border.Effect>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="24,16">
+                <!-- Home Button -->
+                <Button Command="{Binding ShowMainMenuCommand}" 
+                        Style="{StaticResource ModernButtonStyle}"
+                        Background="{StaticResource ChampionGradientBrush}"
+                        Margin="8,0" Padding="24,12">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🏠" FontSize="16" Margin="0,0,8,0"/>
+                        <TextBlock Text="Home" FontSize="14" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
+                
                 <!-- Trainees Button -->
                 <Button Command="{Binding ShowTraineesCommand}" 
                         Style="{StaticResource ModernButtonStyle}"
@@ -140,6 +151,9 @@
         <Border Grid.Row="2" Background="{StaticResource BackgroundBrush}" Padding="24">
             <ContentControl Content="{Binding CurrentViewModel}">
                 <ContentControl.Resources>
+                    <DataTemplate DataType="{x:Type viewModels:MainMenuViewModel}">
+                        <views:SimpleMenuView/>
+                    </DataTemplate>
                     <DataTemplate DataType="{x:Type viewModels:TraineeViewModel}">
                         <views:TraineeView/>
                     </DataTemplate>

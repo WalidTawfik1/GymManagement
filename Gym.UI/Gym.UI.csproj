@@ -10,9 +10,15 @@
 
   <ItemGroup>
     <Folder Include="Controls\" />
-    <Folder Include="Resources\" />
     <Folder Include="ViewModels\" />
     <Folder Include="Views\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\trainer.png" />
+    <Resource Include="Resources\member-card.png" />
+    <Resource Include="Resources\Adobe Express - file.png" />
+    <Resource Include="Resources\GymLogo.jpg" />
   </ItemGroup>
 
   <ItemGroup>

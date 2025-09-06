@@ -19,12 +19,16 @@ namespace Gym.UI.ViewModels
             UpdateLocalizedLabels();
             
             // Initialize ViewModels
+            MainMenuViewModel = new MainMenuViewModel(_localizationService);
             TraineeViewModel = new TraineeViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             MembershipViewModel = new MembershipViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             VisitViewModel = new VisitViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             
-            // Set default active view
-            CurrentViewModel = TraineeViewModel;
+            // Subscribe to menu navigation
+            MainMenuViewModel.NavigationRequested += OnNavigationRequested;
+            
+            // Set default active view to menu
+            CurrentViewModel = MainMenuViewModel;
 
             // Subscribe to language changes
             _localizationService.LanguageChanged += OnLanguageChanged;
@@ -64,6 +68,7 @@ namespace Gym.UI.ViewModels
         public TraineeViewModel TraineeViewModel { get; }
         public MembershipViewModel MembershipViewModel { get; }
         public VisitViewModel VisitViewModel { get; }
+        public MainMenuViewModel MainMenuViewModel { get; }
 
         private void OnLanguageChanged(object? sender, EventArgs e)
         {
@@ -89,6 +94,12 @@ namespace Gym.UI.ViewModels
         }
 
         [RelayCommand]
+        private void ShowMainMenu()
+        {
+            CurrentViewModel = MainMenuViewModel;
+        }
+
+        [RelayCommand]
         private void ShowTrainees()
         {
             CurrentViewModel = TraineeViewModel;
@@ -110,6 +121,22 @@ namespace Gym.UI.ViewModels
         private void SetLanguage(string languageCode)
         {
             _localizationService.SetLanguage(languageCode);
+        }
+
+        private void OnNavigationRequested(string destination)
+        {
+            switch (destination)
+            {
+                case "Trainees":
+                    ShowTrainees();
+                    break;
+                case "Memberships":
+                    ShowMemberships();
+                    break;
+                case "Visits":
+                    ShowVisits();
+                    break;
+            }
         }
     }
 }

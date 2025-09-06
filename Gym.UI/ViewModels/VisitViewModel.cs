@@ -130,9 +130,14 @@ namespace Gym.UI.ViewModels
 
                 var visitResponse = await _unitOfWork.VisitRepository.AddVisitAsync(traineeIdInt);
 
-                if (visitResponse != null)
+                if (visitResponse == null)
                 {
-                    // Display the membership information after successful visit
+                    // Attempt to load membership info anyway
+                    await PopulateMembershipInfoFallback(traineeIdInt, GetLocalizedString("ErrorRecordingVisit"));
+                }
+                else
+                {
+                    // Always show the returned info (even if message indicates a failure like already checked in)
                     LastVisitTraineeName = visitResponse.TraineeName;
                     LastVisitMembershipType = visitResponse.MembershipType;
                     LastVisitRemainingSessions = visitResponse.RemainingSessions;
@@ -140,18 +145,25 @@ namespace Gym.UI.ViewModels
                     LastVisitMessage = visitResponse.Message;
                     ShowLastVisitInfo = true;
 
-                    // Clear the trainee ID for next visit
-                    TraineeId = string.Empty;
-                    VisitDate = DateTime.Now;
+                    // If response indicates success text, show success dialog else info/warning
+                    var type = visitResponse.Message.Contains("تم تسجيل الزيارة") ? DialogType.Success : DialogType.Info;
+                    await _dialog.ShowAsync(visitResponse.Message, type == DialogType.Success ? GetLocalizedString("SuccessTitle") : GetLocalizedString("NotificationTitle"), type);
 
-                    await _dialog.ShowAsync(visitResponse.Message, GetLocalizedString("SuccessTitle"), DialogType.Success);
-                    
-                    // Reload visits to show the new visit
-                    await LoadVisits();
-                }
-                else
-                {
-                    await _dialog.ShowAsync(GetLocalizedString("ErrorRecordingVisit"), GetLocalizedString("ErrorTitle"), DialogType.Error);
+                    // Only clear and reload list if a visit was actually recorded (success phrase)
+                    if (type == DialogType.Success)
+                    {
+                        TraineeId = string.Empty;
+                        VisitDate = DateTime.Now;
+                        await LoadVisits();
+                    }
+                    else
+                    {
+                        // Ensure membership info present; if empty fetch fallback
+                        if (string.IsNullOrWhiteSpace(LastVisitTraineeName))
+                        {
+                            await PopulateMembershipInfoFallback(traineeIdInt, visitResponse.Message);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -162,6 +174,21 @@ namespace Gym.UI.ViewModels
             {
                 IsBusy = false;
             }
+        }
+
+        private async Task PopulateMembershipInfoFallback(int traineeId, string message)
+        {
+            try
+            {
+                var membership = await _unitOfWork.MembershipRepository.GetMembershipByTraineeIdAsync(traineeId);
+                LastVisitTraineeName = membership?.TraineeName ?? string.Empty;
+                LastVisitMembershipType = membership?.MembershipType ?? string.Empty;
+                LastVisitRemainingSessions = membership?.RemainingSessions;
+                LastVisitIsActive = membership?.IsActive ?? false;
+                LastVisitMessage = message;
+                ShowLastVisitInfo = true;
+            }
+            catch { /* swallow fallback errors */ }
         }
 
         [RelayCommand]
