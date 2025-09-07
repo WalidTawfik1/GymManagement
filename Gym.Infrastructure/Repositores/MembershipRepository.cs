@@ -24,12 +24,17 @@ namespace Gym.Infrastructure.Repositores
 
         public async Task<bool> AddMembership(AddMembershipDTO membershipDTO)
         {
-            if (membershipDTO.MembershipType == "محدود" || membershipDTO.MembershipType == "Limit")
+            var hasActiveMembership = await GetMembershipByTraineeIdAsync(membershipDTO.TraineeId);
+
+            if (hasActiveMembership != null) return false;
+
+            if (membershipDTO.MembershipType == "12 حصة" || membershipDTO.MembershipType == "12 Sessions")
             {
                 var membership = new Membership
                 {
                     TraineeId = membershipDTO.TraineeId,
                     MembershipType = membershipDTO.MembershipType,
+                    Price = membershipDTO.Price,
                     StartDate = DateOnly.FromDateTime(DateTime.Now),
                     EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
                     RemainingSessions = 12,
@@ -37,12 +42,27 @@ namespace Gym.Infrastructure.Repositores
                 };
                 await _context.Memberships.AddAsync(membership);
             }
-            else
+            else if(membershipDTO.MembershipType == "3 شهور" || membershipDTO.MembershipType == "3 Months")
             {
                 var membership = new Membership
                 {
                     TraineeId = membershipDTO.TraineeId,
                     MembershipType = membershipDTO.MembershipType,
+                    Price = membershipDTO.Price,
+                    StartDate = DateOnly.FromDateTime(DateTime.Now),
+                    EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(3)),
+                    RemainingSessions = null,
+                    IsActive = true
+                };
+                await _context.Memberships.AddAsync(membership);
+            }
+            else if(membershipDTO.MembershipType == "شهر" || membershipDTO.MembershipType == "1 Month")
+            {
+                var membership = new Membership
+                {
+                    TraineeId = membershipDTO.TraineeId,
+                    MembershipType = membershipDTO.MembershipType,
+                    Price = membershipDTO.Price,
                     StartDate = DateOnly.FromDateTime(DateTime.Now),
                     EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
                     RemainingSessions = null,

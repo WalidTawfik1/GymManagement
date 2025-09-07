@@ -21,10 +21,14 @@
     <SolidColorBrush x:Key="InfoBrush" Color="#0891B2"/>
     <SolidColorBrush x:Key="SuccessBrush" Color="#059669"/>
     
-    <!-- Background Colors (Warm neutrals to complement golden theme) -->
-    <SolidColorBrush x:Key="BackgroundBrush" Color="#FFFCF5"/>
+    <!-- Background Colors (Purple theme) -->
+    <SolidColorBrush x:Key="BackgroundBrush" Color="#6B46C1"/>
     <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
+    
+    <!-- Purple theme variants -->
+    <SolidColorBrush x:Key="PurpleLightBrush" Color="#8B5CF6"/>
+    <SolidColorBrush x:Key="PurpleDarkBrush" Color="#5B21B6"/>
     
     <!-- Text Colors (High contrast for readability) -->
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1A1A1A"/>
@@ -332,7 +336,7 @@
     <Style x:Key="ModernCardStyle" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource CardBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="CornerRadius" Value="12"/>
         <Setter Property="Padding" Value="24"/>
         <Setter Property="Effect">

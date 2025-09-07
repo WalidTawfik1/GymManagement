@@ -123,7 +123,9 @@ namespace Gym.UI.Services
                     
                     // Membership Types
                     ["مفتوح"] = "مفتوح",
-                    ["محدود"] = "12 حصة",
+                    ["12 حصة"] = "12 حصة",
+                    ["3 شهور"] = "3 شهور",
+                    ["شهر"] = "شهر",
                     
                     // Messages
                     ["SuccessTitle"] = "نجح",
@@ -169,6 +171,9 @@ namespace Gym.UI.Services
                     ["MembershipUpdatedSuccess"] = "تم تحديث العضوية بنجاح!",
                     ["MembershipAddedSuccessOpen"] = "تم إضافة العضوية بنجاح (مفتوح)",
                     ["MembershipAddedSuccessLimited"] = "تم إضافة العضوية بنجاح (12 حصة)",
+                    ["MembershipAddedSuccess3Months"] = "تم إضافة العضوية بنجاح (3 شهور)",
+                    ["MembershipAddedSuccess1Month"] = "تم إضافة العضوية بنجاح (شهر)",
+                    ["MembershipAddedSuccessGeneric"] = "تم إضافة العضوية بنجاح",
                     ["EnterAllRequiredFields"] = "يرجى ملء جميع الحقول المطلوبة.",
                     ["EnterTraineeIdToSearch"] = "أدخل رقم المتدرب للبحث",
                     ["InvalidTraineeNumber"] = "رقم متدرب غير صالح",
@@ -258,7 +263,9 @@ namespace Gym.UI.Services
                     
                     // Membership Types
                     ["مفتوح"] = "Open",
-                    ["محدود"] = "12 Sessions",
+                    ["12 حصة"] = "12 Sessions",
+                    ["3 شهور"] = "3 Months", 
+                    ["شهر"] = "1 Month",
                     
                     // Messages
                     ["SuccessTitle"] = "Success",
@@ -304,6 +311,9 @@ namespace Gym.UI.Services
                     , ["MembershipUpdatedSuccess"] = "Membership updated successfully!"
                     , ["MembershipAddedSuccessOpen"] = "Membership added successfully (Open)."
                     , ["MembershipAddedSuccessLimited"] = "Membership added successfully (12 Sessions)."
+                    , ["MembershipAddedSuccess3Months"] = "Membership added successfully (3 Months)."
+                    , ["MembershipAddedSuccess1Month"] = "Membership added successfully (1 Month)."
+                    , ["MembershipAddedSuccessGeneric"] = "Membership added successfully."
                     , ["EnterAllRequiredFields"] = "Please fill in all required fields."
                     , ["EnterTraineeIdToSearch"] = "Enter trainee ID to search"
                     , ["InvalidTraineeNumber"] = "Invalid trainee number"

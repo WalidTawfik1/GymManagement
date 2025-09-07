@@ -83,7 +83,7 @@ namespace Gym.Infrastructure.Repositores
                 
                 await _context.Visits.AddAsync(visit);
                 // Decrement sessions directly on the active membership entity we already have
-                if ((activeMembership.MembershipType == "محدود" || activeMembership.MembershipType == "Limit") && activeMembership.RemainingSessions.HasValue)
+                if ((activeMembership.MembershipType == "12 حصة" || activeMembership.MembershipType == "12 Sessions") && activeMembership.RemainingSessions.HasValue)
                 {
                     activeMembership.RemainingSessions -= 1;
                     if (activeMembership.RemainingSessions <= 0)
@@ -137,7 +137,7 @@ namespace Gym.Infrastructure.Repositores
                 return false; // No active membership found
             }
 
-            if ((membership.MembershipType == "محدود" || membership.MembershipType == "Limit")  && membership.RemainingSessions.HasValue)
+            if ((membership.MembershipType == "12 حصة" || membership.MembershipType == "12 Sessions")  && membership.RemainingSessions.HasValue)
             {
                 membership.RemainingSessions -= 1;
                 if (membership.RemainingSessions <= 0)
@@ -153,9 +153,10 @@ namespace Gym.Infrastructure.Repositores
                 }
                 return true;
             }
-            else if (membership.MembershipType == "مفتوح" || membership.MembershipType == "Open")
+            else if (membership.MembershipType == "3 شهور" || membership.MembershipType == "3 Months" || 
+                     membership.MembershipType == "شهر" || membership.MembershipType == "1 Month")
             {
-                // For unlimited memberships, just check if it's still valid
+                // For time-based memberships, just check if it's still valid
                 // If we reach here, the membership is active and valid (checked above)
                 return true;
             }

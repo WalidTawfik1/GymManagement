@@ -81,8 +81,12 @@ namespace Gym.UI
             {
                 return membershipType switch
                 {
-                    "مفتوح" => "مفتوح", // display only Arabic while keeping original value
-                    "محدود" => "12 حصة", // display label for limited type
+                    "12 حصة" => "12 حصة",
+                    "3 شهور" => "3 شهور", 
+                    "شهر" => "شهر",
+                    "12 Sessions" => "12 Sessions",
+                    "3 Months" => "3 Months",
+                    "1 Month" => "1 Month",
                     _ => membershipType
                 };
             }

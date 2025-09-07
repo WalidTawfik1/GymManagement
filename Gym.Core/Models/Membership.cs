@@ -14,6 +14,8 @@ namespace Gym.Core.Models
 
         public string MembershipType { get; set; }
 
+        public decimal Price { get; set; }
+
         public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
         public DateOnly EndDate { get; set; } = DateOnly.FromDateTime(DateTime.Now.AddMonths(1));
 

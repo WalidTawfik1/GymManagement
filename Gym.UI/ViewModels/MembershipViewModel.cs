@@ -67,6 +67,9 @@ namespace Gym.UI.ViewModels
         private string _membershipType = string.Empty;
 
         [ObservableProperty]
+        private decimal _price;
+
+        [ObservableProperty]
         private DateOnly _startDate = DateOnly.FromDateTime(DateTime.Now);
 
         [ObservableProperty]
@@ -90,8 +93,9 @@ namespace Gym.UI.ViewModels
 
         public List<string> MembershipTypes { get; } = new()
         {
-            "مفتوح",
-            "محدود"
+            "12 حصة",
+            "3 شهور",
+            "شهر"
         };
 
         [RelayCommand]
@@ -154,7 +158,7 @@ namespace Gym.UI.ViewModels
                 traineeId = SelectedTraineeId;
             }
 
-            if (traineeId == 0 || string.IsNullOrWhiteSpace(MembershipType))
+            if (traineeId == 0 || string.IsNullOrWhiteSpace(MembershipType) || Price <= 0)
             {
                 await _dialog.ShowAsync(GetLocalizedString("EnterTraineeIdAndType"), GetLocalizedString("ValidationErrorTitle"), DialogType.Warning);
                 return;
@@ -175,13 +179,20 @@ namespace Gym.UI.ViewModels
                 var membershipDto = new AddMembershipDTO
                 {
                     TraineeId = traineeId,
-                    MembershipType = MembershipType
+                    MembershipType = MembershipType,
+                    Price = Price
                 };
 
                 var success = await _unitOfWork.MembershipRepository.AddMembership(membershipDto);
                 if (success)
                 {
-                    var successKey = MembershipType == "محدود" ? "MembershipAddedSuccessLimited" : "MembershipAddedSuccessOpen";
+                    string successKey = MembershipType switch
+                    {
+                        "12 حصة" or "12 Sessions" => "MembershipAddedSuccessLimited",
+                        "3 شهور" or "3 Months" => "MembershipAddedSuccess3Months", 
+                        "شهر" or "1 Month" => "MembershipAddedSuccess1Month",
+                        _ => "MembershipAddedSuccessGeneric"
+                    };
                     await _dialog.ShowAsync(GetLocalizedString(successKey), GetLocalizedString("SuccessTitle"), DialogType.Success);
                     ClearForm();
                     await LoadMemberships();
@@ -204,7 +215,7 @@ namespace Gym.UI.ViewModels
         [RelayCommand]
         private async Task UpdateMembership()
         {
-            if (SelectedTraineeId == 0 || string.IsNullOrWhiteSpace(MembershipType))
+            if (SelectedTraineeId == 0 || string.IsNullOrWhiteSpace(MembershipType) || Price <= 0)
             {
                 await _dialog.ShowAsync(GetLocalizedString("EnterAllRequiredFields"), GetLocalizedString("ValidationErrorTitle"), DialogType.Warning);
                 return;
@@ -218,6 +229,7 @@ namespace Gym.UI.ViewModels
                     Id = EditMembershipId,
                     TraineeId = SelectedTraineeId,
                     MembershipType = MembershipType,
+                    Price = Price,
                     StartDate = StartDate,
                     EndDate = EndDate,
                     RemainingSessions = RemainingSessions,
@@ -290,6 +302,7 @@ namespace Gym.UI.ViewModels
             EditMembershipId = membership.Id;
             SelectedTraineeId = membership.TraineeId;
             MembershipType = membership.MembershipType;
+            Price = membership.Price;
             StartDate = membership.StartDate;
             EndDate = membership.EndDate;
             RemainingSessions = membership.RemainingSessions;
@@ -304,6 +317,7 @@ namespace Gym.UI.ViewModels
             SelectedTraineeId = 0;
             TraineeIdInput = string.Empty;
             MembershipType = string.Empty;
+            Price = 0;
             StartDate = DateOnly.FromDateTime(DateTime.Now);
             EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(1));
             RemainingSessions = null;

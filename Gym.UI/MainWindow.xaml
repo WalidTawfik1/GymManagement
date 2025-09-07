@@ -8,7 +8,7 @@
         xmlns:viewModels="clr-namespace:Gym.UI.ViewModels"
         mc:Ignorable="d"
         Title="{Binding Title}" Height="750" Width="1200" WindowState="Maximized"
-        Background="#F8FAFC"
+        Background="#6B46C1"
         FlowDirection="{Binding FlowDirection}">
     <Window.Resources>
         <ResourceDictionary>

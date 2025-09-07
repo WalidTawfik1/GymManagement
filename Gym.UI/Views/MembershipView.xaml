@@ -16,7 +16,7 @@
             <local:DateOnlyToStringConverter x:Key="DateOnlyToStringConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Margin="0">
+    <Grid Margin="0" Background="#6B46C1">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -154,7 +154,18 @@
                                         <Setter Property="TextAlignment" Value="Left"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="FontWeight" Value="Medium"/>
-                                        <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+                                        <Setter Property="Foreground" Value="Green"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            
+                            <DataGridTextColumn Header="السعر" Binding="{Binding Price, StringFormat='{}{0:F2} ج.م'}" Width="100" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
@@ -319,8 +330,16 @@
                         </ComboBox>
                     </StackPanel>
                     
+                    <!-- Price Input -->
+                    <StackPanel Grid.Row="3" Margin="0,0,0,16">
+                        <TextBlock Text="السعر (جنيه مصري):" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="#1F2937" Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding Price, UpdateSourceTrigger=PropertyChanged}" 
+                                 Style="{StaticResource ModernTextBoxStyle}"/>
+                    </StackPanel>
+                    
                     <!-- Start Date (Edit Mode Only) -->
-                    <StackPanel Grid.Row="3" Margin="0,0,0,16" 
+                    <StackPanel Grid.Row="4" Margin="0,0,0,16" 
                                 Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TextBlock Text="تاريخ البداية:" FontWeight="SemiBold" FontSize="14"
                                    Foreground="#1F2937" Margin="0,0,0,8"/>
@@ -329,7 +348,7 @@
                     </StackPanel>
                     
                     <!-- End Date (Edit Mode Only) -->
-                    <StackPanel Grid.Row="4" Margin="0,0,0,16" 
+                    <StackPanel Grid.Row="5" Margin="0,0,0,16" 
                                 Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TextBlock Text="تاريخ النهاية:" FontWeight="SemiBold" FontSize="14"
                                    Foreground="#1F2937" Margin="0,0,0,8"/>
@@ -338,7 +357,7 @@
                     </StackPanel>
                     
                     <!-- Remaining Sessions (Edit Mode Only) -->
-                    <StackPanel Grid.Row="5" Margin="0,0,0,16" 
+                    <StackPanel Grid.Row="6" Margin="0,0,0,16" 
                                 Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TextBlock Text="الحصص المتبقية:" FontWeight="SemiBold" FontSize="14"
                                    Foreground="#1F2937" Margin="0,0,0,8"/>
@@ -347,14 +366,14 @@
                     </StackPanel>
                     
                     <!-- Active Status (Edit Mode Only) -->
-                    <StackPanel Grid.Row="6" Margin="0,0,0,20" 
+                    <StackPanel Grid.Row="7" Margin="0,0,0,20" 
                                 Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <CheckBox IsChecked="{Binding IsActive}" Style="{StaticResource ModernCheckBoxStyle}"
                                   Content="نشط" FontWeight="SemiBold" FontSize="14"/>
                     </StackPanel>
                     
                     <!-- Action Buttons -->
-                    <StackPanel Grid.Row="7" Margin="0,0,0,16">
+                    <StackPanel Grid.Row="8" Margin="0,0,0,16">
                         <Button Content="إضافة عضوية" Command="{Binding AddMembershipCommand}" 
                                 Style="{StaticResource SecondaryButtonStyle}"
                                 Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVisibilityConverter}}"
@@ -372,7 +391,7 @@
                     </StackPanel>
                     
                     <!-- Progress Bar -->
-                    <ProgressBar Grid.Row="8" IsIndeterminate="{Binding IsBusy}" 
+                    <ProgressBar Grid.Row="9" IsIndeterminate="{Binding IsBusy}" 
                                  Style="{StaticResource ModernProgressBarStyle}" 
                                  Margin="0,16,0,0"/>
                     </Grid>

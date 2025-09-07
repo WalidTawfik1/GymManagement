@@ -17,7 +17,7 @@
             <local:BooleanToColorConverter x:Key="BooleanToColorConverter"/>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Margin="0">
+    <Grid Margin="0" Background="#6B46C1">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -239,9 +239,9 @@
                         <StackPanel>
                             <!-- Info Header -->
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,16" HorizontalAlignment="Center">
-                                <Ellipse Width="16" Height="16" Fill="Black" Margin="0,0,8,0"/>
+                                <Ellipse Width="16" Height="16" Fill="White" Margin="0,0,8,0"/>
                                 <TextBlock Text="معلومات العضوية" FontSize="14" FontWeight="Bold" 
-                                           Foreground="{StaticResource TextPrimaryBrush}"/>
+                                           Foreground="White"/>
                             </StackPanel>
                             
                             <!-- Member Info Grid -->
@@ -270,7 +270,7 @@
                                                    Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
                                         <Border Background="{StaticResource AccentBrush}" CornerRadius="6" Padding="8,4" HorizontalAlignment="Left">
                                             <TextBlock Text="{Binding LastVisitMembershipType}" FontSize="12" FontWeight="SemiBold"
-                                                       Foreground="White"/>
+                                                       Foreground="Green"/>
                                         </Border>
                                     </StackPanel>
                                 </Border>

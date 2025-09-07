@@ -10,6 +10,7 @@ namespace Gym.Core.DTO
     {
         public int TraineeId { get; set; }
         public string MembershipType { get; set; }
+        public decimal Price { get; set; }
     }
 
     public record MembershipDTO
@@ -18,6 +19,7 @@ namespace Gym.Core.DTO
         public int TraineeId { get; set; }
         public string TraineeName { get; set; }
         public string MembershipType { get; set; }
+        public decimal Price { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
         public int? RemainingSessions { get; set; }
