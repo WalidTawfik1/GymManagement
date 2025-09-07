@@ -32,10 +32,14 @@ namespace Gym.UI.ViewModels
         [ObservableProperty]
         private string _membershipManagementLabel = string.Empty;
 
+        [ObservableProperty]
+        private string _lastUpdatedLabel = string.Empty;
+
         private void UpdateLocalizedLabels()
         {
             Title = GetLocalizedString("MembershipManagement");
             MembershipManagementLabel = GetLocalizedString("MembershipManagement");
+            LastUpdatedLabel = GetLocalizedString("LastUpdated");
         }
 
         // Explicit initialization to avoid starting concurrent DbContext operations in constructor
@@ -94,8 +98,8 @@ namespace Gym.UI.ViewModels
         public List<string> MembershipTypes { get; } = new()
         {
             "12 حصة",
-            "3 شهور",
-            "شهر"
+            "شهر",
+            "3 شهور"
         };
 
         [RelayCommand]
@@ -189,8 +193,8 @@ namespace Gym.UI.ViewModels
                     string successKey = MembershipType switch
                     {
                         "12 حصة" or "12 Sessions" => "MembershipAddedSuccessLimited",
-                        "3 شهور" or "3 Months" => "MembershipAddedSuccess3Months", 
                         "شهر" or "1 Month" => "MembershipAddedSuccess1Month",
+                        "3 شهور" or "3 Months" => "MembershipAddedSuccess3Months", 
                         _ => "MembershipAddedSuccessGeneric"
                     };
                     await _dialog.ShowAsync(GetLocalizedString(successKey), GetLocalizedString("SuccessTitle"), DialogType.Success);

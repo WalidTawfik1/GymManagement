@@ -120,6 +120,7 @@ namespace Gym.UI.Services
                     ["RecordVisit"] = "تسجيل زيارة",
                     ["VisitDate"] = "تاريخ الزيارة",
                     ["Trainee"] = "المتدرب",
+                    ["LastUpdated"] = "آخر تحديث",
                     
                     // Membership Types
                     ["مفتوح"] = "مفتوح",
@@ -260,6 +261,7 @@ namespace Gym.UI.Services
                     ["RecordVisit"] = "Record Visit",
                     ["VisitDate"] = "Visit Date",
                     ["Trainee"] = "Trainee",
+                    ["LastUpdated"] = "Last Updated",
                     
                     // Membership Types
                     ["مفتوح"] = "Open",

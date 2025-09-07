@@ -30,6 +30,11 @@
     <SolidColorBrush x:Key="PurpleLightBrush" Color="#8B5CF6"/>
     <SolidColorBrush x:Key="PurpleDarkBrush" Color="#5B21B6"/>
     
+    <!-- Grey Selection Colors for Lists -->
+    <SolidColorBrush x:Key="SelectionBrush" Color="#F3F4F6"/>
+    <SolidColorBrush x:Key="SelectionDarkBrush" Color="#E5E7EB"/>
+    <SolidColorBrush x:Key="HoverBrush" Color="#F9FAFB"/>
+    
     <!-- Text Colors (High contrast for readability) -->
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1A1A1A"/>
     <SolidColorBrush x:Key="TextSecondaryBrush" Color="#4A4A4A"/>
@@ -260,10 +265,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="#FFF9E6"/>
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource SelectionBrush}"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="#FFF3CD"/>
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource SelectionDarkBrush}"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
@@ -359,6 +364,29 @@
         <Setter Property="RowHeight" Value="48"/>
         <Setter Property="SelectionMode" Value="Single"/>
         <Setter Property="SelectionUnit" Value="FullRow"/>
+        <Setter Property="RowStyle">
+            <Setter.Value>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{StaticResource SelectionBrush}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource SelectionDarkBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource HoverBrush}"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True"/>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" Value="{StaticResource SelectionDarkBrush}"/>
+                        </MultiTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- DataGrid Header Style -->

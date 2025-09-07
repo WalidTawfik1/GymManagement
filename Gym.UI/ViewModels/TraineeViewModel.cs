@@ -64,6 +64,9 @@ namespace Gym.UI.ViewModels
         private string _joinDateLabel = string.Empty;
         
         [ObservableProperty]
+        private string _lastUpdatedLabel = string.Empty;
+        
+        [ObservableProperty]
         private string _actionsLabel = string.Empty;
         
         [ObservableProperty]
@@ -97,6 +100,7 @@ namespace Gym.UI.ViewModels
             FullNameLabel = GetLocalizedString("FullName");
             PhoneNumberLabel = GetLocalizedString("PhoneNumber");
             JoinDateLabel = GetLocalizedString("JoinDate");
+            LastUpdatedLabel = GetLocalizedString("LastUpdated");
             ActionsLabel = GetLocalizedString("Actions");
             EditLabel = GetLocalizedString("Edit");
             DeleteLabel = GetLocalizedString("Delete");
