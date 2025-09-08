@@ -11,5 +11,6 @@ namespace Gym.Core.Interfaces
         ITraineeRepository TraineeRepository { get; }
         IMembershipRepository MembershipRepository { get; }
         IVisitRepository VisitRepository { get; }
+        IAdditionalServiceRepository AdditionalServiceRepository { get; }
     }
 }

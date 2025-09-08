@@ -23,6 +23,7 @@ namespace Gym.UI.ViewModels
             TraineeViewModel = new TraineeViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             MembershipViewModel = new MembershipViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             VisitViewModel = new VisitViewModel(_unitOfWork, _mapper, _localizationService, dialog);
+            AdditionalServiceViewModel = new AdditionalServiceViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             
             // Subscribe to menu navigation
             MainMenuViewModel.NavigationRequested += OnNavigationRequested;
@@ -41,6 +42,7 @@ namespace Gym.UI.ViewModels
             await TraineeViewModel.InitializeAsync();
             await MembershipViewModel.InitializeAsync();
             await VisitViewModel.InitializeAsync();
+            await AdditionalServiceViewModel.InitializeAsync();
         }
 
         [ObservableProperty]
@@ -67,10 +69,14 @@ namespace Gym.UI.ViewModels
         
         [ObservableProperty]
         private string _visitsLabel = string.Empty;
+        
+        [ObservableProperty]
+        private string _additionalServicesLabel = string.Empty;
 
         public TraineeViewModel TraineeViewModel { get; }
         public MembershipViewModel MembershipViewModel { get; }
         public VisitViewModel VisitViewModel { get; }
+        public AdditionalServiceViewModel AdditionalServiceViewModel { get; }
         public MainMenuViewModel MainMenuViewModel { get; }
 
         private void OnLanguageChanged(object? sender, EventArgs e)
@@ -89,6 +95,7 @@ namespace Gym.UI.ViewModels
             TraineesLabel = GetLocalizedString("Trainees");
             MembershipsLabel = GetLocalizedString("Memberships");
             VisitsLabel = GetLocalizedString("Visits");
+            AdditionalServicesLabel = GetLocalizedString("AdditionalServices");
         }
 
         protected override void OnLanguageChanged()
@@ -125,6 +132,13 @@ namespace Gym.UI.ViewModels
         }
 
         [RelayCommand]
+        private void ShowAdditionalServices()
+        {
+            CurrentViewModel = AdditionalServiceViewModel;
+            IsNotMainMenu = true;
+        }
+
+        [RelayCommand]
         private void SetLanguage(string languageCode)
         {
             _localizationService.SetLanguage(languageCode);
@@ -142,6 +156,9 @@ namespace Gym.UI.ViewModels
                     break;
                 case "Visits":
                     ShowVisits();
+                    break;
+                case "AdditionalServices":
+                    ShowAdditionalServices();
                     break;
             }
         }

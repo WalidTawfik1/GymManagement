@@ -73,12 +73,15 @@ namespace Gym.UI.Services
                     ["Trainees"] = "المتدربين",
                     ["Memberships"] = "العضويات", 
                     ["Visits"] = "الزيارات",
+                    ["AdditionalServices"] = "الخدمات الإضافية",
                     ["TraineeManagementTitle"] = "إدارة المتدربين",
                     ["MembershipManagementTitle"] = "إدارة العضويات", 
                     ["VisitManagementTitle"] = "إدارة الزيارات",
+                    ["AdditionalServiceManagementTitle"] = "إدارة الخدمات الإضافية",
                     ["TraineeManagementDesc"] = "إدارة معلومات أعضاء النادي والمتدربين",
                     ["MembershipManagementDesc"] = "إدارة الاشتراكات وخطط العضوية",
                     ["VisitManagementDesc"] = "تتبع زيارات النادي وسجلات الحضور",
+                    ["AdditionalServiceManagementDesc"] = "إدارة الخدمات الإضافية مثل المشاية والميزان وInBody",
                     
                     // Trainee Management
                     ["TraineeManagement"] = "إدارة المتدربين",
@@ -121,6 +124,18 @@ namespace Gym.UI.Services
                     ["VisitDate"] = "تاريخ الزيارة",
                     ["Trainee"] = "المتدرب",
                     ["LastUpdated"] = "آخر تحديث",
+                    
+                    // Additional Service Management
+                    ["AdditionalServiceManagement"] = "إدارة الخدمات الإضافية",
+                    ["AdditionalServicesList"] = "قائمة الخدمات الإضافية",
+                    ["AddNewAdditionalService"] = "إضافة خدمة إضافية جديدة",
+                    ["EditAdditionalService"] = "تعديل الخدمة الإضافية",
+                    ["ServiceType"] = "نوع الخدمة:",
+                    ["Duration"] = "المدة (بالدقائق):",
+                    ["Price"] = "السعر:",
+                    ["ServiceDate"] = "تاريخ الخدمة",
+                    ["AddAdditionalService"] = "إضافة خدمة",
+                    ["UpdateAdditionalService"] = "تحديث خدمة",
                     
                     // Membership Types
                     ["مفتوح"] = "مفتوح",
@@ -214,12 +229,15 @@ namespace Gym.UI.Services
                     ["Trainees"] = "Trainees",
                     ["Memberships"] = "Memberships",
                     ["Visits"] = "Visits",
+                    ["AdditionalServices"] = "Additional Services",
                     ["TraineeManagementTitle"] = "Trainee Management",
                     ["MembershipManagementTitle"] = "Membership Management", 
                     ["VisitManagementTitle"] = "Visit Management",
+                    ["AdditionalServiceManagementTitle"] = "Additional Service Management",
                     ["TraineeManagementDesc"] = "Manage gym members and trainee information",
                     ["MembershipManagementDesc"] = "Handle subscriptions and membership plans",
                     ["VisitManagementDesc"] = "Track gym visits and attendance records",
+                    ["AdditionalServiceManagementDesc"] = "Manage additional services like treadmill, scale and InBody",
                     
                     // Trainee Management
                     ["TraineeManagement"] = "Trainee Management",
@@ -262,6 +280,18 @@ namespace Gym.UI.Services
                     ["VisitDate"] = "Visit Date",
                     ["Trainee"] = "Trainee",
                     ["LastUpdated"] = "Last Updated",
+                    
+                    // Additional Service Management
+                    ["AdditionalServiceManagement"] = "Additional Service Management",
+                    ["AdditionalServicesList"] = "Additional Services List",
+                    ["AddNewAdditionalService"] = "Add New Additional Service",
+                    ["EditAdditionalService"] = "Edit Additional Service",
+                    ["ServiceType"] = "Service Type:",
+                    ["Duration"] = "Duration (minutes):",
+                    ["Price"] = "Price:",
+                    ["ServiceDate"] = "Service Date",
+                    ["AddAdditionalService"] = "Add Service",
+                    ["UpdateAdditionalService"] = "Update Service",
                     
                     // Membership Types
                     ["مفتوح"] = "Open",

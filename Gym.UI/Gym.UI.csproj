@@ -17,6 +17,7 @@
   <ItemGroup>
     <Resource Include="Resources\trainer.png" />
     <Resource Include="Resources\member-card.png" />
+    <Resource Include="Resources\treadmill.png" />
     <Resource Include="Resources\Adobe Express - file.png" />
     <Resource Include="Resources\GymLogo.jpg" />
   </ItemGroup>

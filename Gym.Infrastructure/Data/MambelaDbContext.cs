@@ -15,6 +15,7 @@ namespace Gym.Infrastructure.Data
         public DbSet<Visit> Visits { get; set; }
         public DbSet<Staff> Staff { get; set; }
         public DbSet<StaffAttendance> StaffAttendances { get; set; }
+        public DbSet<AdditionalService> AdditionalServices { get; set; }
 
         public MambelaDbContext(DbContextOptions<MambelaDbContext> options) : base(options)
         {

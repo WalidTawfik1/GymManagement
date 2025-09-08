@@ -267,10 +267,12 @@
                     <StackPanel Grid.Row="3" Margin="0,0,0,16">
                         <Button Content="{Binding AddTraineeLabel}" Command="{Binding AddTraineeCommand}" 
                                 Style="{StaticResource SecondaryButtonStyle}"
+                                Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVisibilityConverter}}"
                                 Padding="20,12" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,12"/>
                         
                         <Button Content="{Binding UpdateTraineeLabel}" Command="{Binding UpdateTraineeCommand}" 
                                 Style="{StaticResource AccentButtonStyle}"
+                                Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}"
                                 Padding="20,12" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,12"/>
                         
                         <Button Content="{Binding ClearFormLabel}" Command="{Binding ClearFormCommand}" 

@@ -203,4 +203,55 @@ namespace Gym.UI
             return Binding.DoNothing; // keep previous value if invalid
         }
     }
+
+    // Converter for calculating price based on service type and duration
+    public class ServiceTypeToPriceConverter : IMultiValueConverter
+    {
+        public static ServiceTypeToPriceConverter Instance { get; } = new ServiceTypeToPriceConverter();
+
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Length >= 2 && values[0] is string serviceType)
+            {
+                return serviceType switch
+                {
+                    "مشاية" => values[1] is int duration ? (decimal)(1.5 * duration) : 0m,
+                    "ميزان" => 5m,
+                    "InBody" => 10m,
+                    _ => 0m
+                };
+            }
+            return 0m;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    // Converter for null DateTime values - shows empty string if DateTime is default/null
+    public class NullDateTimeConverter : IValueConverter
+    {
+        public static NullDateTimeConverter Instance { get; } = new NullDateTimeConverter();
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is DateTime dateTime)
+            {
+                // Check if it's a default DateTime (which would be 01/01/0001)
+                if (dateTime == default(DateTime) || dateTime.Year <= 1)
+                {
+                    return string.Empty;
+                }
+                return dateTime.ToString("dd/MM/yyyy HH:mm");
+            }
+            return string.Empty;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
