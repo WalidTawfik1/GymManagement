@@ -112,5 +112,13 @@ namespace Gym.Infrastructure.Repositores
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<IEnumerable<ExpenseDTO>> GetExpensesByMonthAsync(int month, int year)
+        {
+            var expenses = await Task.Run(() => _context.Expenses
+                .Where(e => e.IncurredAt.Month == month && e.IncurredAt.Year == year && !e.IsDeleted)
+                .ToList());
+            return _mapper.Map<IEnumerable<ExpenseDTO>>(expenses);
+        }
     }
 }

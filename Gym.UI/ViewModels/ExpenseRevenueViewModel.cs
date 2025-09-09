@@ -12,11 +12,24 @@ using System.Windows.Data;
 
 namespace Gym.UI.ViewModels
 {
+    public class FinancialDetailItem
+    {
+        public string Type { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        public string FormattedAmount { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
+        public bool IsIncome { get; set; }
+    }
+
     public partial class ExpenseRevenueViewModel : BaseViewModel
     {
         private readonly IUnitofWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
+
+        // Navigation event
+        public event Action<int, int>? NavigateToDetails;
 
         [ObservableProperty]
         private ObservableCollection<ExpenseDTO> _expenses = new();
@@ -90,6 +103,12 @@ namespace Gym.UI.ViewModels
 
         [ObservableProperty]
         private string _refreshLabel = string.Empty;
+
+        [ObservableProperty]
+        private string _selectedMonthName = string.Empty;
+
+        [ObservableProperty]
+        private bool _isNetProfitPositive = true;
 
         public List<KeyValuePair<int, string>> Months { get; } = new()
         {
@@ -457,6 +476,27 @@ namespace Gym.UI.ViewModels
         private void CancelEdit()
         {
             ClearForm();
+        }
+
+        [RelayCommand]
+        private void ShowDetails()
+        {
+            try
+            {
+                var currentYear = DateTime.Now.Year;
+                NavigateToDetails?.Invoke(SelectedMonth, currentYear);
+            }
+            catch (Exception ex)
+            {
+                // Handle error if needed
+                Console.WriteLine($"Error navigating to details: {ex.Message}");
+            }
+        }
+
+        private void UpdateSelectedMonthName()
+        {
+            var monthInfo = Months.FirstOrDefault(m => m.Key == SelectedMonth);
+            SelectedMonthName = monthInfo.Key != 0 ? monthInfo.Value : "غير محدد";
         }
 
         private void ClearForm()

@@ -15,5 +15,6 @@ namespace Gym.Core.Interfaces
         Task<bool> DeleteExpenseAsync(int id);
         Task<decimal> GetTotalExpensesByMonthAsync(int month);
         Task<decimal> GetTotalRevenueByMonthAsync(int month);
+        Task<IEnumerable<ExpenseDTO>> GetExpensesByMonthAsync(int month, int year);
     }
 }

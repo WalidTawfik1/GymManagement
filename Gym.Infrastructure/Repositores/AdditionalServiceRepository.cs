@@ -105,5 +105,17 @@ namespace Gym.Infrastructure.Repositores
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<IReadOnlyList<AdditionalServiceDTO>> GetAdditionalServicesByMonthAsync(int month, int year)
+        {
+            var services = await _context.AdditionalServices
+                .Include(a => a.Trainee)
+                .Where(a => !a.IsDeleted &&
+                           a.TakenAt.Month == month &&
+                           a.TakenAt.Year == year)
+                .ToListAsync();
+            var servicesDTO = _mapper.Map<IReadOnlyList<AdditionalServiceDTO>>(services);
+            return servicesDTO;
+        }
     }
 }

@@ -104,5 +104,17 @@ namespace Gym.Infrastructure.Repositores
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<IReadOnlyList<MembershipDTO>> GetMembershipsByMonthAsync(int month, int year)
+        {
+            var memberships = await _context.Memberships
+                .Include(m => m.Trainee)
+                .Where(m => !m.IsDeleted && 
+                           m.StartDate.Month == month && 
+                           m.StartDate.Year == year)
+                .ToListAsync();
+            var membershipsDTO = _mapper.Map<IReadOnlyList<MembershipDTO>>(memberships);
+            return membershipsDTO;
+        }
     }
 }

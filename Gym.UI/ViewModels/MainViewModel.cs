@@ -25,9 +25,14 @@ namespace Gym.UI.ViewModels
             VisitViewModel = new VisitViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             AdditionalServiceViewModel = new AdditionalServiceViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             ExpenseRevenueViewModel = new ExpenseRevenueViewModel(_unitOfWork, _mapper, _localizationService, dialog);
+            FinancialDetailsViewModel = new FinancialDetailsViewModel(_unitOfWork, _mapper, _localizationService);
             
             // Subscribe to menu navigation
             MainMenuViewModel.NavigationRequested += OnNavigationRequested;
+            
+            // Subscribe to navigation events
+            ExpenseRevenueViewModel.NavigateToDetails += OnNavigateToFinancialDetails;
+            FinancialDetailsViewModel.NavigateBack += OnNavigateBackToExpenseRevenue;
             
             // Set default active view to menu
             CurrentViewModel = MainMenuViewModel;
@@ -83,6 +88,7 @@ namespace Gym.UI.ViewModels
         public VisitViewModel VisitViewModel { get; }
         public AdditionalServiceViewModel AdditionalServiceViewModel { get; }
         public ExpenseRevenueViewModel ExpenseRevenueViewModel { get; }
+        public FinancialDetailsViewModel FinancialDetailsViewModel { get; }
         public MainMenuViewModel MainMenuViewModel { get; }
 
         private void OnLanguageChanged(object? sender, EventArgs e)
@@ -178,6 +184,19 @@ namespace Gym.UI.ViewModels
                     ShowExpenseRevenue();
                     break;
             }
+        }
+
+        private async void OnNavigateToFinancialDetails(int month, int year)
+        {
+            await FinancialDetailsViewModel.LoadDataAsync(month, year);
+            CurrentViewModel = FinancialDetailsViewModel;
+            IsNotMainMenu = true;
+        }
+
+        private void OnNavigateBackToExpenseRevenue()
+        {
+            CurrentViewModel = ExpenseRevenueViewModel;
+            IsNotMainMenu = true;
         }
     }
 }

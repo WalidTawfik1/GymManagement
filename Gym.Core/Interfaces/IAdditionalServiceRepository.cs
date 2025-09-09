@@ -15,5 +15,6 @@ namespace Gym.Core.Interfaces
         Task<IReadOnlyList<AdditionalServiceDTO>> GetAllAdditionalServicesAsync();
         Task<IReadOnlyList<AdditionalServiceDTO>> GetAdditionalServiceByTraineeIdAsync(int traineeId);
         Task<bool> DeleteAdditionalServiceAsync(int id);
+        Task<IReadOnlyList<AdditionalServiceDTO>> GetAdditionalServicesByMonthAsync(int month, int year);
     }
 }
