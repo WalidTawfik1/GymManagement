@@ -15,7 +15,14 @@ namespace Gym.UI
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool boolValue)
+            {
+                if (parameter is string paramStr && paramStr.Contains('|'))
+                {
+                    var parts = paramStr.Split('|');
+                    return boolValue ? parts[0] : parts[1];
+                }
                 return boolValue ? TrueValue : FalseValue;
+            }
             return FalseValue;
         }
 

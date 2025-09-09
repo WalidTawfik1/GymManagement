@@ -74,14 +74,17 @@ namespace Gym.UI.Services
                     ["Memberships"] = "العضويات", 
                     ["Visits"] = "الزيارات",
                     ["AdditionalServices"] = "الخدمات الإضافية",
+                    ["ExpenseRevenue"] = "المصروفات والإيرادات",
                     ["TraineeManagementTitle"] = "إدارة المتدربين",
                     ["MembershipManagementTitle"] = "إدارة العضويات", 
                     ["VisitManagementTitle"] = "إدارة الزيارات",
                     ["AdditionalServiceManagementTitle"] = "إدارة الخدمات الإضافية",
+                    ["ExpenseRevenueManagementTitle"] = "إدارة المصروفات والإيرادات",
                     ["TraineeManagementDesc"] = "إدارة معلومات أعضاء النادي والمتدربين",
                     ["MembershipManagementDesc"] = "إدارة الاشتراكات وخطط العضوية",
                     ["VisitManagementDesc"] = "تتبع زيارات النادي وسجلات الحضور",
                     ["AdditionalServiceManagementDesc"] = "إدارة الخدمات الإضافية مثل المشاية والميزان وInBody",
+                    ["ExpenseRevenueManagementDesc"] = "إدارة مصروفات النادي وحساب الأرباح",
                     
                     // Trainee Management
                     ["TraineeManagement"] = "إدارة المتدربين",
@@ -136,6 +139,20 @@ namespace Gym.UI.Services
                     ["ServiceDate"] = "تاريخ الخدمة",
                     ["AddAdditionalService"] = "إضافة خدمة",
                     ["UpdateAdditionalService"] = "تحديث خدمة",
+                    
+                    // Expense & Revenue Management
+                    ["ExpenseManagement"] = "إدارة المصروفات والإيرادات",
+                    ["Month"] = "الشهر",
+                    ["ExpenseType"] = "نوع المصروف",
+                    ["Amount"] = "المبلغ", 
+                    ["Description"] = "الوصف",
+                    ["Optional"] = "اختياري",
+                    ["AddExpense"] = "إضافة مصروف",
+                    ["UpdateExpense"] = "تحديث مصروف",
+                    ["DeleteExpense"] = "حذف مصروف",
+                    ["TotalExpenses"] = "إجمالي المصروفات",
+                    ["TotalRevenue"] = "إجمالي الإيرادات",
+                    ["NetProfit"] = "صافي الربح",
                     
                     // Membership Types
                     ["مفتوح"] = "مفتوح",
@@ -230,14 +247,17 @@ namespace Gym.UI.Services
                     ["Memberships"] = "Memberships",
                     ["Visits"] = "Visits",
                     ["AdditionalServices"] = "Additional Services",
+                    ["ExpenseRevenue"] = "Expenses & Revenue",
                     ["TraineeManagementTitle"] = "Trainee Management",
                     ["MembershipManagementTitle"] = "Membership Management", 
                     ["VisitManagementTitle"] = "Visit Management",
                     ["AdditionalServiceManagementTitle"] = "Additional Service Management",
+                    ["ExpenseRevenueManagementTitle"] = "Expense & Revenue Management",
                     ["TraineeManagementDesc"] = "Manage gym members and trainee information",
                     ["MembershipManagementDesc"] = "Handle subscriptions and membership plans",
                     ["VisitManagementDesc"] = "Track gym visits and attendance records",
                     ["AdditionalServiceManagementDesc"] = "Manage additional services like treadmill, scale and InBody",
+                    ["ExpenseRevenueManagementDesc"] = "Manage gym expenses and calculate profits",
                     
                     // Trainee Management
                     ["TraineeManagement"] = "Trainee Management",
@@ -292,6 +312,20 @@ namespace Gym.UI.Services
                     ["ServiceDate"] = "Service Date",
                     ["AddAdditionalService"] = "Add Service",
                     ["UpdateAdditionalService"] = "Update Service",
+                    
+                    // Expense & Revenue Management
+                    ["ExpenseManagement"] = "Expense & Revenue Management",
+                    ["Month"] = "Month",
+                    ["ExpenseType"] = "Expense Type",
+                    ["Amount"] = "Amount",
+                    ["Description"] = "Description", 
+                    ["Optional"] = "Optional",
+                    ["AddExpense"] = "Add Expense",
+                    ["UpdateExpense"] = "Update Expense",
+                    ["DeleteExpense"] = "Delete Expense",
+                    ["TotalExpenses"] = "Total Expenses",
+                    ["TotalRevenue"] = "Total Revenue",
+                    ["NetProfit"] = "Net Profit",
                     
                     // Membership Types
                     ["مفتوح"] = "Open",

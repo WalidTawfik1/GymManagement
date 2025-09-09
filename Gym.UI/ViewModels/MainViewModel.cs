@@ -24,6 +24,7 @@ namespace Gym.UI.ViewModels
             MembershipViewModel = new MembershipViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             VisitViewModel = new VisitViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             AdditionalServiceViewModel = new AdditionalServiceViewModel(_unitOfWork, _mapper, _localizationService, dialog);
+            ExpenseRevenueViewModel = new ExpenseRevenueViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             
             // Subscribe to menu navigation
             MainMenuViewModel.NavigationRequested += OnNavigationRequested;
@@ -43,6 +44,7 @@ namespace Gym.UI.ViewModels
             await MembershipViewModel.InitializeAsync();
             await VisitViewModel.InitializeAsync();
             await AdditionalServiceViewModel.InitializeAsync();
+            await ExpenseRevenueViewModel.InitializeAsync();
         }
 
         [ObservableProperty]
@@ -73,10 +75,14 @@ namespace Gym.UI.ViewModels
         [ObservableProperty]
         private string _additionalServicesLabel = string.Empty;
 
+        [ObservableProperty]
+        private string _expenseRevenueLabel = string.Empty;
+
         public TraineeViewModel TraineeViewModel { get; }
         public MembershipViewModel MembershipViewModel { get; }
         public VisitViewModel VisitViewModel { get; }
         public AdditionalServiceViewModel AdditionalServiceViewModel { get; }
+        public ExpenseRevenueViewModel ExpenseRevenueViewModel { get; }
         public MainMenuViewModel MainMenuViewModel { get; }
 
         private void OnLanguageChanged(object? sender, EventArgs e)
@@ -96,6 +102,7 @@ namespace Gym.UI.ViewModels
             MembershipsLabel = GetLocalizedString("Memberships");
             VisitsLabel = GetLocalizedString("Visits");
             AdditionalServicesLabel = GetLocalizedString("AdditionalServices");
+            ExpenseRevenueLabel = GetLocalizedString("ExpenseRevenue");
         }
 
         protected override void OnLanguageChanged()
@@ -139,6 +146,13 @@ namespace Gym.UI.ViewModels
         }
 
         [RelayCommand]
+        private void ShowExpenseRevenue()
+        {
+            CurrentViewModel = ExpenseRevenueViewModel;
+            IsNotMainMenu = true;
+        }
+
+        [RelayCommand]
         private void SetLanguage(string languageCode)
         {
             _localizationService.SetLanguage(languageCode);
@@ -159,6 +173,9 @@ namespace Gym.UI.ViewModels
                     break;
                 case "AdditionalServices":
                     ShowAdditionalServices();
+                    break;
+                case "ExpenseRevenue":
+                    ShowExpenseRevenue();
                     break;
             }
         }

@@ -156,6 +156,9 @@
                     <DataTemplate DataType="{x:Type viewModels:AdditionalServiceViewModel}">
                         <views:AdditionalServiceView/>
                     </DataTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:ExpenseRevenueViewModel}">
+                        <views:ExpenseRevenueView/>
+                    </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>
         </Border>

@@ -77,7 +77,7 @@ namespace Gym.Infrastructure.Repositores
         public async Task<IReadOnlyList<AdditionalServiceDTO>> GetAdditionalServiceByTraineeIdAsync(int traineeId)
         {
             var additionalServices = await _context.AdditionalServices
-                .Where(a => a.TraineeId == traineeId)
+                .Where(a => a.TraineeId == traineeId && !a.IsDeleted)
                 .OrderByDescending(a => a.TakenAt)
                 .ToListAsync();
             var additionalServicesDTO = _mapper.Map<IReadOnlyList<AdditionalServiceDTO>>(additionalServices);
@@ -87,6 +87,7 @@ namespace Gym.Infrastructure.Repositores
         public async Task<IReadOnlyList<AdditionalServiceDTO>> GetAllAdditionalServicesAsync()
         {
             var additionalServices = await _context.AdditionalServices
+                .Where(a => !a.IsDeleted)
                 .Include(a => a.Trainee)
                 .ToListAsync();
             var additionalServicesDTO = _mapper.Map<IReadOnlyList<AdditionalServiceDTO>>(additionalServices);
@@ -97,7 +98,9 @@ namespace Gym.Infrastructure.Repositores
         {
             var additionalService = await _context.AdditionalServices.FindAsync(additionalServiceDTO.Id);
             if (additionalService == null) return false;
+            var lastDate = additionalService.TakenAt;
             _mapper.Map(additionalServiceDTO, additionalService);
+            additionalService.TakenAt = lastDate;
             additionalService.UpdatedAt = DateTime.Now;
             await _context.SaveChangesAsync();
             return true;
