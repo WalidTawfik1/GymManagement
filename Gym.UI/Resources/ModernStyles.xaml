@@ -1,5 +1,11 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Gym.UI">
+
+    <!-- Converters -->
+    <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    <local:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+    <local:PercentageToColorConverter x:Key="PercentageToColorConverter"/>
 
     <!-- Champions Mambela Gym Brand Color Palette -->
     <!-- Primary Brand Colors (Golden Yellow from Logo) -->

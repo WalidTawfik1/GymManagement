@@ -39,6 +39,9 @@ namespace Gym.UI.ViewModels
         private string _phoneNumber = string.Empty;
 
         [ObservableProperty]
+        private DateOnly _joinDate = DateOnly.FromDateTime(DateTime.Today);
+
+        [ObservableProperty]
         private bool _isEditMode;
 
         [ObservableProperty]
@@ -232,7 +235,8 @@ namespace Gym.UI.ViewModels
                 {
                     Id = EditTraineeId,
                     FullName = FullName,
-                    PhoneNumber = PhoneNumber
+                    PhoneNumber = PhoneNumber,
+                    JoinDate = JoinDate
                 };
 
                 var success = await _unitOfWork.TraineeRepository.UpdateTraineeAsync(updateDto);
@@ -295,6 +299,7 @@ namespace Gym.UI.ViewModels
             EditTraineeId = trainee.Id;
             FullName = trainee.FullName;
             PhoneNumber = trainee.PhoneNumber;
+            JoinDate = trainee.JoinDate;
         }
 
         [RelayCommand]
@@ -304,6 +309,7 @@ namespace Gym.UI.ViewModels
             EditTraineeId = 0;
             FullName = string.Empty;
             PhoneNumber = string.Empty;
+            JoinDate = DateOnly.FromDateTime(DateTime.Today);
             SelectedTrainee = null;
         }
     }

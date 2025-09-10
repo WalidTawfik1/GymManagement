@@ -1,0 +1,414 @@
+<UserControl x:Class="Gym.UI.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="1200">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/ModernStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Dashboard Card Style -->
+            <Style x:Key="DashboardCardStyle" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource CardBrush}"/>
+                <Setter Property="CornerRadius" Value="12"/>
+                <Setter Property="Padding" Value="20"/>
+                <Setter Property="Margin" Value="8"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect ShadowDepth="2" BlurRadius="8" Opacity="0.1" Color="Gray"/>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
+            <!-- Metric Number Style -->
+            <Style x:Key="MetricNumberStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="28"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+            </Style>
+            
+            <!-- Metric Label Style -->
+            <Style x:Key="MetricLabelStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="0,4,0,0"/>
+            </Style>
+            
+            <!-- Growth Indicator Style -->
+            <Style x:Key="GrowthIndicatorStyle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="0,2,0,0"/>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <Grid Background="{StaticResource BackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{StaticResource ChampionGradientBrush}" 
+                CornerRadius="16" Margin="20,20,20,16" Padding="24">
+            <StackPanel HorizontalAlignment="Center">
+                <TextBlock Text="{Binding DashboardTitle}" 
+                           FontSize="28" FontWeight="Bold" 
+                           Foreground="White" 
+                           TextAlignment="Center"
+                           Margin="0,0,0,8"/>
+                <TextBlock Text="{Binding DashboardSubtitle}" 
+                           FontSize="16" 
+                           Foreground="White" 
+                           TextAlignment="Center"
+                           Opacity="0.9"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Loading Indicator -->
+        <Border Grid.Row="1" Background="Transparent" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" Width="200" Height="4" Margin="0,0,0,10"/>
+                <TextBlock Text="{Binding LoadingText}" HorizontalAlignment="Center" 
+                           Foreground="White"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Dashboard Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" 
+                      Visibility="{Binding IsLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                      Margin="20,0,20,20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" MinHeight="350"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Key Metrics Row -->
+                <Grid Grid.Row="0" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Active Members Card -->
+                    <Border Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
+                        <StackPanel>
+                            <Border Width="50" Height="50" Background="{StaticResource SuccessBrush}" 
+                                    CornerRadius="25" HorizontalAlignment="Center" Margin="0,0,0,12">
+                                <TextBlock Text="👥" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="{Binding TotalActiveMembers}" Style="{StaticResource MetricNumberStyle}"/>
+                            <TextBlock Text="{Binding ActiveMembersText}" Style="{StaticResource MetricLabelStyle}"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Monthly Visits Card -->
+                    <Border Grid.Column="1" Style="{StaticResource DashboardCardStyle}">
+                        <StackPanel>
+                            <Border Width="50" Height="50" Background="{StaticResource InfoBrush}" 
+                                    CornerRadius="25" HorizontalAlignment="Center" Margin="0,0,0,12">
+                                <TextBlock Text="📊" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="{Binding TotalVisitsThisMonth}" Style="{StaticResource MetricNumberStyle}"/>
+                            <TextBlock Text="{Binding VisitsThisMonthText}" Style="{StaticResource MetricLabelStyle}"/>
+                            <TextBlock Text="{Binding VisitGrowthText}" Style="{StaticResource GrowthIndicatorStyle}">
+                                <TextBlock.Foreground>
+                                    <SolidColorBrush Color="{Binding MonthlyComparison.VisitGrowthPercentage, Converter={StaticResource PercentageToColorConverter}}"/>
+                                </TextBlock.Foreground>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Expiring Soon Card -->
+                    <Border Grid.Column="2" Style="{StaticResource DashboardCardStyle}">
+                        <StackPanel>
+                            <Border Width="50" Height="50" Background="{StaticResource WarningBrush}" 
+                                    CornerRadius="25" HorizontalAlignment="Center" Margin="0,0,0,12">
+                                <TextBlock Text="⚠️" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="{Binding MembershipsEndingSoon}" Style="{StaticResource MetricNumberStyle}"/>
+                            <TextBlock Text="{Binding EndingSoonText}" Style="{StaticResource MetricLabelStyle}"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Net Profit Card -->
+                    <Border Grid.Column="3" Style="{StaticResource DashboardCardStyle}">
+                        <StackPanel>
+                            <Border Width="50" Height="50" Background="{StaticResource PrimaryBrush}" 
+                                    CornerRadius="25" HorizontalAlignment="Center" Margin="0,0,0,12">
+                                <TextBlock Text="💰" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="{Binding NetProfitThisMonth, StringFormat='{}{0:N2} ج.م'}" Style="{StaticResource MetricNumberStyle}"/>
+                            <TextBlock Text="{Binding NetProfitThisMonthText}" Style="{StaticResource MetricLabelStyle}"/>
+                            <TextBlock Text="{Binding ProfitGrowthText}" Style="{StaticResource GrowthIndicatorStyle}">
+                                <TextBlock.Foreground>
+                                    <SolidColorBrush Color="{Binding MonthlyComparison.ProfitGrowthPercentage, Converter={StaticResource PercentageToColorConverter}}"/>
+                                </TextBlock.Foreground>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                
+                <!-- Secondary Metrics Row -->
+                <Grid Grid.Row="1" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Total Revenue Card -->
+                    <Border Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding TotalRevenueThisMonth, StringFormat='{}{0:N2} ج.م'}" 
+                                       Style="{StaticResource MetricNumberStyle}" FontSize="20"/>
+                            <TextBlock Text="{Binding TotalRevenueText}" Style="{StaticResource MetricLabelStyle}"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Total Expenses Card -->
+                    <Border Grid.Column="1" Style="{StaticResource DashboardCardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding TotalExpensesThisMonth, StringFormat='{}{0:N2} ج.م'}" 
+                                       Style="{StaticResource MetricNumberStyle}" FontSize="20" Foreground="{StaticResource DangerBrush}"/>
+                            <TextBlock Text="{Binding TotalExpensesText}" Style="{StaticResource MetricLabelStyle}"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- New Members Card -->
+                    <Border Grid.Column="2" Style="{StaticResource DashboardCardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding NewMembersThisMonth}" Style="{StaticResource MetricNumberStyle}" FontSize="20"/>
+                            <TextBlock Text="{Binding NewMembersText}" Style="{StaticResource MetricLabelStyle}"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Total Trainees Card -->
+                    <Border Grid.Column="3" Style="{StaticResource DashboardCardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding TotalTrainees}" Style="{StaticResource MetricNumberStyle}" FontSize="20"/>
+                            <TextBlock Text="{Binding TotalTraineesText}" Style="{StaticResource MetricLabelStyle}"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                
+                <!-- Charts Row -->
+                <Grid Grid.Row="2" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Membership Distribution Chart -->
+                    <Border Grid.Column="0" Style="{StaticResource DashboardCardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding MembershipDistributionText}" 
+                                       FontSize="16" FontWeight="SemiBold" 
+                                       Margin="0,0,0,16" HorizontalAlignment="Center"/>
+                            <lvc:PieChart LegendLocation="Bottom" Height="250" 
+                                          Series="{Binding MembershipSeries}"
+                                          x:Name="MembershipChart"
+                                          InnerRadius="40"
+                                          StartingRotationAngle="0">
+                                <lvc:PieChart.DataTooltip>
+                                    <lvc:DefaultTooltip BulletSize="20"/>
+                                </lvc:PieChart.DataTooltip>
+                            </lvc:PieChart>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Monthly Comparison -->
+                    <Border Grid.Column="1" Style="{StaticResource DashboardCardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding MonthlyGrowthText}" 
+                                       FontSize="16" FontWeight="SemiBold" 
+                                       Margin="0,0,0,16" HorizontalAlignment="Center"/>
+                            
+                            <StackPanel Margin="0,8">
+                                <TextBlock Text="{Binding RevenueGrowthLabel}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{Binding RevenueGrowthText}" FontSize="18" FontWeight="Bold">
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="{Binding MonthlyComparison.RevenueGrowthPercentage, Converter={StaticResource PercentageToColorConverter}}"/>
+                                    </TextBlock.Foreground>
+                                </TextBlock>
+                            </StackPanel>
+                            
+                            <StackPanel Margin="0,8">
+                                <TextBlock Text="{Binding MemberGrowthLabel}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{Binding MemberGrowthText}" FontSize="18" FontWeight="Bold">
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="{Binding MonthlyComparison.MemberGrowthPercentage, Converter={StaticResource PercentageToColorConverter}}"/>
+                                    </TextBlock.Foreground>
+                                </TextBlock>
+                            </StackPanel>
+                            
+                            <StackPanel Margin="0,8">
+                                <TextBlock Text="{Binding VisitGrowthLabel}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{Binding VisitGrowthText}" FontSize="18" FontWeight="Bold">
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="{Binding MonthlyComparison.VisitGrowthPercentage, Converter={StaticResource PercentageToColorConverter}}"/>
+                                    </TextBlock.Foreground>
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                
+                <!-- Upcoming Expirations -->
+                <Border Grid.Row="3" Style="{StaticResource DashboardCardStyle}" MinHeight="300">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- Header -->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16" HorizontalAlignment="Center">
+                            <Ellipse Width="20" Height="20" Fill="{StaticResource WarningBrush}" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding UpcomingExpirationsText}" 
+                                       FontSize="16" FontWeight="Bold" 
+                                       Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <!-- Modern DataGrid -->
+                        <DataGrid Grid.Row="1" 
+                                  ItemsSource="{Binding UpcomingExpirations}" 
+                                  Style="{StaticResource ModernDataGridStyle}"
+                                  AutoGenerateColumns="False" 
+                                  IsReadOnly="True"
+                                  CanUserAddRows="False"
+                                  HeadersVisibility="Column"
+                                  FlowDirection="RightToLeft">
+                            <DataGrid.Resources>
+                                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridHeaderStyle}">
+                                    <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="رقم المتدرب" 
+                                                    Binding="{Binding TraineeId}" 
+                                                    Width="120">
+                                    <DataGridTextColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridHeaderStyle}">
+                                            <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.HeaderStyle>
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                            <Setter Property="Foreground" Value="#1F2937"/>
+                                            <Setter Property="FlowDirection" Value="LeftToRight"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                
+                                <DataGridTextColumn Header="اسم المتدرب" 
+                                                    Binding="{Binding TraineeName}" 
+                                                    Width="200">
+                                    <DataGridTextColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridHeaderStyle}">
+                                            <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.HeaderStyle>
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                            <Setter Property="Foreground" Value="#1F2937"/>
+                                            <Setter Property="Margin" Value="12,0"/>
+                                            <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                            <Setter Property="TextAlignment" Value="Right"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                
+                                <DataGridTextColumn Header="نوع العضوية" 
+                                                    Binding="{Binding MembershipType}" 
+                                                    Width="150">
+                                    <DataGridTextColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridHeaderStyle}">
+                                            <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.HeaderStyle>
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="FontWeight" Value="Medium"/>
+                                            <Setter Property="Foreground" Value="#1F2937"/>
+                                            <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                
+                                <DataGridTextColumn Header="تاريخ الانتهاء" 
+                                                    Binding="{Binding EndDate, StringFormat='dd/MM/yyyy'}" 
+                                                    Width="130">
+                                    <DataGridTextColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridHeaderStyle}">
+                                            <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.HeaderStyle>
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Foreground" Value="{StaticResource DangerBrush}"/>
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                            <Setter Property="FlowDirection" Value="LeftToRight"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                
+                                <DataGridTextColumn Header="الجلسات المتبقية" 
+                                                    Binding="{Binding RemainingSessions}" 
+                                                    Width="130">
+                                    <DataGridTextColumn.HeaderStyle>
+                                        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridHeaderStyle}">
+                                            <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.HeaderStyle>
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                            <Setter Property="Foreground" Value="#1F2937"/>
+                                            <Setter Property="FlowDirection" Value="LeftToRight"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

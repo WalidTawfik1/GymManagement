@@ -15,5 +15,6 @@ namespace Gym.Core.Interfaces
         Task<IReadOnlyList<MembershipDTO>> GetAllMembershipsAsync();
         Task<MembershipDTO?> GetMembershipByTraineeIdAsync(int id);
         Task<IReadOnlyList<MembershipDTO>> GetMembershipsByMonthAsync(int month, int year);
+        Task<IReadOnlyList<MembershipDTO>> GetNearFinishMemberships();
     }
 }

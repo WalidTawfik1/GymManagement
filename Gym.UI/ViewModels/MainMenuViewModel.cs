@@ -39,6 +39,12 @@ namespace Gym.UI.ViewModels
         [ObservableProperty]
         private string _expenseRevenueManagementDesc = string.Empty;
 
+        [ObservableProperty]
+        private string _dashboardManagementTitle = string.Empty;
+        
+        [ObservableProperty]
+        private string _dashboardManagementDesc = string.Empty;
+
         public MainMenuViewModel(ILocalizationService localizationService) : base(localizationService)
         {
             Title = GetLocalizedString("MainMenu");
@@ -60,11 +66,13 @@ namespace Gym.UI.ViewModels
             VisitManagementTitle = GetLocalizedString("VisitManagementTitle");
             AdditionalServiceManagementTitle = GetLocalizedString("AdditionalServiceManagementTitle");
             ExpenseRevenueManagementTitle = GetLocalizedString("ExpenseRevenueManagementTitle");
+            DashboardManagementTitle = GetLocalizedString("DashboardManagementTitle");
             TraineeManagementDesc = GetLocalizedString("TraineeManagementDesc");
             MembershipManagementDesc = GetLocalizedString("MembershipManagementDesc");
             VisitManagementDesc = GetLocalizedString("VisitManagementDesc");
             AdditionalServiceManagementDesc = GetLocalizedString("AdditionalServiceManagementDesc");
             ExpenseRevenueManagementDesc = GetLocalizedString("ExpenseRevenueManagementDesc");
+            DashboardManagementDesc = GetLocalizedString("DashboardManagementDesc");
         }
 
         [RelayCommand]
@@ -95,6 +103,12 @@ namespace Gym.UI.ViewModels
         private void ShowExpenseRevenue()
         {
             NavigationRequested?.Invoke("ExpenseRevenue");
+        }
+
+        [RelayCommand]
+        private void ShowDashboard()
+        {
+            NavigationRequested?.Invoke("Dashboard");
         }
 
         protected override void OnLanguageChanged()

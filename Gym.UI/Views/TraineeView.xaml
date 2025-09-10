@@ -237,6 +237,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
@@ -256,15 +257,24 @@
                     </StackPanel>
                     
                     <!-- Phone Number Input -->
-                    <StackPanel Grid.Row="2" Margin="0,0,0,20">
+                    <StackPanel Grid.Row="2" Margin="0,0,0,16">
                         <TextBlock Text="{Binding PhoneNumberLabel}" FontWeight="SemiBold" FontSize="14"
                                    Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                         <TextBox Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}" 
                                  Style="{StaticResource ModernTextBoxStyle}"/>
                     </StackPanel>
                     
+                    <!-- Join Date Input (Only visible in edit mode) -->
+                    <StackPanel Grid.Row="3" Margin="0,0,0,20"
+                                Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Text="{Binding JoinDateLabel}" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding JoinDate, Mode=TwoWay, Converter={StaticResource DateOnlyToStringConverter}, UpdateSourceTrigger=PropertyChanged}" 
+                                 Style="{StaticResource ModernTextBoxStyle}"/>
+                    </StackPanel>
+                    
                     <!-- Action Buttons -->
-                    <StackPanel Grid.Row="3" Margin="0,0,0,16">
+                    <StackPanel Grid.Row="4" Margin="0,0,0,16">
                         <Button Content="{Binding AddTraineeLabel}" Command="{Binding AddTraineeCommand}" 
                                 Style="{StaticResource SecondaryButtonStyle}"
                                 Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVisibilityConverter}}"
@@ -282,7 +292,7 @@
                     </StackPanel>
                     
                     <!-- Progress Bar -->
-                    <ProgressBar Grid.Row="4" IsIndeterminate="{Binding IsBusy}" 
+                    <ProgressBar Grid.Row="5" IsIndeterminate="{Binding IsBusy}" 
                                  Style="{StaticResource ModernProgressBarStyle}" 
                                  Margin="0,16,0,0"/>
                 </Grid>

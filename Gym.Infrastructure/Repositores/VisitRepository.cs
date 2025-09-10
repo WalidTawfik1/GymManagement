@@ -271,5 +271,13 @@ namespace Gym.Infrastructure.Repositores
             return _mapper.Map<IReadOnlyList<VisitDTO>>(visits);
 
         }
+
+        public async Task<int> GetVisitsCountByMonthAsync(int month, int year)
+        {
+            return await _context.Visits
+                .CountAsync(v => v.VisitDate.Month == month && 
+                                v.VisitDate.Year == year && 
+                                !v.IsDeleted);
+        }
     }
 }

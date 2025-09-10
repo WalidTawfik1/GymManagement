@@ -15,5 +15,6 @@ namespace Gym.Core.DTO
     public record UpdateTraineeDTO: TraineeDTO
     {
         public int Id { get; set; }
+        public DateOnly JoinDate { get; set; }
     }
 }

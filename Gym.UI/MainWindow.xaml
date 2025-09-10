@@ -162,6 +162,9 @@
                     <DataTemplate DataType="{x:Type viewModels:FinancialDetailsViewModel}">
                         <views:FinancialDetailsView/>
                     </DataTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:DashboardViewModel}">
+                        <views:DashboardView/>
+                    </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>
         </Border>

@@ -26,6 +26,7 @@ namespace Gym.UI.ViewModels
             AdditionalServiceViewModel = new AdditionalServiceViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             ExpenseRevenueViewModel = new ExpenseRevenueViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             FinancialDetailsViewModel = new FinancialDetailsViewModel(_unitOfWork, _mapper, _localizationService);
+            DashboardViewModel = new DashboardViewModel(_unitOfWork.DashboardRepository, _localizationService);
             
             // Subscribe to menu navigation
             MainMenuViewModel.NavigationRequested += OnNavigationRequested;
@@ -44,12 +45,31 @@ namespace Gym.UI.ViewModels
         // Called after construction (from App.xaml.cs) to load data sequentially and avoid parallel DbContext operations
         public async Task InitializeAsync()
         {
-            // Load in sequence to prevent EF Core concurrency on a single scoped DbContext
-            await TraineeViewModel.InitializeAsync();
-            await MembershipViewModel.InitializeAsync();
-            await VisitViewModel.InitializeAsync();
-            await AdditionalServiceViewModel.InitializeAsync();
-            await ExpenseRevenueViewModel.InitializeAsync();
+            try
+            {
+                // Load in sequence with small delays to prevent EF Core concurrency on a single scoped DbContext
+                await TraineeViewModel.InitializeAsync().ConfigureAwait(false);
+                await Task.Delay(10).ConfigureAwait(false); // Small delay to prevent DbContext threading issues
+                
+                await MembershipViewModel.InitializeAsync().ConfigureAwait(false);
+                await Task.Delay(10).ConfigureAwait(false);
+                
+                await VisitViewModel.InitializeAsync().ConfigureAwait(false);
+                await Task.Delay(10).ConfigureAwait(false);
+                
+                await AdditionalServiceViewModel.InitializeAsync().ConfigureAwait(false);
+                await Task.Delay(10).ConfigureAwait(false);
+                
+                await ExpenseRevenueViewModel.InitializeAsync().ConfigureAwait(false);
+                await Task.Delay(10).ConfigureAwait(false);
+                
+                await DashboardViewModel.InitializeAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error during initialization: {ex.Message}");
+                // Don't rethrow to prevent app crash - individual ViewModels should handle their own errors
+            }
         }
 
         [ObservableProperty]
@@ -90,6 +110,7 @@ namespace Gym.UI.ViewModels
         public ExpenseRevenueViewModel ExpenseRevenueViewModel { get; }
         public FinancialDetailsViewModel FinancialDetailsViewModel { get; }
         public MainMenuViewModel MainMenuViewModel { get; }
+        public DashboardViewModel DashboardViewModel { get; }
 
         private void OnLanguageChanged(object? sender, EventArgs e)
         {
@@ -159,6 +180,13 @@ namespace Gym.UI.ViewModels
         }
 
         [RelayCommand]
+        private void ShowDashboard()
+        {
+            CurrentViewModel = DashboardViewModel;
+            IsNotMainMenu = true;
+        }
+
+        [RelayCommand]
         private void SetLanguage(string languageCode)
         {
             _localizationService.SetLanguage(languageCode);
@@ -182,6 +210,9 @@ namespace Gym.UI.ViewModels
                     break;
                 case "ExpenseRevenue":
                     ShowExpenseRevenue();
+                    break;
+                case "Dashboard":
+                    ShowDashboard();
                     break;
             }
         }

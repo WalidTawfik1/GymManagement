@@ -116,5 +116,17 @@ namespace Gym.Infrastructure.Repositores
             var membershipsDTO = _mapper.Map<IReadOnlyList<MembershipDTO>>(memberships);
             return membershipsDTO;
         }
+
+        public async Task<IReadOnlyList<MembershipDTO>> GetNearFinishMemberships()
+        {
+            var memberships = await _context.Memberships
+                .Include(m => m.Trainee)
+                .Where(m => !m.IsDeleted && m.IsActive && 
+                 (m.EndDate <= DateOnly.FromDateTime(DateTime.Now.AddDays(3)) || 
+                 (m.RemainingSessions != null && m.RemainingSessions <= 3)))
+                .ToListAsync();
+            var membershipsDTO = _mapper.Map<IReadOnlyList<MembershipDTO>>(memberships);
+            return membershipsDTO;
+        }
     }
 }

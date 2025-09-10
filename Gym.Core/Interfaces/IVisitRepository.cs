@@ -18,5 +18,6 @@ namespace Gym.Core.Interfaces
         Task<IReadOnlyList<VisitDTO>> GetAllVisitsAsync();
         Task<IReadOnlyList<VisitResponseDTO>> GetAllVisitsWithResponseAsync();
         Task<IReadOnlyList<VisitDTO>> GetTodayVisits(DateOnly today);
+        Task<int> GetVisitsCountByMonthAsync(int month, int year);
     }
 }

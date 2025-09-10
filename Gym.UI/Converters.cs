@@ -261,4 +261,101 @@ namespace Gym.UI
             throw new NotImplementedException();
         }
     }
+
+    // Converter for percentage values to colors (green for positive, red for negative)
+    public class PercentageToColorConverter : IValueConverter
+    {
+        public static PercentageToColorConverter Instance { get; } = new PercentageToColorConverter();
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is decimal percentage)
+            {
+                if (percentage > 0)
+                    return Colors.Green;
+                else if (percentage < 0)
+                    return Colors.Red;
+                else
+                    return Colors.Gray;
+            }
+            return Colors.Gray;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    // Converter for boolean to visibility (true = visible, false = collapsed)
+    public class BooleanToVisibilityConverter : IValueConverter
+    {
+        public static BooleanToVisibilityConverter Instance { get; } = new BooleanToVisibilityConverter();
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                return boolValue ? Visibility.Visible : Visibility.Collapsed;
+            }
+            return Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is Visibility visibility)
+            {
+                return visibility == Visibility.Visible;
+            }
+            return false;
+        }
+    }
+
+    // Converter for inverse boolean to visibility (true = collapsed, false = visible)
+    public class InverseBooleanToVisibilityConverter : IValueConverter
+    {
+        public static InverseBooleanToVisibilityConverter Instance { get; } = new InverseBooleanToVisibilityConverter();
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                return boolValue ? Visibility.Collapsed : Visibility.Visible;
+            }
+            return Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is Visibility visibility)
+            {
+                return visibility == Visibility.Collapsed;
+            }
+            return true;
+        }
+    }
+
+    // Converter for DateOnly to DateTime for DatePicker binding
+    public class DateOnlyToDateTimeConverter : IValueConverter
+    {
+        public static DateOnlyToDateTimeConverter Instance { get; } = new DateOnlyToDateTimeConverter();
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is DateOnly dateOnly)
+            {
+                return dateOnly.ToDateTime(TimeOnly.MinValue);
+            }
+            return DateTime.Today;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is DateTime dateTime)
+            {
+                return DateOnly.FromDateTime(dateTime);
+            }
+            return DateOnly.FromDateTime(DateTime.Today);
+        }
+    }
 }

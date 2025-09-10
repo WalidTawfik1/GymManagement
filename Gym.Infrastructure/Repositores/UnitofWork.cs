@@ -20,6 +20,7 @@ namespace Gym.Infrastructure.Repositores
         public IVisitRepository VisitRepository { get; }
         public IAdditionalServiceRepository AdditionalServiceRepository { get; }
         public IExpenseAndRevenueRepository ExpenseAndRevenueRepository { get; }
+        public IDashboardRepository DashboardRepository { get; }
 
 
         public UnitofWork(MambelaDbContext context, IMapper mapper)
@@ -27,13 +28,12 @@ namespace Gym.Infrastructure.Repositores
             _context = context;
             _mapper = mapper;
 
-
-
             TraineeRepository = new TraineeRepository(_mapper, _context);
             MembershipRepository = new MembershipRepository(_context, _mapper);
             VisitRepository = new VisitRepository(_context, _mapper);
             AdditionalServiceRepository = new AdditionalServiceRepository(_context, _mapper);
             ExpenseAndRevenueRepository = new ExpenseAndRevenueRepository(_context, _mapper);
+            DashboardRepository = new DashboardRepository(_context, _mapper, MembershipRepository, VisitRepository, ExpenseAndRevenueRepository);
         }
 
 

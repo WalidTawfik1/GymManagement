@@ -13,5 +13,6 @@ namespace Gym.Core.Interfaces
         IVisitRepository VisitRepository { get; }
         IAdditionalServiceRepository AdditionalServiceRepository { get; }
         IExpenseAndRevenueRepository ExpenseAndRevenueRepository { get; }
+        IDashboardRepository DashboardRepository { get; }
     }
 }

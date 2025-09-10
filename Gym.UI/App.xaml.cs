@@ -87,11 +87,18 @@ namespace Gym.UI
                 {
                     try
                     {
-                        await mainViewModel.InitializeAsync();
+                        // Use ConfigureAwait(false) to help prevent UI thread deadlocks during initialization
+                        await Task.Run(async () =>
+                        {
+                            await mainViewModel.InitializeAsync().ConfigureAwait(false);
+                        }).ConfigureAwait(false);
                     }
                     catch (Exception initEx)
                     {
-                        MessageBox.Show($"Initialization failed: {initEx.Message}", "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        await mainWindow.Dispatcher.InvokeAsync(() =>
+                        {
+                            MessageBox.Show($"Initialization failed: {initEx.Message}", "Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
                     }
                 };
 
