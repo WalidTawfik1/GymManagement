@@ -39,12 +39,25 @@ namespace Gym.UI
                     args.Handled = true; // prevent silent crash so we can continue diagnosis
                 };
 
-                // Load environment variables
-                Env.Load();
+                // Load environment variables (if .env file exists)
+                try
+                {
+                    Env.Load();
+                }
+                catch
+                {
+                    // .env file might not exist in published app, that's OK
+                }
+
+                // Determine environment (default to Production for published apps)
+                var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
 
                 // Build configuration
                 var configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
+                    .AddEnvironmentVariables()
                     .Build();
 
                 // Create host and configure services

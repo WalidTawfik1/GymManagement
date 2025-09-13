@@ -20,7 +20,7 @@ namespace Gym.Infrastructure
     {
         public static IServiceCollection InfrastructureConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            // Try to load .env file from multiple possible locations
+            // Try to load .env file from multiple possible locations (for development)
             var envPaths = new[]
             {
                 ".env",
@@ -38,8 +38,10 @@ namespace Gym.Infrastructure
                 }
             }
 
-            string connStr = Environment.GetEnvironmentVariable("MambelaDatabase")
-               ?? throw new InvalidOperationException("Connection string not found in environment variables.");
+            // Try multiple sources for connection string
+            string connStr = Environment.GetEnvironmentVariable("MambelaDatabase") // Environment variable first
+                ?? configuration.GetConnectionString("MambelaDatabase") // Then appsettings.json
+                ?? "Server=(localdb)\\mssqllocaldb;Database=MambelaGymDB;Trusted_Connection=true;MultipleActiveResultSets=true;"; // Default fallback
 
 
             services.AddScoped<IUnitofWork, UnitofWork>();
