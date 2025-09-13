@@ -370,4 +370,14 @@ FodyWeavers.xsd
 .env.test.local
 .env.production.local
 
+# Configuration files with sensitive data
+appsettings.json
+appsettings.*.json
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Local.json
+
+# Project-specific environment files
 /Gym.UI/.env
+/Gym.UI/appsettings.json
+/Gym.UI/appsettings.*.json
