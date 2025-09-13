@@ -21,6 +21,7 @@ namespace Gym.Core.DTO
 
     public class MembershipDistributionDTO
     {
+        public int SingleSessionMemberships { get; set; }
         public int OneMonthMemberships { get; set; }
         public int ThreeMonthMemberships { get; set; }
         public int TwelveSessionMemberships { get; set; }

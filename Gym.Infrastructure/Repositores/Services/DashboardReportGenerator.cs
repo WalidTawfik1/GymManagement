@@ -141,6 +141,9 @@ namespace Gym.Infrastructure.Services
                                 }
                             });
 
+                            table.Cell().Element(CellStyle).AlignRight().Text("حصة واحدة");
+                            table.Cell().Element(CellStyle).AlignCenter().Text(data.SingleSessionMemberships.ToString());
+
                             table.Cell().Element(CellStyle).AlignRight().Text("عضوية شهر واحد");
                             table.Cell().Element(CellStyle).AlignCenter().Text(data.OneMonthMemberships.ToString());
 

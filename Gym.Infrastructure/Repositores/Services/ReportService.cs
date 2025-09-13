@@ -73,6 +73,7 @@ namespace Gym.Infrastructure.Services
                 ProfitGrowthPercentage = dashboardData.MonthlyComparison.ProfitGrowthPercentage,
                 MemberGrowthPercentage = dashboardData.MonthlyComparison.MemberGrowthPercentage,
                 VisitGrowthPercentage = dashboardData.MonthlyComparison.VisitGrowthPercentage,
+                SingleSessionMemberships = dashboardData.MembershipDistribution.SingleSessionMemberships,
                 OneMonthMemberships = dashboardData.MembershipDistribution.OneMonthMemberships,
                 ThreeMonthMemberships = dashboardData.MembershipDistribution.ThreeMonthMemberships,
                 TwelveSessionMemberships = dashboardData.MembershipDistribution.TwelveSessionMemberships,

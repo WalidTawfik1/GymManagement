@@ -138,6 +138,9 @@ namespace Gym.UI.ViewModels
         private string _remainingSessionsHeaderText = "";
 
         [ObservableProperty]
+        private string _singleSessionChartText = "";
+
+        [ObservableProperty]
         private string _oneMonthChartText = "";
 
         [ObservableProperty]
@@ -147,6 +150,9 @@ namespace Gym.UI.ViewModels
         private string _twelveSessionsChartText = "";
 
         // LiveCharts Values
+        [ObservableProperty]
+        private ChartValues<int> _singleSessionValues = new();
+
         [ObservableProperty]
         private ChartValues<int> _oneMonthValues = new();
 
@@ -223,20 +229,9 @@ namespace Gym.UI.ViewModels
                     UpdateChartValues();
                 });
                 
-                // Debug information
-                System.Diagnostics.Debug.WriteLine($"Dashboard Data Loaded:");
-                System.Diagnostics.Debug.WriteLine($"Active Members: {TotalActiveMembers}");
-                System.Diagnostics.Debug.WriteLine($"One Month: {MembershipDistribution.OneMonthMemberships}");
-                System.Diagnostics.Debug.WriteLine($"Three Months: {MembershipDistribution.ThreeMonthMemberships}");
-                System.Diagnostics.Debug.WriteLine($"Twelve Sessions: {MembershipDistribution.TwelveSessionMemberships}");
-                System.Diagnostics.Debug.WriteLine($"Upcoming Expirations: {UpcomingExpirations.Count}");
             }
             catch (Exception ex)
-            {
-                // Handle error with detailed logging
-                System.Diagnostics.Debug.WriteLine($"Error loading dashboard data: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
-                
+            {                
                 // Initialize with empty data to prevent null reference exceptions on UI thread
                 await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
@@ -260,10 +255,12 @@ namespace Gym.UI.ViewModels
                 return;
             }
 
+            SingleSessionValues.Clear();
             OneMonthValues.Clear();
             ThreeMonthValues.Clear();
             TwelveSessionValues.Clear();
 
+            SingleSessionValues.Add(MembershipDistribution.SingleSessionMemberships);
             OneMonthValues.Add(MembershipDistribution.OneMonthMemberships);
             ThreeMonthValues.Add(MembershipDistribution.ThreeMonthMemberships);
             TwelveSessionValues.Add(MembershipDistribution.TwelveSessionMemberships);
@@ -287,6 +284,17 @@ namespace Gym.UI.ViewModels
             MembershipSeries.Clear();
             
             // Only add series with non-zero values to avoid empty chart
+            if (MembershipDistribution.SingleSessionMemberships > 0)
+            {
+                MembershipSeries.Add(new PieSeries
+                {
+                    Title = SingleSessionChartText,
+                    Values = new ChartValues<int> { MembershipDistribution.SingleSessionMemberships },
+                    Fill = new SolidColorBrush(Color.FromRgb(255, 165, 0)), // Orange
+                    DataLabels = true
+                });
+            }
+
             if (MembershipDistribution.OneMonthMemberships > 0)
             {
                 MembershipSeries.Add(new PieSeries
@@ -370,6 +378,7 @@ namespace Gym.UI.ViewModels
             MembershipTypeHeaderText = GetLocalizedString("MembershipType");
             EndDateHeaderText = GetLocalizedString("EndDate");
             RemainingSessionsHeaderText = GetLocalizedString("RemainingSessions");
+            SingleSessionChartText = GetLocalizedString("SingleSession");
             OneMonthChartText = GetLocalizedString("OneMonth");
             ThreeMonthsChartText = GetLocalizedString("ThreeMonths");
             TwelveSessionsChartText = GetLocalizedString("TwelveSessions");

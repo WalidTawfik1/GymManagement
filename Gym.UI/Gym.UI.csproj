@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\GymLogo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +23,7 @@
     <Resource Include="Resources\dashboard.png" />
     <Resource Include="Resources\Adobe Express - file.png" />
     <Resource Include="Resources\GymLogo.jpg" />
+    <Resource Include="Resources\GymLogo.ico" />
   </ItemGroup>
 
   <ItemGroup>

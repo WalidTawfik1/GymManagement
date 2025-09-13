@@ -25,6 +25,7 @@ namespace Gym.Core.Models.Reports
         public decimal VisitGrowthPercentage { get; set; }
         
         // توزيع العضويات
+        public int SingleSessionMemberships { get; set; }
         public int OneMonthMemberships { get; set; }
         public int ThreeMonthMemberships { get; set; }
         public int TwelveSessionMemberships { get; set; }

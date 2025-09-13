@@ -109,6 +109,7 @@ namespace Gym.UI.Services
                     ["UpcomingMembershipExpirations"] = "الاشتراكات المنتهية قريباً",
                     ["TraineeName"] = "اسم المتدرب",
                     ["EndDate"] = "تاريخ الانتهاء",
+                    ["SingleSession"] = "حصة واحدة",
                     ["OneMonth"] = "شهر واحد",
                     ["ThreeMonths"] = "3 شهور",
                     ["TwelveSessions"] = "12 حصة",
@@ -230,6 +231,7 @@ namespace Gym.UI.Services
                     ["FailedUpdateMembershipGeneric"] = "فشل في تحديث العضوية.",
                     ["MembershipUpdatedSuccess"] = "تم تحديث العضوية بنجاح!",
                     ["MembershipAddedSuccessOpen"] = "تم إضافة العضوية بنجاح (مفتوح)",
+                    ["MembershipAddedSuccessSingleSession"] = "تم إضافة العضوية بنجاح (حصة واحدة)",
                     ["MembershipAddedSuccessLimited"] = "تم إضافة العضوية بنجاح (12 حصة)",
                     ["MembershipAddedSuccess3Months"] = "تم إضافة العضوية بنجاح (3 شهور)",
                     ["MembershipAddedSuccess1Month"] = "تم إضافة العضوية بنجاح (شهر)",
@@ -309,6 +311,7 @@ namespace Gym.UI.Services
                     ["UpcomingMembershipExpirations"] = "Upcoming Membership Expirations",
                     ["TraineeName"] = "Trainee Name",
                     ["EndDate"] = "End Date",
+                    ["SingleSession"] = "Single Session",
                     ["OneMonth"] = "1 Month",
                     ["ThreeMonths"] = "3 Months",
                     ["TwelveSessions"] = "12 Sessions",
@@ -430,6 +433,7 @@ namespace Gym.UI.Services
                     , ["FailedUpdateMembershipGeneric"] = "Failed to update membership."
                     , ["MembershipUpdatedSuccess"] = "Membership updated successfully!"
                     , ["MembershipAddedSuccessOpen"] = "Membership added successfully (Open)."
+                    , ["MembershipAddedSuccessSingleSession"] = "Membership added successfully (Single Session)."
                     , ["MembershipAddedSuccessLimited"] = "Membership added successfully (12 Sessions)."
                     , ["MembershipAddedSuccess3Months"] = "Membership added successfully (3 Months)."
                     , ["MembershipAddedSuccess1Month"] = "Membership added successfully (1 Month)."

@@ -91,13 +91,16 @@ namespace Gym.Infrastructure.Repositores
         public async Task<MembershipDistributionDTO> GetMembershipDistributionAsync()
         {
             var activeMemberships = await _context.Memberships
-                .Where(m => m.IsActive && !m.IsDeleted)
+                .Where(m => !m.IsDeleted)
                 .ToListAsync();
 
             return new MembershipDistributionDTO
             {
+                SingleSessionMemberships = activeMemberships.Count(m => 
+                    m.MembershipType.Contains("حصة واحدة") || m.MembershipType.Contains("Single Session")),
                 OneMonthMemberships = activeMemberships.Count(m => 
-                    m.MembershipType.Contains("شهر") || m.MembershipType.Contains("Month")),
+                    (m.MembershipType.Contains("شهر") || m.MembershipType.Contains("Month")) &&
+                    !m.MembershipType.Contains("3")),
                 ThreeMonthMemberships = activeMemberships.Count(m => 
                     m.MembershipType.Contains("3 شهور") || m.MembershipType.Contains("3 Months")),
                 TwelveSessionMemberships = activeMemberships.Count(m => 

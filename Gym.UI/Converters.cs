@@ -88,9 +88,11 @@ namespace Gym.UI
             {
                 return membershipType switch
                 {
+                    "حصة واحدة" => "حصة واحدة",
                     "12 حصة" => "12 حصة",
                     "شهر" => "شهر",
                     "3 شهور" => "3 شهور", 
+                    "Single Session" => "Single Session",
                     "12 Sessions" => "12 Sessions",
                     "1 Month" => "1 Month",
                     "3 Months" => "3 Months",

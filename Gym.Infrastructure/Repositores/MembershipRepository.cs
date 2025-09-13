@@ -28,7 +28,21 @@ namespace Gym.Infrastructure.Repositores
 
             if (hasActiveMembership != null) return false;
 
-            if (membershipDTO.MembershipType == "12 حصة" || membershipDTO.MembershipType == "12 Sessions")
+            if (membershipDTO.MembershipType == "حصة واحدة" || membershipDTO.MembershipType == "Single Session")
+            {
+                var membership = new Membership
+                {
+                    TraineeId = membershipDTO.TraineeId,
+                    MembershipType = membershipDTO.MembershipType,
+                    Price = membershipDTO.Price,
+                    StartDate = DateOnly.FromDateTime(DateTime.Now),
+                    EndDate = DateOnly.FromDateTime(DateTime.Now),
+                    RemainingSessions = null,
+                    IsActive = false
+                };
+                await _context.Memberships.AddAsync(membership);
+            }
+            else if (membershipDTO.MembershipType == "12 حصة" || membershipDTO.MembershipType == "12 Sessions")
             {
                 var membership = new Membership
                 {
