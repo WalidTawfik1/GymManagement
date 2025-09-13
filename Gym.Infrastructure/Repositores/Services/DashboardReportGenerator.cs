@@ -1,10 +1,10 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using Gym.UI.Models.Reports;
+using Gym.Core.Models.Reports;
 using System.Globalization;
 
-namespace Gym.UI.Services.Reports
+namespace Gym.Infrastructure.Services
 {
     public class DashboardReportGenerator
     {

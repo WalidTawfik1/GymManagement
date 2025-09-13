@@ -2,8 +2,8 @@ using AutoMapper;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Gym.Core.Interfaces;
+using Gym.Core.Interfaces.Services;
 using Gym.UI.Services;
-using Gym.UI.Services.Reports;
 
 namespace Gym.UI.ViewModels
 {

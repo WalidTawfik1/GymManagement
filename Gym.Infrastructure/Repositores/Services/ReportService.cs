@@ -1,10 +1,12 @@
 using AutoMapper;
 using Gym.Core.Interfaces;
-using Gym.UI.Models.Reports;
+using Gym.Core.Interfaces.Services;
+using Gym.Core.Models.Reports;
+using Gym.Infrastructure.Services;
 using System.Globalization;
 using System.IO;
 
-namespace Gym.UI.Services.Reports
+namespace Gym.Infrastructure.Services
 {
     public class ReportService : IReportService
     {

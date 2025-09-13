@@ -2,9 +2,9 @@ using AutoMapper;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Gym.Core.Interfaces;
+using Gym.Core.Interfaces.Services;
 using Gym.UI.Services;
 using Gym.UI.Services.Dialogs;
-using Gym.UI.Services.Reports;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 

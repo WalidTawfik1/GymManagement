@@ -1,7 +1,9 @@
 ﻿using DotNetEnv;
 using Gym.Core.Interfaces;
+using Gym.Core.Interfaces.Services;
 using Gym.Infrastructure.Data;
 using Gym.Infrastructure.Repositores;
+using Gym.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,7 +43,7 @@ namespace Gym.Infrastructure
 
 
             services.AddScoped<IUnitofWork, UnitofWork>();
-
+            services.AddScoped<IReportService, ReportService>();
 
             services.AddDbContext<MambelaDbContext>((options) =>
             {

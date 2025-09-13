@@ -1,4 +1,4 @@
-namespace Gym.UI.Models.Reports
+namespace Gym.Core.Models.Reports
 {
     public class FinancialReportModel
     {
