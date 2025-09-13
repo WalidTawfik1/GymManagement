@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Gym.Core.Interfaces;
 using Gym.UI.Services;
+using Gym.UI.Services.Reports;
 
 namespace Gym.UI.ViewModels
 {
@@ -11,7 +12,8 @@ namespace Gym.UI.ViewModels
         private readonly IUnitofWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public MainViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService, Gym.UI.Services.Dialogs.IDialogService dialog) 
+        public MainViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService, 
+            Gym.UI.Services.Dialogs.IDialogService dialog, IReportService reportService) 
             : base(localizationService)
         {
             _unitOfWork = unitOfWork;
@@ -24,9 +26,9 @@ namespace Gym.UI.ViewModels
             MembershipViewModel = new MembershipViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             VisitViewModel = new VisitViewModel(_unitOfWork, _mapper, _localizationService, dialog);
             AdditionalServiceViewModel = new AdditionalServiceViewModel(_unitOfWork, _mapper, _localizationService, dialog);
-            ExpenseRevenueViewModel = new ExpenseRevenueViewModel(_unitOfWork, _mapper, _localizationService, dialog);
-            FinancialDetailsViewModel = new FinancialDetailsViewModel(_unitOfWork, _mapper, _localizationService);
-            DashboardViewModel = new DashboardViewModel(_unitOfWork.DashboardRepository, _localizationService);
+            ExpenseRevenueViewModel = new ExpenseRevenueViewModel(_unitOfWork, _mapper, _localizationService, dialog, reportService);
+            FinancialDetailsViewModel = new FinancialDetailsViewModel(_unitOfWork, _mapper, _localizationService, reportService, dialog);
+            DashboardViewModel = new DashboardViewModel(_unitOfWork.DashboardRepository, _localizationService, reportService, dialog);
             
             // Subscribe to menu navigation
             MainMenuViewModel.NavigationRequested += OnNavigationRequested;

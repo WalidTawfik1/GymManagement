@@ -98,6 +98,45 @@
                         </StackPanel>
                     </Border>
                 </StackPanel>
+                
+                <!-- Export Button -->
+                <Button Grid.Column="2" Content="تصدير التقرير المالي" 
+                        Command="{Binding ExportFinancialReportCommand}"
+                        Style="{StaticResource ModernButtonStyle}" 
+                        Background="White"
+                        Padding="16,8" FontSize="12" VerticalAlignment="Center"
+                        HorizontalAlignment="Right" Margin="0,0,0,0" Cursor="Hand">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="20" Padding="{TemplateBinding Padding}">
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="4" BlurRadius="16" Opacity="0.2" Color="#000000"/>
+                                </Border.Effect>
+                                <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock Text="📊" FontSize="12" Margin="0,0,6,0" Foreground="#F59E0B"/>
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextBlock.Foreground="#F59E0B"/>
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#7C3AED"/>
+                                    <Setter Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect ShadowDepth="6" BlurRadius="20" Opacity="0.3" Color="#7C3AED"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="RenderTransform">
+                                        <Setter.Value>
+                                            <ScaleTransform ScaleX="0.95" ScaleY="0.95"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
             </Grid>
         </Border>
         

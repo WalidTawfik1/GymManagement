@@ -3,10 +3,13 @@ using CommunityToolkit.Mvvm.Input;
 using Gym.Core.DTO;
 using Gym.Core.Interfaces;
 using Gym.UI.Services;
+using Gym.UI.Services.Dialogs;
+using Gym.UI.Services.Reports;
 using LiveCharts;
 using LiveCharts.Wpf;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
@@ -156,10 +159,16 @@ namespace Gym.UI.ViewModels
         [ObservableProperty]
         private SeriesCollection _membershipSeries = new();
 
-        public DashboardViewModel(IDashboardRepository dashboardRepository, ILocalizationService localizationService) 
+        private readonly IReportService _reportService;
+        private readonly IDialogService _dialogService;
+
+        public DashboardViewModel(IDashboardRepository dashboardRepository, ILocalizationService localizationService, 
+            IReportService reportService, IDialogService dialogService) 
             : base(localizationService)
         {
             _dashboardRepository = dashboardRepository;
+            _reportService = reportService;
+            _dialogService = dialogService;
             Title = GetLocalizedString("Dashboard");
             LoadDashboardDataCommand = new AsyncRelayCommand(LoadDashboardDataAsync);
             
@@ -376,6 +385,30 @@ namespace Gym.UI.ViewModels
         {
             Title = GetLocalizedString("Dashboard");
             UpdateLocalizedTexts();
+        }
+
+        [RelayCommand]
+        private async Task ExportDashboardReportAsync()
+        {
+            try
+            {
+                IsBusy = true;
+                
+                var filePath = await _reportService.GenerateDashboardReportAsync();
+                
+                await _dialogService.ShowAsync($"تم إنشاء التقرير بنجاح وحفظه في:\n{filePath}", "تصدير التقرير", DialogType.Success);
+                
+                // فتح مجلد التقارير
+                Process.Start("explorer.exe", System.IO.Path.GetDirectoryName(filePath) ?? "");
+            }
+            catch (Exception ex)
+            {
+                await _dialogService.ShowAsync($"حدث خطأ أثناء إنشاء التقرير: {ex.Message}", "خطأ", DialogType.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
     }
 }

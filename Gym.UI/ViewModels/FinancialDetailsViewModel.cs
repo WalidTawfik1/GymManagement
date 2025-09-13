@@ -3,7 +3,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Gym.Core.Interfaces;
 using Gym.UI.Services;
+using Gym.UI.Services.Dialogs;
+using Gym.UI.Services.Reports;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace Gym.UI.ViewModels
 {
@@ -11,12 +14,17 @@ namespace Gym.UI.ViewModels
     {
         private readonly IUnitofWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IReportService _reportService;
+        private readonly IDialogService _dialogService;
 
-        public FinancialDetailsViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService)
+        public FinancialDetailsViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService,
+            IReportService reportService, IDialogService dialogService)
             : base(localizationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _reportService = reportService;
+            _dialogService = dialogService;
             FinancialDetails = new ObservableCollection<FinancialDetailItem>();
         }
 
@@ -149,6 +157,30 @@ namespace Gym.UI.ViewModels
                 "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
             };
             return month >= 1 && month <= 12 ? months[month - 1] : "غير محدد";
+        }
+
+        [RelayCommand]
+        private async Task ExportFinancialReportAsync()
+        {
+            try
+            {
+                IsBusy = true;
+                
+                var filePath = await _reportService.GenerateFinancialReportAsync(SelectedMonth, SelectedYear);
+                
+                await _dialogService.ShowAsync($"تم إنشاء التقرير المالي بنجاح وحفظه في:\n{filePath}", "تصدير التقرير المالي", DialogType.Success);
+                
+                // فتح مجلد التقارير
+                Process.Start("explorer.exe", System.IO.Path.GetDirectoryName(filePath) ?? "");
+            }
+            catch (Exception ex)
+            {
+                await _dialogService.ShowAsync($"حدث خطأ أثناء إنشاء التقرير المالي: {ex.Message}", "خطأ", DialogType.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
     }
 }

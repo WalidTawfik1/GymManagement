@@ -5,8 +5,10 @@ using Gym.Core.DTO;
 using Gym.Core.Interfaces;
 using Gym.UI.Services;
 using Gym.UI.Services.Dialogs;
+using Gym.UI.Services.Reports;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -27,6 +29,7 @@ namespace Gym.UI.ViewModels
         private readonly IUnitofWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IDialogService _dialogService;
+        private readonly IReportService _reportService;
 
         // Navigation event
         public event Action<int, int>? NavigateToDetails;
@@ -126,12 +129,14 @@ namespace Gym.UI.ViewModels
             new(12, "ديسمبر")
         };
 
-        public ExpenseRevenueViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService, IDialogService dialogService) 
+        public ExpenseRevenueViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService, 
+            IDialogService dialogService, IReportService reportService) 
             : base(localizationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _dialogService = dialogService;
+            _reportService = reportService;
             
             // Set default month to current month without triggering property change
             _selectedMonth = DateTime.Now.Month;
@@ -506,6 +511,30 @@ namespace Gym.UI.ViewModels
             Amount = string.Empty;
             Description = string.Empty;
             SelectedExpense = null;
+        }
+
+        [RelayCommand]
+        private async Task ExportFinancialReportAsync()
+        {
+            try
+            {
+                IsBusy = true;
+                
+                var filePath = await _reportService.GenerateFinancialReportAsync(SelectedMonth, DateTime.Now.Year);
+                
+                await _dialogService.ShowAsync($"تم إنشاء التقرير المالي بنجاح وحفظه في:\n{filePath}", "تصدير التقرير المالي", DialogType.Success);
+                
+                // فتح مجلد التقارير
+                Process.Start("explorer.exe", System.IO.Path.GetDirectoryName(filePath) ?? "");
+            }
+            catch (Exception ex)
+            {
+                await _dialogService.ShowAsync($"حدث خطأ أثناء إنشاء التقرير المالي: {ex.Message}", "خطأ", DialogType.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
     }
 }

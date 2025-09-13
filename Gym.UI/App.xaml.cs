@@ -2,6 +2,7 @@
 using Gym.Infrastructure;
 using Gym.UI.Services;
 using Gym.UI.Services.Dialogs;
+using Gym.UI.Services.Reports;
 using Gym.UI.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,6 +66,9 @@ namespace Gym.UI
 
                         // Register dialog service
                         services.AddSingleton<IDialogService, DialogService>();
+                        
+                        // Register report service
+                        services.AddTransient<IReportService, ReportService>();
 
                         // Register ViewModels
                         services.AddTransient<MainViewModel>();

@@ -63,18 +63,34 @@
         <!-- Header -->
         <Border Grid.Row="0" Background="{StaticResource ChampionGradientBrush}" 
                 CornerRadius="16" Margin="20,20,20,16" Padding="24">
-            <StackPanel HorizontalAlignment="Center">
-                <TextBlock Text="{Binding DashboardTitle}" 
-                           FontSize="28" FontWeight="Bold" 
-                           Foreground="White" 
-                           TextAlignment="Center"
-                           Margin="0,0,0,8"/>
-                <TextBlock Text="{Binding DashboardSubtitle}" 
-                           FontSize="16" 
-                           Foreground="White" 
-                           TextAlignment="Center"
-                           Opacity="0.9"/>
-            </StackPanel>
+            <Grid>
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding DashboardTitle}" 
+                               FontSize="28" FontWeight="Bold" 
+                               Foreground="White" 
+                               TextAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding DashboardSubtitle}" 
+                               FontSize="16" 
+                               Foreground="White" 
+                               TextAlignment="Center"
+                               Opacity="0.9"/>
+                </StackPanel>
+                
+                <!-- Export Button -->
+                <Button HorizontalAlignment="Left" VerticalAlignment="Top"
+                        Command="{Binding ExportDashboardReportCommand}"
+                        Style="{StaticResource ModernButtonStyle}"
+                        Background="White" 
+                        Foreground="{StaticResource PrimaryBrush}"
+                        Padding="16,8"
+                        Margin="8">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="📊" FontSize="16" Margin="0,0,8,0"/>
+                        <TextBlock Text="تصدير تقرير" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
         </Border>
         
         <!-- Loading Indicator -->
