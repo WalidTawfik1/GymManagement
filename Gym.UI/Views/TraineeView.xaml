@@ -112,12 +112,16 @@
                               Style="{StaticResource ModernDataGridStyle}"
                               AutoGenerateColumns="False" 
                               CanUserAddRows="False"
+                              EnableRowVirtualization="True"
+                              EnableColumnVirtualization="True"
+                              ScrollViewer.CanContentScroll="True"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                               FlowDirection="{Binding FlowDirection}">
                         <DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridHeaderStyle}"/>
                         </DataGrid.Resources>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="الرقم" Binding="{Binding Id}" Width="60" IsReadOnly="True">
+                            <DataGridTextColumn Header="الرقم" Binding="{Binding Id}" MinWidth="60" Width="SizeToHeader" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Center"/>
@@ -128,7 +132,7 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
                             
-                            <DataGridTextColumn Header="الاسم الكامل" Binding="{Binding FullName}" Width="*" IsReadOnly="True">
+                            <DataGridTextColumn Header="الاسم الكامل" Binding="{Binding FullName}" Width="2*" MinWidth="160" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -140,7 +144,7 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
                             
-                            <DataGridTextColumn Header="رقم الهاتف" Binding="{Binding PhoneNumber}" Width="140" IsReadOnly="True">
+                            <DataGridTextColumn Header="رقم الهاتف" Binding="{Binding PhoneNumber}" MinWidth="120" Width="Auto" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -151,7 +155,7 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
                             
-                            <DataGridTextColumn Header="تاريخ الانضمام" Binding="{Binding JoinDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="120" IsReadOnly="True">
+                            <DataGridTextColumn Header="تاريخ الانضمام" Binding="{Binding JoinDate, StringFormat='{}{0:dd/MM/yyyy}'}" MinWidth="100" Width="Auto" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Center"/>
@@ -162,7 +166,7 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
                             
-                            <DataGridTemplateColumn Header="الإجراءات" Width="140">
+                            <DataGridTemplateColumn Header="الإجراءات" MinWidth="120" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -212,7 +216,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTextColumn Header="اخر تحديث" Binding="{Binding UpdatedAt, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="140" IsReadOnly="True">
+                            <DataGridTextColumn Header="اخر تحديث" Binding="{Binding UpdatedAt, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" MinWidth="120" Width="Auto" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Center"/>
@@ -230,6 +234,7 @@
             
             <!-- Add/Edit Form Card -->
             <Border Grid.Column="2" Style="{StaticResource ModernCardStyle}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12,0,12,0">
                 <Grid FlowDirection="{Binding FlowDirection}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -296,6 +301,7 @@
                                  Style="{StaticResource ModernProgressBarStyle}" 
                                  Margin="0,16,0,0"/>
                 </Grid>
+                </ScrollViewer>
             </Border>
         </Grid>
     </Grid>

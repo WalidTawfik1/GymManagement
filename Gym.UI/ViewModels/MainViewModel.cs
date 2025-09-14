@@ -80,6 +80,14 @@ namespace Gym.UI.ViewModels
         [ObservableProperty]
         private bool _isNotMainMenu = false;
 
+    // Zoom scaling for responsive laptop screens (0.8x - 1.5x)
+    [ObservableProperty]
+    private double _zoomScale = 1.0;
+
+    private const double MinZoom = 0.8;
+    private const double MaxZoom = 1.5;
+    private const double ZoomStep = 0.1;
+
         // Localized Labels
         [ObservableProperty]
         private string _languageLabel = string.Empty;
@@ -230,6 +238,24 @@ namespace Gym.UI.ViewModels
         {
             CurrentViewModel = ExpenseRevenueViewModel;
             IsNotMainMenu = true;
+        }
+
+        [RelayCommand]
+        private void ZoomIn()
+        {
+            ZoomScale = Math.Min(MaxZoom, Math.Round(ZoomScale + ZoomStep, 2));
+        }
+
+        [RelayCommand]
+        private void ZoomOut()
+        {
+            ZoomScale = Math.Max(MinZoom, Math.Round(ZoomScale - ZoomStep, 2));
+        }
+
+        [RelayCommand]
+        private void ResetZoom()
+        {
+            ZoomScale = 1.0;
         }
     }
 }

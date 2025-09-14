@@ -141,6 +141,25 @@
                             </Button>
                         </StackPanel>
                     </Border>
+
+                    <!-- Zoom Controls -->
+                    <Border Background="White" CornerRadius="20" Padding="4" Margin="8,0,0,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="-" Command="{Binding ZoomOutCommand}"
+                                    Style="{StaticResource ModernButtonStyle}"
+                                    Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}"
+                                    Padding="12,6" Margin="2" FontSize="14"/>
+                            <TextBlock Text="{Binding ZoomScale, StringFormat= {}{0:P0}}" VerticalAlignment="Center" Margin="8,0" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <Button Content="+" Command="{Binding ZoomInCommand}" 
+                                    Style="{StaticResource ModernButtonStyle}"
+                                    Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}"
+                                    Padding="12,6" Margin="2" FontSize="14"/>
+                            <Button Content="Reset" Command="{Binding ResetZoomCommand}" 
+                                    Style="{StaticResource ModernButtonStyle}"
+                                    Background="Transparent" Foreground="{StaticResource TextPrimaryBrush}"
+                                    Padding="12,6" Margin="2" FontSize="12"/>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </Grid>
         </Border>
@@ -150,28 +169,68 @@
             <ContentControl Content="{Binding CurrentViewModel}">
                 <ContentControl.Resources>
                     <DataTemplate DataType="{x:Type viewModels:MainMenuViewModel}">
-                        <views:SimpleMenuView/>
+                        <views:SimpleMenuView>
+                            <views:SimpleMenuView.LayoutTransform>
+                                <ScaleTransform ScaleX="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                ScaleY="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            </views:SimpleMenuView.LayoutTransform>
+                        </views:SimpleMenuView>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type viewModels:TraineeViewModel}">
-                        <views:TraineeView/>
+                        <views:TraineeView>
+                            <views:TraineeView.LayoutTransform>
+                                <ScaleTransform ScaleX="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                ScaleY="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            </views:TraineeView.LayoutTransform>
+                        </views:TraineeView>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type viewModels:MembershipViewModel}">
-                        <views:MembershipView/>
+                        <views:MembershipView>
+                            <views:MembershipView.LayoutTransform>
+                                <ScaleTransform ScaleX="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                ScaleY="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            </views:MembershipView.LayoutTransform>
+                        </views:MembershipView>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type viewModels:VisitViewModel}">
-                        <views:VisitView/>
+                        <views:VisitView>
+                            <views:VisitView.LayoutTransform>
+                                <ScaleTransform ScaleX="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                ScaleY="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            </views:VisitView.LayoutTransform>
+                        </views:VisitView>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type viewModels:AdditionalServiceViewModel}">
-                        <views:AdditionalServiceView/>
+                        <views:AdditionalServiceView>
+                            <views:AdditionalServiceView.LayoutTransform>
+                                <ScaleTransform ScaleX="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                ScaleY="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            </views:AdditionalServiceView.LayoutTransform>
+                        </views:AdditionalServiceView>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type viewModels:ExpenseRevenueViewModel}">
-                        <views:ExpenseRevenueView/>
+                        <views:ExpenseRevenueView>
+                            <views:ExpenseRevenueView.LayoutTransform>
+                                <ScaleTransform ScaleX="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                ScaleY="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            </views:ExpenseRevenueView.LayoutTransform>
+                        </views:ExpenseRevenueView>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type viewModels:FinancialDetailsViewModel}">
-                        <views:FinancialDetailsView/>
+                        <views:FinancialDetailsView>
+                            <views:FinancialDetailsView.LayoutTransform>
+                                <ScaleTransform ScaleX="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                ScaleY="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            </views:FinancialDetailsView.LayoutTransform>
+                        </views:FinancialDetailsView>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type viewModels:DashboardViewModel}">
-                        <views:DashboardView/>
+                        <views:DashboardView>
+                            <views:DashboardView.LayoutTransform>
+                                <ScaleTransform ScaleX="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                                ScaleY="{Binding DataContext.ZoomScale, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            </views:DashboardView.LayoutTransform>
+                        </views:DashboardView>
                     </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>

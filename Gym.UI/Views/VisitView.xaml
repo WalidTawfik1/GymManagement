@@ -121,12 +121,16 @@
                               Style="{StaticResource ModernDataGridStyle}"
                               AutoGenerateColumns="False" 
                               CanUserAddRows="False"
+                              EnableRowVirtualization="True"
+                              EnableColumnVirtualization="True"
+                              ScrollViewer.CanContentScroll="True"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                               FlowDirection="{Binding FlowDirection}">
                         <DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridHeaderStyle}"/>
                         </DataGrid.Resources>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="الرقم" Binding="{Binding Id}" Width="60" IsReadOnly="True">
+                            <DataGridTextColumn Header="الرقم" Binding="{Binding Id}" MinWidth="60" Width="SizeToHeader" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Center"/>
@@ -137,7 +141,7 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
                             
-                            <DataGridTextColumn Header="المتدرب" Binding="{Binding TraineeName}" Width="*" IsReadOnly="True">
+                            <DataGridTextColumn Header="المتدرب" Binding="{Binding TraineeName}" MinWidth="160" Width="2*" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -149,7 +153,7 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
                             
-                            <DataGridTextColumn Header="تاريخ الزيارة" Binding="{Binding VisitDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="160" IsReadOnly="True">
+                            <DataGridTextColumn Header="تاريخ الزيارة" Binding="{Binding VisitDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" MinWidth="140" Width="Auto" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Left"/>
@@ -160,7 +164,7 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
                             
-                            <DataGridTemplateColumn Header="الإجراءات" Width="100">
+                            <DataGridTemplateColumn Header="الإجراءات" MinWidth="100" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Command="{Binding DataContext.DeleteVisitCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
@@ -194,6 +198,7 @@
             
             <!-- Record Visit Form Card -->
             <Border Grid.Column="2" Style="{StaticResource ModernCardStyle}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12,0,12,0">
                 <Grid FlowDirection="{Binding FlowDirection}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -314,6 +319,7 @@
                                  Style="{StaticResource ModernProgressBarStyle}" 
                                  Margin="0,16,0,0"/>
                 </Grid>
+                </ScrollViewer>
             </Border>
         </Grid>
     </Grid>

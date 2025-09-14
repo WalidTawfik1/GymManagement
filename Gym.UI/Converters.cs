@@ -360,4 +360,24 @@ namespace Gym.UI
             return DateOnly.FromDateTime(DateTime.Today);
         }
     }
+
+    // Simple converter to check if width is above threshold for responsive layouts
+    public class WidthToVisibilityConverter : IValueConverter
+    {
+        public static WidthToVisibilityConverter Instance { get; } = new WidthToVisibilityConverter();
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is double width && parameter is string thresholdStr && double.TryParse(thresholdStr, out double threshold))
+            {
+                return width >= threshold ? Visibility.Visible : Visibility.Collapsed;
+            }
+            return Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
