@@ -21,11 +21,10 @@
     </UserControl.Resources>
     
     <Grid Margin="0" Background="#6B46C1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         
         <!-- Modern Header -->
         <Border Grid.Row="0" Background="Black" 
@@ -43,104 +42,57 @@
                                Foreground="White" VerticalAlignment="Center"/>
                 </StackPanel>
                 
-               <StackPanel Grid.Column="1" Orientation="Horizontal">
-    <Border Background="White" CornerRadius="20" Padding="12,8" Opacity="0.9">
-        <StackPanel Orientation="Horizontal">
-            <ComboBox ItemsSource="{Binding Months}" 
-                      SelectedValue="{Binding SelectedMonth}" 
-                      DisplayMemberPath="Value" 
-                      SelectedValuePath="Key"
-                      Style="{StaticResource ModernComboBoxStyle}" 
-                      Width="120" FontSize="12"/>
-                       <TextBlock Text="الشهر" 
-                       FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Margin="8,0,0,0"/>
-              </StackPanel>
-                </Border>
-                
-                <!-- Details Button -->
-                <Button Content="اضغط للتفاصيل" 
-                        Command="{Binding ShowDetailsCommand}"
-                        Style="{StaticResource ModernButtonStyle}" 
-                        Background="#3B82F6" 
-                        Foreground="White"
-                        Padding="12,8" FontSize="12" 
-                        Margin="12,0,0,0" VerticalAlignment="Center">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" 
-                                    CornerRadius="20" 
-                                    Padding="{TemplateBinding Padding}">
-                                <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
-                                    <Ellipse Width="8" Height="8" Fill="White" Margin="0,0,6,0"/>
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                                    TextBlock.Foreground="White"/>
-                                </StackPanel>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#2563EB"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
-            </StackPanel>
-            </Grid>
-        </Border>
-        
-        <!-- Financial Summary Cards -->
-        <Grid Grid.Row="1" Margin="0,0,0,24">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="20"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="20"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            
-            <!-- Total Expenses Card -->
-            <Border Grid.Column="0" Style="{StaticResource ModernCardStyle}" Background="#EF4444" Padding="20">
-                <StackPanel>
-                    <TextBlock Text="{Binding TotalExpensesLabel}" 
-                               FontSize="14" FontWeight="Bold" 
-                               Foreground="White" Margin="0,0,0,8"/>
-                    <TextBlock Text="{Binding TotalExpenses, StringFormat='{}{0:F2} ج.م'}" 
-                               FontSize="24" FontWeight="Bold" 
-                               Foreground="White"/>
-                </StackPanel>
-            </Border>
-            
-            <!-- Total Revenue Card -->
-            <Border Grid.Column="2" Style="{StaticResource ModernCardStyle}" Background="#10B981" Padding="20">
-                <StackPanel>
-                    <TextBlock Text="{Binding TotalRevenueLabel}" 
-                               FontSize="14" FontWeight="Bold" 
-                               Foreground="White" Margin="0,0,0,8"/>
-                    <TextBlock Text="{Binding TotalRevenue, StringFormat='{}{0:F2} ج.م'}" 
-                               FontSize="24" FontWeight="Bold" 
-                               Foreground="White"/>
-                </StackPanel>
-            </Border>
-            
-            <!-- Net Profit Card -->
-            <Border Grid.Column="4" Style="{StaticResource ModernCardStyle}" Background="#3B82F6" Padding="20">
-                <StackPanel>
-                    <TextBlock Text="{Binding NetProfitLabel}" 
-                               FontSize="14" FontWeight="Bold" 
-                               Foreground="White" Margin="0,0,0,8"/>
-                    <TextBlock Text="{Binding NetProfit, StringFormat='{}{0:F2} ج.م'}" 
-                               FontSize="24" FontWeight="Bold" 
-                               Foreground="White"/>
-                </StackPanel>
-            </Border>
-        </Grid>
-        
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*" MinWidth="500"/>
-                <ColumnDefinition Width="20"/>
-                <ColumnDefinition Width="1.5*" MinWidth="300"/>
-            </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Border Background="White" CornerRadius="20" Padding="12,8" Opacity="0.9">
+                        <StackPanel Orientation="Horizontal">
+                            <ComboBox ItemsSource="{Binding Months}" 
+                                      SelectedValue="{Binding SelectedMonth}" 
+                                      DisplayMemberPath="Value" 
+                                      SelectedValuePath="Key"
+                                      Style="{StaticResource ModernComboBoxStyle}" 
+                                      Width="120" Height="32" FontSize="12"/>
+                            <TextBlock Text="الشهر" 
+                                       FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Details Button -->
+                    <Button Content="اضغط للتفاصيل" 
+                            Command="{Binding ShowDetailsCommand}"
+                            Style="{StaticResource ModernButtonStyle}" 
+                            Background="#3B82F6" 
+                            Foreground="White"
+                            Padding="12,8" FontSize="12" 
+                            Margin="12,0,0,0" VerticalAlignment="Center">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" 
+                                        CornerRadius="20" 
+                                        Padding="{TemplateBinding Padding}">
+                                    <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+                                        <Ellipse Width="8" Height="8" Fill="White" Margin="0,0,6,0"/>
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                        TextBlock.Foreground="White"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#2563EB"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+        </StackPanel>
+    </Grid>
+</Border>
+
+<Grid Grid.Row="1">
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="2*"/>
+        <ColumnDefinition Width="20"/>
+        <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
             
             <!-- Expenses List Card -->
             <Border Grid.Column="0" Style="{StaticResource ModernCardStyle}">
@@ -153,17 +105,14 @@
                     <!-- List Header -->
                     <Grid Grid.Row="0" Margin="0,0,0,20" FlowDirection="LeftToRight">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>   <!-- Refresh -->
+                            <ColumnDefinition Width="*"/>      <!-- Spacer -->
+                            <ColumnDefinition Width="Auto"/>   <!-- Title -->
                         </Grid.ColumnDefinitions>
-
-                        <!-- Refresh Button (Left) -->
-                        <Button Grid.Column="0" Content="{Binding RefreshLabel}" 
-                                Command="{Binding RefreshDataCommand}"
-                                Style="{StaticResource ModernButtonStyle}" 
-                                Background="{StaticResource InfoBrush}"
-                                Padding="16,8" FontSize="12" VerticalAlignment="Center">
+                        
+                        <!-- Refresh Button -->
+                        <Button Grid.Column="0" Content="{Binding RefreshLabel}" Command="{Binding RefreshDataCommand}" 
+                                Style="{StaticResource ModernButtonStyle}" Background="{StaticResource InfoBrush}" Padding="16,8" FontSize="12" VerticalAlignment="Center">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Border Background="{TemplateBinding Background}" CornerRadius="20" Padding="{TemplateBinding Padding}">
@@ -180,29 +129,33 @@
                                 </ControlTemplate>
                             </Button.Template>
                         </Button>
-
-                        <!-- Title (Right) -->
+                        
+                        <!-- Title -->
                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="قائمة المصروفات" FontSize="18" FontWeight="Bold"
-                                       Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <Ellipse Width="20" Height="20" Fill="Black"/>
+                            <TextBlock Text="قائمة المصروفات" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <Ellipse Width="20" Height="20" Fill="{StaticResource SecondaryBrush}"/>
                         </StackPanel>
                     </Grid>
 
-                    <!-- DataGrid -->
+                    <!-- Modern DataGrid -->
                     <DataGrid Grid.Row="1" 
                               ItemsSource="{Binding Expenses}" 
                               SelectedItem="{Binding SelectedExpense}"
                               Style="{StaticResource ModernDataGridStyle}"
                               AutoGenerateColumns="False" 
                               CanUserAddRows="False"
-                              IsReadOnly="True"
+                              EnableRowVirtualization="True"
+                              EnableColumnVirtualization="True"
+                              ScrollViewer.CanContentScroll="True"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                               FlowDirection="{Binding FlowDirection}">
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource ModernDataGridHeaderStyle}"/>
+                        </DataGrid.Resources>
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="نوع المصروف" 
                                                 Binding="{Binding ExpenseType}" 
-                                                Width="150"
-                                                HeaderStyle="{StaticResource ModernDataGridHeaderStyle}">
+                                                Width="2*" MinWidth="140" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -216,8 +169,7 @@
                             
                             <DataGridTextColumn Header="المبلغ" 
                                                 Binding="{Binding Amount, StringFormat='{}{0:F2} ج.م'}" 
-                                                Width="100"
-                                                HeaderStyle="{StaticResource ModernDataGridHeaderStyle}">
+                                                MinWidth="100" Width="Auto" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Center"/>
@@ -229,39 +181,40 @@
                             </DataGridTextColumn>
                             
                             <DataGridTextColumn Header="التاريخ" 
-                                                Binding="{Binding IncurredAt, StringFormat='dd/MM/yyyy'}" 
-                                                Width="100"
-                                                HeaderStyle="{StaticResource ModernDataGridHeaderStyle}">
+                                                Binding="{Binding IncurredAt, StringFormat='{}{0:dd/MM/yyyy}'}" 
+                                                MinWidth="100" Width="Auto" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Center"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Foreground" Value="Black"/>
+                                        <Setter Property="Foreground" Value="#1F2937"/>
+                                        <Setter Property="FontWeight" Value="Medium"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
                             
                             <DataGridTextColumn Header="الوصف" 
                                                 Binding="{Binding Description}" 
-                                                Width="*"
-                                                HeaderStyle="{StaticResource ModernDataGridHeaderStyle}">
+                                                Width="*" MinWidth="120" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="Foreground" Value="#1F2937"/>
                                         <Setter Property="Margin" Value="16,0"/>
                                         <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                        <Setter Property="FontWeight" Value="Medium"/>
                                         <Setter Property="TextWrapping" Value="Wrap"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
                             
-                            <DataGridTemplateColumn Header="الإجراءات" Width="120" HeaderStyle="{StaticResource ModernDataGridHeaderStyle}">
+                            <DataGridTemplateColumn Header="الإجراءات" MinWidth="120" Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <Button Command="{Binding DataContext.EditExpenseCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                     CommandParameter="{Binding}"
+                                                    Content="تعديل"
                                                     Style="{StaticResource AccentButtonStyle}"
                                                     Padding="8,4" Margin="2" FontSize="11">
                                                 <Button.Template>
@@ -269,9 +222,7 @@
                                                         <Border Background="{StaticResource AccentBrush}" 
                                                                 CornerRadius="6" 
                                                                 Padding="{TemplateBinding Padding}">
-                                                            <TextBlock Text="تعديل" Foreground="White" 
-                                                                       FontSize="11" FontWeight="SemiBold" 
-                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextBlock.Foreground="White"/>
                                                         </Border>
                                                         <ControlTemplate.Triggers>
                                                             <Trigger Property="IsMouseOver" Value="True">
@@ -284,6 +235,7 @@
                                             
                                             <Button Command="{Binding DataContext.DeleteExpenseCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                                     CommandParameter="{Binding}"
+                                                    Content="حذف"
                                                     Style="{StaticResource DangerButtonStyle}"
                                                     Padding="8,4" Margin="2" FontSize="11">
                                                 <Button.Template>
@@ -291,9 +243,7 @@
                                                         <Border Background="{StaticResource DangerBrush}" 
                                                                 CornerRadius="6" 
                                                                 Padding="{TemplateBinding Padding}">
-                                                            <TextBlock Text="حذف" Foreground="White" 
-                                                                       FontSize="11" FontWeight="SemiBold" 
-                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextBlock.Foreground="White"/>
                                                         </Border>
                                                         <ControlTemplate.Triggers>
                                                             <Trigger Property="IsMouseOver" Value="True">
@@ -308,10 +258,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             
-                            <DataGridTextColumn Header="آخر تحديث" 
-                                                Binding="{Binding UpdatedAt, Converter={StaticResource NullDateTimeConverter}}" 
-                                                Width="140"
-                                                HeaderStyle="{StaticResource ModernDataGridHeaderStyle}">
+                            <DataGridTextColumn Header="اخر تحديث" Binding="{Binding UpdatedAt, Converter={StaticResource NullDateTimeConverter}}" MinWidth="120" Width="Auto" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Center"/>
@@ -329,107 +276,83 @@
             
             <!-- Add/Edit Form Card -->
             <Border Grid.Column="2" Style="{StaticResource ModernCardStyle}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12,0,24,0">
-                    <Grid FlowDirection="{Binding FlowDirection}" Margin="0,0,0,16">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12,0,12,0">
+                <Grid FlowDirection="{Binding FlowDirection}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Form Header -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,24" HorizontalAlignment="Center">
+                        <Ellipse Width="24" Height="24" Fill="{StaticResource SecondaryBrush}" Margin="0,0,12,0"/>
+                        <TextBlock FontSize="18" FontWeight="Bold" 
+                                   Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center">
+                            <TextBlock.Text>
+                                <Binding Path="IsEditMode" Converter="{StaticResource BoolToStringConverter}">
+                                    <Binding.ConverterParameter>تحديث مصروف|إضافة مصروف جديد</Binding.ConverterParameter>
+                                </Binding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                    
+                    <!-- Expense Type Input -->
+                    <StackPanel Grid.Row="1" Margin="0,0,0,16">
+                        <TextBlock Text="{Binding ExpenseTypeLabel}" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding ExpenseType, UpdateSourceTrigger=PropertyChanged}" 
+                                 Style="{StaticResource ModernTextBoxStyle}"/>
+                    </StackPanel>
+                    
+                    <!-- Amount Input -->
+                    <StackPanel Grid.Row="2" Margin="0,0,0,16">
+                        <TextBlock Text="{Binding AmountLabel}" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged}" 
+                                 Style="{StaticResource ModernTextBoxStyle}"/>
+                    </StackPanel>
+                    
+                    <!-- Description Input -->
+                    <StackPanel Grid.Row="3" Margin="0,0,0,16">
+                        <TextBlock Text="{Binding DescriptionLabel}" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" 
+                                 Style="{StaticResource ModernTextBoxStyle}" 
+                                 Height="80" 
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True"/>
+                    </StackPanel>
+                    
+                    <!-- Action Buttons -->
+                    <StackPanel Grid.Row="4" Margin="0,0,0,16">
+                        <Button Content="{Binding AddExpenseLabel}" Command="{Binding AddExpenseCommand}" 
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                Height="45" MinWidth="120" FontSize="14" FontWeight="SemiBold" 
+                                Padding="16,10" Margin="0,0,0,8"/>
                         
-                        <!-- Form Title -->
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,24" HorizontalAlignment="Center">
-                            <Ellipse Width="24" Height="24" Fill="Black" Margin="0,0,12,0"/>
-                            <TextBlock FontSize="18" FontWeight="Bold" 
-                                       Foreground="#1F2937" VerticalAlignment="Center">
-                                <TextBlock.Text>
-                                    <Binding Path="IsEditMode" Converter="{StaticResource BoolToStringConverter}">
-                                        <Binding.ConverterParameter>تحديث مصروف|إضافة مصروف جديد</Binding.ConverterParameter>
-                                    </Binding>
-                                </TextBlock.Text>
-                            </TextBlock>
-                        </StackPanel>
+                        <Button Content="{Binding UpdateExpenseLabel}" Command="{Binding UpdateExpenseCommand}" 
+                                Style="{StaticResource AccentButtonStyle}"
+                                Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                Height="45" MinWidth="120" FontSize="14" FontWeight="SemiBold" 
+                                Padding="16,10" Margin="0,0,0,8"/>
                         
-                        <!-- Expense Type Input -->
-                        <StackPanel Grid.Row="1" Margin="0,0,0,16">
-                            <TextBlock Text="{Binding ExpenseTypeLabel}" 
-                                       FontWeight="SemiBold" FontSize="14"
-                                       Foreground="{StaticResource TextPrimaryBrush}" 
-                                       Margin="0,0,0,8"/>
-                            <TextBox Text="{Binding ExpenseType, UpdateSourceTrigger=PropertyChanged}" 
-                                     Style="{StaticResource ModernTextBoxStyle}"
-                                     FlowDirection="RightToLeft"
-                                     IsTabStop="True"
-                                     TabIndex="1"/>
-                        </StackPanel>
-                        
-                        <!-- Amount Input -->
-                        <StackPanel Grid.Row="2" Margin="0,0,0,16">
-                            <TextBlock Text="{Binding AmountLabel}" 
-                                       FontWeight="SemiBold" FontSize="14"
-                                       Foreground="{StaticResource TextPrimaryBrush}" 
-                                       Margin="0,0,0,8"/>
-                            <TextBox Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged}" 
-                                     Style="{StaticResource ModernTextBoxStyle}"
-                                     FlowDirection="RightToLeft"
-                                     IsTabStop="True"
-                                     TabIndex="2"/>
-                        </StackPanel>
-                        
-                        <!-- Description Input -->
-                        <StackPanel Grid.Row="3" Margin="0,0,0,16">
-                            <TextBlock Text="{Binding DescriptionLabel}" 
-                                       FontWeight="SemiBold" FontSize="14"
-                                       Foreground="{StaticResource TextPrimaryBrush}" 
-                                       Margin="0,0,0,8"/>
-                            <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" 
-                                     Style="{StaticResource ModernTextBoxStyle}" 
-                                     Height="80" 
-                                     TextWrapping="Wrap"
-                                     AcceptsReturn="True"
-                                     FlowDirection="RightToLeft"
-                                     IsTabStop="True"
-                                     TabIndex="3"/>
-                        </StackPanel>
-                        
-                        <!-- Action Buttons -->
-                        <StackPanel Grid.Row="4" Margin="0,0,0,16">
-                            <!-- Add Mode Buttons -->
-                            <StackPanel Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                                <Button Content="{Binding AddExpenseLabel}"
-                                        Command="{Binding AddExpenseCommand}" 
-                                        Style="{StaticResource SecondaryButtonStyle}"
-                                        Padding="20,12" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,12"/>
-                                <Button Content="مسح النموذج"
-                                        Command="{Binding CancelEditCommand}" 
-                                        Background="{StaticResource TextMutedBrush}" Foreground="White"
-                                        Style="{StaticResource ModernButtonStyle}"
-                                        Padding="20,12" FontSize="14" FontWeight="SemiBold"/>
-                            </StackPanel>
-                            
-                            <!-- Edit Mode Buttons -->
-                            <StackPanel Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                <Button Content="{Binding UpdateExpenseLabel}"
-                                        Command="{Binding UpdateExpenseCommand}" 
-                                        Style="{StaticResource AccentButtonStyle}"
-                                        Padding="20,12" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,12"/>
-                                <Button Content="مسح النموذج"
-                                        Command="{Binding CancelEditCommand}" 
-                                        Background="{StaticResource TextMutedBrush}" Foreground="White"
-                                        Style="{StaticResource ModernButtonStyle}"
-                                        Padding="20,12" FontSize="14" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </StackPanel>
-                        
-                        <!-- Progress Bar -->
-                        <ProgressBar Grid.Row="5" IsIndeterminate="{Binding IsBusy}" 
-                                     Style="{StaticResource ModernProgressBarStyle}" 
-                                     Height="4" 
-                                     Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                    </Grid>
+                        <Button Content="مسح النموذج" Command="{Binding CancelEditCommand}" 
+                                Background="{StaticResource TextMutedBrush}" Foreground="White"
+                                Style="{StaticResource ModernButtonStyle}"
+                                Height="40" MinWidth="120" FontSize="13" FontWeight="Medium"
+                                Padding="16,8" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    
+                    <!-- Progress Bar -->
+                    <ProgressBar Grid.Row="5" IsIndeterminate="{Binding IsBusy}" 
+                                 Style="{StaticResource ModernProgressBarStyle}" 
+                                 Margin="0,16,0,0"/>
+                </Grid>
                 </ScrollViewer>
             </Border>
         </Grid>

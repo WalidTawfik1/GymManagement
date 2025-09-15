@@ -24,7 +24,7 @@
         
         <!-- Header Section -->
         <Border Grid.Row="0" Background="{StaticResource PrimaryGradientBrush}" 
-                CornerRadius="24,24,0,0" Padding="32,32" Margin="16,16,16,24">
+                CornerRadius="20,20,0,0" Padding="16,20" Margin="8,8,8,16">
             <Border.Effect>
                 <DropShadowEffect ShadowDepth="8" BlurRadius="24" Opacity="0.15" Color="#000000"/>
             </Border.Effect>
@@ -37,20 +37,20 @@
                 
                 <!-- Back Button -->
                 <Button Grid.Column="0" Command="{Binding GoBackCommand}" 
-                        Width="70" Height="45" Margin="0,0,20,0" Cursor="Hand">
+                        Width="60" Height="35" Margin="0,0,12,0" Cursor="Hand">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border Background="White" CornerRadius="22" Padding="0">
+                            <Border Background="White" CornerRadius="18" Padding="0">
                                 <Border.Effect>
-                                    <DropShadowEffect ShadowDepth="4" BlurRadius="16" Opacity="0.2" Color="#000000"/>
+                                    <DropShadowEffect ShadowDepth="2" BlurRadius="12" Opacity="0.15" Color="#000000"/>
                                 </Border.Effect>
                                 <Grid>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <Path Data="M12,20 L4,12 L12,4" 
-                                              Stroke="#F59E0B" StrokeThickness="2.5" 
+                                              Stroke="#F59E0B" StrokeThickness="2" 
                                               StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                              Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                        <TextBlock Text="رجوع" FontSize="13" FontWeight="Bold" 
+                                              Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="رجوع" FontSize="11" FontWeight="Bold" 
                                                    Foreground="#F59E0B" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Grid>
@@ -78,42 +78,42 @@
                 
                 <!-- Title -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" FlowDirection="LeftToRight">
-                    <Border Background="White" CornerRadius="18" Padding="12,8" Margin="0,0,16,0">
+                    <Border Background="White" CornerRadius="14" Padding="8,6" Margin="0,0,10,0">
                         <Border.Effect>
-                            <DropShadowEffect ShadowDepth="2" BlurRadius="8" Opacity="0.15" Color="#000000"/>
+                            <DropShadowEffect ShadowDepth="1" BlurRadius="6" Opacity="0.12" Color="#000000"/>
                         </Border.Effect>
-                        <Ellipse Width="28" Height="28" Fill="#F59E0B" Opacity="0.9"/>
+                        <Ellipse Width="20" Height="20" Fill="#F59E0B" Opacity="0.9"/>
                     </Border>
-                    <Border Background="#40FFFFFF" CornerRadius="16" Padding="20,12">
+                    <Border Background="#40FFFFFF" CornerRadius="12" Padding="14,8">
                         <Border.Effect>
-                            <DropShadowEffect ShadowDepth="2" BlurRadius="12" Opacity="0.1" Color="#000000"/>
+                            <DropShadowEffect ShadowDepth="1" BlurRadius="8" Opacity="0.08" Color="#000000"/>
                         </Border.Effect>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding SelectedMonthName}" 
-                                       FontSize="26" FontWeight="Bold" 
+                                       FontSize="18" FontWeight="Bold" 
                                        Foreground="White" VerticalAlignment="Center"/>
                             <TextBlock Text=" تفاصيل الإيرادات والمصروفات لشهر" 
-                                       FontSize="26" FontWeight="Bold" 
+                                       FontSize="18" FontWeight="Bold" 
                                        Foreground="White" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
                 
                 <!-- Export Button -->
-                <Button Grid.Column="2" Content="تصدير التقرير المالي" 
+                <Button Grid.Column="2" Content="تصدير التقرير" 
                         Command="{Binding ExportFinancialReportCommand}"
                         Style="{StaticResource ModernButtonStyle}" 
                         Background="White"
-                        Padding="16,8" FontSize="12" VerticalAlignment="Center"
+                        Padding="10,6" FontSize="10" VerticalAlignment="Center"
                         HorizontalAlignment="Right" Margin="0,0,0,0" Cursor="Hand">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}" CornerRadius="20" Padding="{TemplateBinding Padding}">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="16" Padding="{TemplateBinding Padding}">
                                 <Border.Effect>
-                                    <DropShadowEffect ShadowDepth="4" BlurRadius="16" Opacity="0.2" Color="#000000"/>
+                                    <DropShadowEffect ShadowDepth="2" BlurRadius="12" Opacity="0.15" Color="#000000"/>
                                 </Border.Effect>
                                 <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <TextBlock Text="📊" FontSize="12" Margin="0,0,6,0" Foreground="#F59E0B"/>
+                                    <TextBlock Text="📊" FontSize="10" Margin="0,0,4,0" Foreground="#F59E0B"/>
                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextBlock.Foreground="#F59E0B"/>
                                 </StackPanel>
                             </Border>
@@ -142,14 +142,14 @@
         
         <!-- Content Area -->
         <Border Grid.Row="1" Background="White" 
-                CornerRadius="28,28,24,24" Padding="36" Margin="16,0,16,16">
+                CornerRadius="20,20,16,16" Padding="12" Margin="8,0,8,8">
             <Border.Effect>
-                <DropShadowEffect ShadowDepth="12" BlurRadius="32" Opacity="0.1" Color="#000000"/>
+                <DropShadowEffect ShadowDepth="6" BlurRadius="20" Opacity="0.08" Color="#000000"/>
             </Border.Effect>
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
                 
                 <!-- Financial Details List -->
@@ -165,20 +165,21 @@
                           ScrollViewer.CanContentScroll="False"
                           ScrollViewer.VerticalScrollBarVisibility="Auto"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          PreviewMouseWheel="DataGrid_PreviewMouseWheel">
+                          PreviewMouseWheel="DataGrid_PreviewMouseWheel"
+                          Margin="0,0,0,8">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="النوع" 
                                                 Binding="{Binding Type}" 
-                                                Width="120"
+                                                Width="100"
                                                 HeaderStyle="{StaticResource ModernDataGridHeaderStyle}">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="FontWeight" Value="Bold"/>
-                                        <Setter Property="Margin" Value="8,4"/>
+                                        <Setter Property="Margin" Value="4,2"/>
                                         <Setter Property="TextAlignment" Value="Center"/>
-                                        <Setter Property="Padding" Value="8,4"/>
-                                        <Setter Property="FontSize" Value="12"/>
+                                        <Setter Property="Padding" Value="6,3"/>
+                                        <Setter Property="FontSize" Value="10"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsIncome}" Value="True">
                                                 <Setter Property="Foreground" Value="#059669"/>
@@ -201,23 +202,24 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="Foreground" Value="#1F2937"/>
-                                        <Setter Property="Margin" Value="12,0"/>
+                                        <Setter Property="Margin" Value="8,0"/>
                                         <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="FontSize" Value="11"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
                             
                             <DataGridTextColumn Header="المبلغ" 
                                                 Binding="{Binding FormattedAmount}" 
-                                                Width="150"
+                                                Width="120"
                                                 HeaderStyle="{StaticResource ModernDataGridHeaderStyle}">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Center"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="FontWeight" Value="Bold"/>
-                                        <Setter Property="FontSize" Value="16"/>
-                                        <Setter Property="Padding" Value="8,4"/>
+                                        <Setter Property="FontSize" Value="11"/>
+                                        <Setter Property="Padding" Value="6,3"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsIncome}" Value="True">
                                                 <Setter Property="Foreground" Value="#059669"/>
@@ -234,14 +236,14 @@
                             
                             <DataGridTextColumn Header="التاريخ" 
                                                 Binding="{Binding Date, StringFormat='dd/MM/yyyy'}" 
-                                                Width="100"
+                                                Width="80"
                                                 HeaderStyle="{StaticResource ModernDataGridHeaderStyle}">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="TextAlignment" Value="Center"/>
                                         <Setter Property="VerticalAlignment" Value="Center"/>
                                         <Setter Property="Foreground" Value="#6B7280"/>
-                                        <Setter Property="FontSize" Value="12"/>
+                                        <Setter Property="FontSize" Value="10"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
@@ -249,9 +251,9 @@
                     </DataGrid>
                 
                 <!-- Summary Section -->
-                <Border Grid.Row="1" Background="#F8FAFC" CornerRadius="20" Padding="28" Margin="0,28,0,0">
+                <Border Grid.Row="1" Background="#F8FAFC" CornerRadius="16" Padding="20" Margin="0,0,0,0">
                     <Border.Effect>
-                        <DropShadowEffect ShadowDepth="4" BlurRadius="16" Opacity="0.08" Color="#000000"/>
+                        <DropShadowEffect ShadowDepth="3" BlurRadius="16" Opacity="0.08" Color="#000000"/>
                     </Border.Effect>
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -260,40 +262,40 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         
-                        <StackPanel Grid.Column="0" HorizontalAlignment="Center">
-                            <TextBlock Text="إجمالي الإيرادات" FontSize="15" Foreground="#64748B" Margin="35,0,0,12" FontWeight="Medium"/>
+                        <StackPanel Grid.Column="0" HorizontalAlignment="Center" Margin="8,0">
+                            <TextBlock Text="إجمالي الإيرادات" FontSize="13" Foreground="#64748B" Margin="0,0,0,12" FontWeight="Medium" HorizontalAlignment="Center"/>
                             <Border Background="#059669" CornerRadius="16" Padding="20,12">
                                 <Border.Effect>
-                                    <DropShadowEffect ShadowDepth="6" BlurRadius="20" Opacity="0.15" Color="#059669"/>
+                                    <DropShadowEffect ShadowDepth="4" BlurRadius="16" Opacity="0.15" Color="#059669"/>
                                 </Border.Effect>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <TextBlock Text="+" FontSize="26" FontWeight="Bold" Foreground="White" 
+                                    <TextBlock Text="+" FontSize="18" FontWeight="Bold" Foreground="White" 
                                                VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                    <TextBlock Text="{Binding TotalRevenue, StringFormat='{}{0:F2} ج.م'}" 
-                                               FontSize="22" FontWeight="Bold" Foreground="White" 
+                                    <TextBlock Text="{Binding TotalRevenue, StringFormat='{}{0:F0} ج.م'}" 
+                                               FontSize="16" FontWeight="Bold" Foreground="White" 
                                                VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
                         
-                        <StackPanel Grid.Column="1" HorizontalAlignment="Center">
-                            <TextBlock Text="إجمالي المصروفات" FontSize="15" Foreground="#64748B" Margin="20,0,0,12" FontWeight="Medium"/>
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Center" Margin="8,0">
+                            <TextBlock Text="إجمالي المصروفات" FontSize="13" Foreground="#64748B" Margin="0,0,0,12" FontWeight="Medium" HorizontalAlignment="Center"/>
                             <Border Background="#DC2626" CornerRadius="16" Padding="20,12">
                                 <Border.Effect>
-                                    <DropShadowEffect ShadowDepth="6" BlurRadius="20" Opacity="0.15" Color="#DC2626"/>
+                                    <DropShadowEffect ShadowDepth="4" BlurRadius="16" Opacity="0.15" Color="#DC2626"/>
                                 </Border.Effect>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <TextBlock Text="-" FontSize="26" FontWeight="Bold" Foreground="White" 
+                                    <TextBlock Text="-" FontSize="18" FontWeight="Bold" Foreground="White" 
                                                VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                    <TextBlock Text="{Binding TotalExpenses, StringFormat='{}{0:F2} ج.م'}" 
-                                               FontSize="22" FontWeight="Bold" Foreground="White" 
+                                    <TextBlock Text="{Binding TotalExpenses, StringFormat='{}{0:F0} ج.م'}" 
+                                               FontSize="16" FontWeight="Bold" Foreground="White" 
                                                VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
                         
-                        <StackPanel Grid.Column="2" HorizontalAlignment="Center" >
-                            <TextBlock Text="صافي الربح" FontSize="15" Foreground="#64748B" Margin="45,0,0,12" FontWeight="Medium"/>
+                        <StackPanel Grid.Column="2" HorizontalAlignment="Center" Margin="8,0">
+                            <TextBlock Text="صافي الربح" FontSize="13" Foreground="#64748B" Margin="0,0,0,12" FontWeight="Medium" HorizontalAlignment="Center"/>
                             <Border CornerRadius="16" Padding="20,12">
                                 <Border.Style>
                                     <Style TargetType="Border">
@@ -302,7 +304,7 @@
                                                 <Setter Property="Background" Value="#059669"/>
                                                 <Setter Property="Effect">
                                                     <Setter.Value>
-                                                        <DropShadowEffect ShadowDepth="6" BlurRadius="20" Opacity="0.15" Color="#059669"/>
+                                                        <DropShadowEffect ShadowDepth="4" BlurRadius="16" Opacity="0.15" Color="#059669"/>
                                                     </Setter.Value>
                                                 </Setter>
                                             </DataTrigger>
@@ -310,7 +312,7 @@
                                                 <Setter Property="Background" Value="#DC2626"/>
                                                 <Setter Property="Effect">
                                                     <Setter.Value>
-                                                        <DropShadowEffect ShadowDepth="6" BlurRadius="20" Opacity="0.15" Color="#DC2626"/>
+                                                        <DropShadowEffect ShadowDepth="4" BlurRadius="16" Opacity="0.15" Color="#DC2626"/>
                                                     </Setter.Value>
                                                 </Setter>
                                             </DataTrigger>
@@ -318,7 +320,7 @@
                                     </Style>
                                 </Border.Style>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <TextBlock FontSize="26" FontWeight="Bold" Foreground="White" 
+                                    <TextBlock FontSize="18" FontWeight="Bold" Foreground="White" 
                                                VerticalAlignment="Center" Margin="0,0,6,0">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
@@ -333,10 +335,10 @@
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
-                                    <TextBlock FontSize="22" FontWeight="Bold" Foreground="White" 
+                                    <TextBlock FontSize="16" FontWeight="Bold" Foreground="White" 
                                                VerticalAlignment="Center">
                                         <TextBlock.Text>
-                                            <Binding Path="NetProfit" StringFormat="{}{0:F2} ج.م"/>
+                                            <Binding Path="NetProfit" StringFormat="{}{0:F0} ج.م"/>
                                         </TextBlock.Text>
                                     </TextBlock>
                                 </StackPanel>
