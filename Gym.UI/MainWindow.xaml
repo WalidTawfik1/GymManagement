@@ -87,7 +87,7 @@
                                Stretch="UniformToFill" 
                                Margin="2"/>
                     </Border>
-                    <TextBlock Text="Champions Mambela Gym"
+                    <TextBlock Text="Mambela Gym"
                                FontSize="20" FontWeight="Bold" 
                                Foreground="White" VerticalAlignment="Center"/>
                 </StackPanel>

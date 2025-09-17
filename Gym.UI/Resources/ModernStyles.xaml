@@ -7,7 +7,7 @@
     <local:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
     <local:PercentageToColorConverter x:Key="PercentageToColorConverter"/>
 
-    <!-- Champions Mambela Gym Brand Color Palette -->
+    <!-- Mambela Gym Brand Color Palette -->
     <!-- Primary Brand Colors (Golden Yellow from Logo) -->
     <SolidColorBrush x:Key="PrimaryBrush" Color="#F5B800"/>
     <SolidColorBrush x:Key="PrimaryDarkBrush" Color="#D49E00"/>

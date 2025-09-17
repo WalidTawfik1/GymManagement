@@ -83,7 +83,7 @@ namespace Gym.Infrastructure.Repositores
                 
                 await _context.Visits.AddAsync(visit);
                 // Decrement sessions directly on the active membership entity we already have
-                if ((activeMembership.MembershipType == "12 حصة" || activeMembership.MembershipType == "12 Sessions") && activeMembership.RemainingSessions.HasValue)
+                if ((activeMembership.MembershipType == "8 حصص" || activeMembership.MembershipType == "8 Sessions" || activeMembership.MembershipType == "12 حصة" || activeMembership.MembershipType == "12 Sessions") && activeMembership.RemainingSessions.HasValue)
                 {
                     activeMembership.RemainingSessions -= 1;
                     if (activeMembership.RemainingSessions <= 0)
@@ -137,7 +137,7 @@ namespace Gym.Infrastructure.Repositores
                 return false; // No active membership found
             }
 
-            if ((membership.MembershipType == "12 حصة" || membership.MembershipType == "12 Sessions")  && membership.RemainingSessions.HasValue)
+            if ((membership.MembershipType == "8 حصص" || membership.MembershipType == "8 Sessions" || membership.MembershipType == "12 حصة" || membership.MembershipType == "12 Sessions")  && membership.RemainingSessions.HasValue)
             {
                 membership.RemainingSessions -= 1;
                 if (membership.RemainingSessions <= 0)

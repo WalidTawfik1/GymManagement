@@ -98,6 +98,7 @@ namespace Gym.UI.ViewModels
         public List<string> MembershipTypes { get; } = new()
         {
             "حصة واحدة",
+            "8 حصص",
             "12 حصة",
             "شهر",
             "3 شهور"
@@ -194,6 +195,7 @@ namespace Gym.UI.ViewModels
                     string successKey = MembershipType switch
                     {
                         "حصة واحدة" or "Single Session" => "MembershipAddedSuccessSingleSession",
+                        "8 حصص" or "8 Sessions" => "MembershipAddedSuccessLimited",
                         "12 حصة" or "12 Sessions" => "MembershipAddedSuccessLimited",
                         "شهر" or "1 Month" => "MembershipAddedSuccess1Month",
                         "3 شهور" or "3 Months" => "MembershipAddedSuccess3Months", 

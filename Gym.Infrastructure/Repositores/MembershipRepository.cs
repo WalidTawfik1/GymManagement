@@ -42,6 +42,20 @@ namespace Gym.Infrastructure.Repositores
                 };
                 await _context.Memberships.AddAsync(membership);
             }
+            else if (membershipDTO.MembershipType == "8 حصص" || membershipDTO.MembershipType == "8 Sessions")
+            {
+                var membership = new Membership
+                {
+                    TraineeId = membershipDTO.TraineeId,
+                    MembershipType = membershipDTO.MembershipType,
+                    Price = membershipDTO.Price,
+                    StartDate = DateOnly.FromDateTime(DateTime.Now),
+                    EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(1).AddDays(-1)),
+                    RemainingSessions = 8,
+                    IsActive = true
+                };
+                await _context.Memberships.AddAsync(membership);
+            }
             else if (membershipDTO.MembershipType == "12 حصة" || membershipDTO.MembershipType == "12 Sessions")
             {
                 var membership = new Membership
@@ -50,7 +64,7 @@ namespace Gym.Infrastructure.Repositores
                     MembershipType = membershipDTO.MembershipType,
                     Price = membershipDTO.Price,
                     StartDate = DateOnly.FromDateTime(DateTime.Now),
-                    EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+                    EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(1).AddDays(-1)),
                     RemainingSessions = 12,
                     IsActive = true
                 };
@@ -64,7 +78,7 @@ namespace Gym.Infrastructure.Repositores
                     MembershipType = membershipDTO.MembershipType,
                     Price = membershipDTO.Price,
                     StartDate = DateOnly.FromDateTime(DateTime.Now),
-                    EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(3)),
+                    EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(3).AddDays(-1)),
                     RemainingSessions = null,
                     IsActive = true
                 };
@@ -78,7 +92,7 @@ namespace Gym.Infrastructure.Repositores
                     MembershipType = membershipDTO.MembershipType,
                     Price = membershipDTO.Price,
                     StartDate = DateOnly.FromDateTime(DateTime.Now),
-                    EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(1)),
+                    EndDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(1).AddDays(-1)),
                     RemainingSessions = null,
                     IsActive = true
                 };

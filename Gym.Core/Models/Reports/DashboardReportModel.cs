@@ -4,7 +4,7 @@ namespace Gym.Core.Models.Reports
 {
     public class DashboardReportModel
     {
-        public string CompanyName { get; set; } = "Champions Mambela Gym";
+        public string CompanyName { get; set; } = "Mambela Gym";
         public DateTime GeneratedDate { get; set; } = DateTime.Now;
         public string ReportTitle { get; set; } = "تقرير لوحة التحكم";
         
