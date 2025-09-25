@@ -66,6 +66,7 @@
                     <Grid Grid.Row="0" Margin="0,0,0,20" FlowDirection="LeftToRight">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>   <!-- Refresh -->
+                            <ColumnDefinition Width="Auto"/>   <!-- Export -->
                             <ColumnDefinition Width="*"/>      <!-- Spacer -->
                             <ColumnDefinition Width="Auto"/>   <!-- Search -->
                             <ColumnDefinition Width="*"/>      <!-- Spacer -->
@@ -90,8 +91,29 @@
                                 </ControlTemplate>
                             </Button.Template>
                         </Button>
+                        
+                        <!-- Export Button -->
+                        <Button Grid.Column="1" Content="تصدير تقرير" Command="{Binding ExportTraineesReportCommand}" 
+                                Style="{StaticResource ModernButtonStyle}" Background="{StaticResource SuccessBrush}" Padding="16,8" FontSize="12" VerticalAlignment="Center" Margin="10,0,0,0">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="20" Padding="{TemplateBinding Padding}">
+                                        <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+                                            <Ellipse Width="12" Height="12" Fill="White" Margin="0,0,6,0"/>
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextBlock.Foreground="White"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#059669"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
                         <!-- Search Controls -->
-                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBox Width="240" Height="40" FlowDirection="RightToLeft"
                                      Text="{Binding SearchTraineeName, UpdateSourceTrigger=PropertyChanged}"
                                      Style="{StaticResource ModernTextBoxStyle}" Padding="8,4" Tag="ادخل اسم المتدرب"/>
@@ -99,7 +121,7 @@
                                     Style="{StaticResource ModernButtonStyle}" Height="32" Padding="16,4"/>
                         </StackPanel>
                         <!-- Title -->
-                        <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+                        <StackPanel Grid.Column="5" Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="{Binding TraineesListLabel}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
                             <Ellipse Width="20" Height="20" Fill="{StaticResource SecondaryBrush}"/>
                         </StackPanel>

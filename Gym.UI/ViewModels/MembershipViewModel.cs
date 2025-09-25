@@ -3,10 +3,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Gym.Core.DTO;
 using Gym.Core.Interfaces;
+using Gym.Core.Interfaces.Services;
 using Gym.Core.Models;
 using Gym.UI.Services;
 using Gym.UI.Services.Dialogs;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 
 namespace Gym.UI.ViewModels
@@ -16,13 +19,15 @@ namespace Gym.UI.ViewModels
         private readonly IUnitofWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IDialogService _dialog;
+    private readonly IReportService _reportService;
 
-        public MembershipViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService, IDialogService dialog) 
+        public MembershipViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService, IDialogService dialog, IReportService reportService) 
             : base(localizationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _dialog = dialog;
+            _reportService = reportService;
             UpdateLocalizedLabels();
         }
 
@@ -373,6 +378,37 @@ namespace Gym.UI.ViewModels
             catch (Exception ex)
             {
                 await _dialog.ShowAsync($"خطأ أثناء البحث: {ex.Message}", "Error", DialogType.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task ExportMembershipsReport()
+        {
+            try
+            {
+                IsBusy = true;
+                var filePath = await _reportService.ExportMembershipsReportAsync();
+                
+                await _dialog.ShowAsync(GetLocalizedString("ReportExportedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
+                
+                // فتح مجلد التقارير
+                var folderPath = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(folderPath) && Directory.Exists(folderPath))
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = folderPath,
+                        UseShellExecute = true
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                await _dialog.ShowAsync($"{GetLocalizedString("ReportExportError")}: {ex.Message}", GetLocalizedString("ErrorTitle"), DialogType.Error);
             }
             finally
             {

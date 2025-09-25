@@ -1,6 +1,7 @@
 using AutoMapper;
 using Gym.Core.Interfaces;
 using Gym.Core.Interfaces.Services;
+using Gym.Core.Models;
 using Gym.Core.Models.Reports;
 using Gym.Infrastructure.Services;
 using System.Globalization;
@@ -169,6 +170,54 @@ namespace Gym.Infrastructure.Services
             }
             
             return Task.CompletedTask;
+        }
+
+        public async Task<string> ExportTraineesReportAsync()
+        {
+            var trainees = await _unitOfWork.TraineeRepository.GetAllTraineesAsync();
+            
+            var fileName = $"تقرير_المتدربين_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+            var filePath = Path.Combine(_reportsDirectory, fileName);
+            
+            TraineesReportGenerator.GenerateReport(trainees, filePath);
+            
+            return filePath;
+        }
+
+        public async Task<string> ExportMembershipsReportAsync()
+        {
+            var membershipsDto = await _unitOfWork.MembershipRepository.GetAllMembershipsAsync();
+            
+            var fileName = $"تقرير_العضويات_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+            var filePath = Path.Combine(_reportsDirectory, fileName);
+            
+            MembershipsReportGenerator.GenerateReport(membershipsDto, filePath);
+            
+            return filePath;
+        }
+
+        public async Task<string> ExportVisitsReportAsync()
+        {
+            var visitsDto = await _unitOfWork.VisitRepository.GetAllVisitsAsync();
+            
+            var fileName = $"تقرير_الزيارات_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+            var filePath = Path.Combine(_reportsDirectory, fileName);
+            
+            VisitsReportGenerator.GenerateReport(visitsDto, filePath);
+            
+            return filePath;
+        }
+
+        public async Task<string> ExportAdditionalServicesReportAsync()
+        {
+            var services = await _unitOfWork.AdditionalServiceRepository.GetAllAdditionalServicesAsync();
+            
+            var fileName = $"تقرير_الخدمات_الإضافية_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+            var filePath = Path.Combine(_reportsDirectory, fileName);
+            
+            AdditionalServicesReportGenerator.GenerateReport(services, filePath);
+            
+            return filePath;
         }
 
         private string GetMonthName(int month)

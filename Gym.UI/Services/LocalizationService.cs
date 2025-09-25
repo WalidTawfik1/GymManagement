@@ -229,6 +229,11 @@ namespace Gym.UI.Services
                     ["EnterTraineeIdAndType"] = "يرجى إدخال رقم المتدرب واختيار نوع العضوية.",
                     ["TraineeNotFound"] = "المتدرب غير موجود. يرجى التحقق من رقم المتدرب.",
                     ["FailedAddMembershipGeneric"] = "فشل في إضافة العضوية.",
+                    
+                    // Export Reports
+                    ["ExportReport"] = "تصدير تقرير",
+                    ["ReportExportedSuccess"] = "تم تصدير التقرير بنجاح! سيتم فتح مجلد التقارير.",
+                    ["ReportExportError"] = "خطأ في تصدير التقرير",
                     ["FailedUpdateMembershipGeneric"] = "فشل في تحديث العضوية.",
                     ["MembershipUpdatedSuccess"] = "تم تحديث العضوية بنجاح!",
                     ["MembershipAddedSuccessOpen"] = "تم إضافة العضوية بنجاح (مفتوح)",
@@ -431,6 +436,11 @@ namespace Gym.UI.Services
                     , ["EnterValidTraineeId"] = "Please enter a valid trainee ID number."
                     , ["EnterTraineeIdAndType"] = "Please enter trainee ID and select membership type."
                     , ["TraineeNotFound"] = "Trainee not found. Please check the trainee ID."
+                    
+                    // Export Reports
+                    , ["ExportReport"] = "Export Report"
+                    , ["ReportExportedSuccess"] = "Report exported successfully! Reports folder will be opened."
+                    , ["ReportExportError"] = "Error exporting report"
                     , ["FailedAddMembershipGeneric"] = "Failed to add membership."
                     , ["FailedUpdateMembershipGeneric"] = "Failed to update membership."
                     , ["MembershipUpdatedSuccess"] = "Membership updated successfully!"

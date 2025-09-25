@@ -72,6 +72,7 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         
                         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
@@ -90,8 +91,31 @@
                                            Foreground="White" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Border>
+
+                        <!-- Export Button -->
+                        <Button Grid.Column="2" Content="تصدير تقرير" Command="{Binding ExportVisitsReportCommand}" 
+                                Style="{StaticResource ModernButtonStyle}" Background="{StaticResource SuccessBrush}"
+                                Padding="16,8" FontSize="12" Margin="0,0,10,0">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" 
+                                            CornerRadius="20" 
+                                            Padding="{TemplateBinding Padding}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse Width="12" Height="12" Fill="White" Margin="0,0,6,0"/>
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextBlock.Foreground="White"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#059669"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
                         
-                        <Button Grid.Column="2" Content="تحديث" Command="{Binding LoadVisitsCommand}" 
+                        <Button Grid.Column="3" Content="تحديث" Command="{Binding LoadVisitsCommand}" 
                                 Style="{StaticResource ModernButtonStyle}" Background="{StaticResource InfoBrush}"
                                 Padding="16,8" FontSize="12">
                             <Button.Template>

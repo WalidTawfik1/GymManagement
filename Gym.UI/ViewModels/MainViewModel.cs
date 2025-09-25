@@ -22,10 +22,10 @@ namespace Gym.UI.ViewModels
             
             // Initialize ViewModels
             MainMenuViewModel = new MainMenuViewModel(_localizationService);
-            TraineeViewModel = new TraineeViewModel(_unitOfWork, _mapper, _localizationService, dialog);
-            MembershipViewModel = new MembershipViewModel(_unitOfWork, _mapper, _localizationService, dialog);
-            VisitViewModel = new VisitViewModel(_unitOfWork, _mapper, _localizationService, dialog);
-            AdditionalServiceViewModel = new AdditionalServiceViewModel(_unitOfWork, _mapper, _localizationService, dialog);
+            TraineeViewModel = new TraineeViewModel(_unitOfWork, _mapper, _localizationService, dialog, reportService);
+            MembershipViewModel = new MembershipViewModel(_unitOfWork, _mapper, _localizationService, dialog, reportService);
+            VisitViewModel = new VisitViewModel(_unitOfWork, _mapper, _localizationService, dialog, reportService);
+            AdditionalServiceViewModel = new AdditionalServiceViewModel(_unitOfWork, _mapper, _localizationService, dialog, reportService);
             ExpenseRevenueViewModel = new ExpenseRevenueViewModel(_unitOfWork, _mapper, _localizationService, dialog, reportService);
             FinancialDetailsViewModel = new FinancialDetailsViewModel(_unitOfWork, _mapper, _localizationService, reportService, dialog);
             DashboardViewModel = new DashboardViewModel(_unitOfWork.DashboardRepository, _localizationService, reportService, dialog);

@@ -35,6 +35,14 @@ namespace Gym.Infrastructure.Repositores
             return true;
         }
 
+        public async Task<IReadOnlyList<Trainee>> GetAllTraineesAsync()
+        {
+            return await context.Trainees
+                .Where(t => !t.IsDeleted)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<IReadOnlyList<Trainee>> GetTraineeByNameAsync(string name)
         {
             return await context.Trainees

@@ -3,10 +3,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Gym.Core.DTO;
 using Gym.Core.Interfaces;
+using Gym.Core.Interfaces.Services;
 using Gym.Core.Models;
 using Gym.UI.Services;
 using Gym.UI.Services.Dialogs;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 
 namespace Gym.UI.ViewModels
@@ -16,13 +19,15 @@ namespace Gym.UI.ViewModels
         private readonly IUnitofWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IDialogService _dialog;
+    private readonly IReportService _reportService;
 
-        public TraineeViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService, IDialogService dialog) 
+        public TraineeViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService, IDialogService dialog, IReportService reportService) 
             : base(localizationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _dialog = dialog;
+            _reportService = reportService;
             UpdateLocalizedLabels();
         }
 
@@ -162,9 +167,9 @@ namespace Gym.UI.ViewModels
             try
             {
                 IsBusy = true;
-                var trainees = await _unitOfWork.TraineeRepository.GetAllAsync();
+                var trainees = await _unitOfWork.TraineeRepository.GetAllTraineesAsync();
                 Trainees.Clear();
-                foreach (var trainee in trainees.Where(t => !t.IsDeleted))
+                foreach (var trainee in trainees)
                 {
                     Trainees.Add(trainee);
                 }
@@ -311,6 +316,37 @@ namespace Gym.UI.ViewModels
             PhoneNumber = string.Empty;
             JoinDate = DateOnly.FromDateTime(DateTime.Today);
             SelectedTrainee = null;
+        }
+
+        [RelayCommand]
+        private async Task ExportTraineesReport()
+        {
+            try
+            {
+                IsBusy = true;
+                var filePath = await _reportService.ExportTraineesReportAsync();
+                
+                await _dialog.ShowAsync(GetLocalizedString("ReportExportedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
+                
+                // فتح مجلد التقارير
+                var folderPath = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(folderPath) && Directory.Exists(folderPath))
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = folderPath,
+                        UseShellExecute = true
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                await _dialog.ShowAsync($"{GetLocalizedString("ReportExportError")}: {ex.Message}", GetLocalizedString("ErrorTitle"), DialogType.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
     }
 }
