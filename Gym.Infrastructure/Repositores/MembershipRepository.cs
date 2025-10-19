@@ -147,14 +147,29 @@ namespace Gym.Infrastructure.Repositores
 
         public async Task<IReadOnlyList<MembershipDTO>> GetNearFinishMemberships()
         {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var threeDaysFromNow = DateOnly.FromDateTime(DateTime.Now.AddDays(3));
+
             var memberships = await _context.Memberships
                 .Include(m => m.Trainee)
-                .Where(m => !m.IsDeleted && m.IsActive && 
-                 (m.EndDate <= DateOnly.FromDateTime(DateTime.Now.AddDays(3)) || 
-                 (m.RemainingSessions != null && m.RemainingSessions <= 3)))
+                .Where(m =>
+                    !m.IsDeleted &&
+                    m.IsActive &&
+                    (
+                        // Ends within 1–3 days
+                        (m.EndDate > today && m.EndDate <= threeDaysFromNow) ||
+
+                        // Has 3 or fewer sessions remaining and not yet expired
+                        (m.RemainingSessions != null &&
+                         m.RemainingSessions <= 3 &&
+                         m.EndDate > today)
+                    )
+                )
                 .ToListAsync();
+
             var membershipsDTO = _mapper.Map<IReadOnlyList<MembershipDTO>>(memberships);
             return membershipsDTO;
         }
+
     }
 }
