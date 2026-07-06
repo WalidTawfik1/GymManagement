@@ -73,7 +73,10 @@ namespace Gym.Infrastructure.Services
                         column.Item().AlignRight().Text("إحصائيات الزيارات").FontSize(14).SemiBold();
                         column.Item().PaddingVertical(5);
                         
-                        var thisMonth = visits.Count(v => v.VisitDate.Month == DateTime.Now.Month && v.VisitDate.Year == DateTime.Now.Year);
+                        var currentPeriod = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(
+                            Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth(),
+                            Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear());
+                        var thisMonth = visits.Count(v => v.VisitDate >= currentPeriod.StartDate && v.VisitDate < currentPeriod.EndDate);
                         var thisWeek = visits.Count(v => v.VisitDate >= DateTime.Now.AddDays(-7));
                         var today = visits.Count(v => v.VisitDate.Date == DateTime.Today);
                         

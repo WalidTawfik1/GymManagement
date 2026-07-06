@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Gym.Core.DTO;
 using Gym.Core.Interfaces;
 using Gym.Core.Models;
@@ -99,6 +99,7 @@ namespace Gym.Infrastructure.Repositores
                 
                 return new VisitResponseDTO
                 {
+                    Id = visit.Id,
                     TraineeName = activeMembership.Trainee?.FullName ?? "",
                     MembershipType = activeMembership.MembershipType,
                     RemainingSessions = activeMembership.RemainingSessions,
@@ -201,7 +202,7 @@ namespace Gym.Infrastructure.Repositores
         {
             var expiredMemberships = await _context.Memberships
                 .Where(m => m.TraineeId == traineeId &&
-                           m.EndDate < DateOnly.FromDateTime(DateTime.Now) &&
+                           (m.EndDate < DateOnly.FromDateTime(DateTime.Now) || (m.RemainingSessions != null && m.RemainingSessions <= 0)) &&
                            m.IsActive &&
                            !m.IsDeleted)
                 .ToListAsync();
@@ -217,13 +218,17 @@ namespace Gym.Infrastructure.Repositores
             }
         }
 
-        public async Task<IReadOnlyList<VisitDTO>> GetAllVisitsAsync()
+        public async Task<IReadOnlyList<VisitDTO>> GetAllVisitsAsync(int? month = null, int? year = null)
         {
-            var visits = await _context.Visits
+            var targetMonth = month ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth();
+            var targetYear = year ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear();
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(targetMonth, targetYear);
+            
+            var visits = await Task.Run(() => _context.Visits
+                .Where(v => !v.IsDeleted && v.VisitDate >= period.StartDate && v.VisitDate < period.EndDate)
                 .Include(v => v.Trainee)
-                .Where(v => !v.IsDeleted)
                 .OrderByDescending(v => v.VisitDate)
-                .ToListAsync();
+                .ToList());
             return _mapper.Map<IReadOnlyList<VisitDTO>>(visits);
         }
 
@@ -241,12 +246,13 @@ namespace Gym.Infrastructure.Repositores
             foreach (var visit in visits)
             {
                 var activeMembership = visit.Trainee?.Memberships
-                    .Where(m => m.IsActive && !m.IsDeleted && m.EndDate >= DateOnly.FromDateTime(DateTime.Now))
+                    .Where(m => m.IsActive && !m.IsDeleted && m.EndDate >= DateOnly.FromDateTime(DateTime.Now) && (m.RemainingSessions == null || m.RemainingSessions > 0))
                     .OrderBy(m => m.EndDate)
                     .FirstOrDefault();
 
                 var response = new VisitResponseDTO
                 {
+                    Id = visit.Id,
                     TraineeName = visit.Trainee?.FullName ?? "غير محدد",
                     MembershipType = activeMembership?.MembershipType ?? "لا يوجد اشتراك",
                     RemainingSessions = activeMembership?.RemainingSessions,
@@ -274,10 +280,43 @@ namespace Gym.Infrastructure.Repositores
 
         public async Task<int> GetVisitsCountByMonthAsync(int month, int year)
         {
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(month, year);
             return await _context.Visits
-                .CountAsync(v => v.VisitDate.Month == month && 
-                                v.VisitDate.Year == year && 
+                .CountAsync(v => v.VisitDate >= period.StartDate && 
+                                v.VisitDate < period.EndDate && 
                                 !v.IsDeleted);
+        }
+
+        public async Task<bool> DeleteVisitAndRestoreSessionAsync(int visitId)
+        {
+            var visit = await _context.Visits.FindAsync(visitId);
+            if (visit == null || visit.IsDeleted) return false;
+
+            // Delete the visit
+            visit.IsDeleted = true;
+            _context.Visits.Update(visit);
+
+            // Restore the session to the active membership if it's a sessions-based membership
+            var membership = await _context.Memberships
+                .Where(m => m.TraineeId == visit.TraineeId && !m.IsDeleted && 
+                           (m.MembershipType == "8 حصص" || m.MembershipType == "8 Sessions" || m.MembershipType == "12 حصة" || m.MembershipType == "12 Sessions"))
+                .OrderByDescending(m => m.StartDate)
+                .FirstOrDefaultAsync();
+
+            if (membership != null && membership.RemainingSessions.HasValue)
+            {
+                membership.RemainingSessions += 1;
+                // Reactivate if it was deactivated because sessions reached 0
+                if (!membership.IsActive && membership.EndDate >= DateOnly.FromDateTime(DateTime.Now))
+                {
+                    membership.IsActive = true;
+                }
+                membership.UpdatedAt = DateTime.Now;
+                _context.Memberships.Update(membership);
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

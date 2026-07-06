@@ -1,0 +1,218 @@
+@page "/"
+@using Gym.Core.Models
+@using Gym.Core.DTO
+@using Gym.Core.Interfaces
+@using Gym.Core.Interfaces.Services
+@inject IUnitofWork UnitOfWork
+@inject IJSRuntime JS
+@inject IReportService ReportService
+@rendermode InteractiveServer
+
+<PageTitle>لوحة التحكم | Mambela Gym</PageTitle>
+
+<div class="container mx-auto" dir="rtl">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+        <div>
+            <h2 class="font-bold text-2xl text-gym-primary mb-1">📊 لوحة التحكم</h2>
+            <p class="text-gray-500 text-sm">عرض الإحصائيات والتحليلات الشاملة للنادي</p>
+        </div>
+        <div>
+            <button class="btn-outline flex items-center gap-2" @onclick="ExportReport">
+                <i class="bi bi-file-earmark-excel"></i> تصدير تقرير النظام
+            </button>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="flex justify-center py-10">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gym-primary"></div>
+        </div>
+    }
+    else if (dashboardData != null)
+    {
+        <!-- Key Metrics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+            
+            <!-- Active Members -->
+            <div class="card-modern border-r-4 border-gym-primary h-full">
+                <div class="p-5 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-gym-primary uppercase mb-1">الأعضاء النشطين</div>
+                        <div class="text-2xl font-bold text-gray-800">@dashboardData.TotalActiveMembers</div>
+                    </div>
+                    <div class="opacity-30">
+                        <i class="bi bi-people-fill text-4xl text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Revenue -->
+            <div class="card-modern border-r-4 border-gym-success h-full">
+                <div class="p-5 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-gym-success uppercase mb-1">إيرادات الشهر الحالي</div>
+                        <div class="text-2xl font-bold text-gray-800">@dashboardData.TotalRevenueThisMonth.ToString("N0") ج.م</div>
+                    </div>
+                    <div class="opacity-30">
+                        <i class="bi bi-currency-dollar text-4xl text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Net Profit -->
+            <div class="card-modern border-r-4 border-gym-info h-full">
+                <div class="p-5 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-gym-info uppercase mb-1">صافي الربح</div>
+                        <div class="text-2xl font-bold text-gray-800">@dashboardData.NetProfitThisMonth.ToString("N0") ج.م</div>
+                    </div>
+                    <div class="opacity-30">
+                        <i class="bi bi-graph-up text-4xl text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Visits -->
+            <div class="card-modern border-r-4 border-gym-warning h-full">
+                <div class="p-5 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-gym-warning uppercase mb-1">زيارات الشهر الحالي</div>
+                        <div class="text-2xl font-bold text-gray-800">@dashboardData.TotalVisitsThisMonth</div>
+                    </div>
+                    <div class="opacity-30">
+                        <i class="bi bi-calendar2-check-fill text-4xl text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Memberships Ending Soon -->
+            <div class="card-modern flex flex-col">
+                <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-2xl">
+                    <h6 class="m-0 font-bold text-gym-danger">⚠️ اشتراكات تنتهي قريباً (@dashboardData.MembershipsEndingSoon)</h6>
+                </div>
+                <div class="p-0 flex-1 bg-white rounded-b-2xl">
+                    <div class="divide-y divide-gray-100">
+                        @if (!dashboardData.UpcomingExpirations.Any())
+                        {
+                            <div class="p-6 text-center text-gray-500">لا يوجد اشتراكات تنتهي قريباً.</div>
+                        }
+                        else
+                        {
+                            @foreach(var exp in dashboardData.UpcomingExpirations.Take(5))
+                            {
+                                <div class="px-5 py-4 hover:bg-gray-50 transition-colors">
+                                    <div class="flex w-full justify-between items-center mb-1">
+                                        <h6 class="font-bold text-gray-800">@exp.TraineeName</h6>
+                                        <span class="text-xs font-bold px-2 py-1 bg-red-100 text-red-600 rounded-full">@exp.EndDate.ToString("yyyy-MM-dd")</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 m-0">@exp.MembershipType</p>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- General Stats -->
+            <div class="card-modern flex flex-col">
+                <div class="px-5 py-4 border-b border-gray-100 bg-white rounded-t-2xl">
+                    <h6 class="m-0 font-bold text-gym-primary">📈 مقارنة الأداء ومعدلات النمو</h6>
+                </div>
+                <div class="p-5 bg-white rounded-b-2xl flex-1">
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-bold text-gray-700">نمو الإيرادات</span>
+                            <span class="text-sm font-bold text-gym-success">@dashboardData.MonthlyComparison.RevenueGrowthPercentage.ToString("N1")%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-gym-success h-2 rounded-full" style="width: @(Math.Min(100, Math.Max(0, dashboardData.MonthlyComparison.RevenueGrowthPercentage)))%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-bold text-gray-700">نمو الأرباح</span>
+                            <span class="text-sm font-bold text-gym-info">@dashboardData.MonthlyComparison.ProfitGrowthPercentage.ToString("N1")%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-gym-info h-2 rounded-full" style="width: @(Math.Min(100, Math.Max(0, dashboardData.MonthlyComparison.ProfitGrowthPercentage)))%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-bold text-gray-700">نمو عدد الأعضاء</span>
+                            <span class="text-sm font-bold text-gym-primary">@dashboardData.MonthlyComparison.MemberGrowthPercentage.ToString("N1")%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-gym-primary h-2 rounded-full" style="width: @(Math.Min(100, Math.Max(0, dashboardData.MonthlyComparison.MemberGrowthPercentage)))%"></div>
+                        </div>
+                    </div>
+
+                    <hr class="border-gray-100 my-4" />
+                    
+                    <div class="flex text-center mt-6">
+                        <div class="w-1/2">
+                            <h3 class="text-3xl font-bold text-gray-800">@dashboardData.NewMembersThisMonth</h3>
+                            <p class="text-sm text-gray-500 mt-1">مشترك جديد (هذا الشهر)</p>
+                        </div>
+                        <div class="w-1/2 border-r border-gray-100">
+                            <h3 class="text-3xl font-bold text-gray-800">@dashboardData.TotalTrainees</h3>
+                            <p class="text-sm text-gray-500 mt-1">إجمالي المشتركين المسجلين</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool isLoading = true;
+    private DashboardDTO dashboardData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        try
+        {
+            dashboardData = await UnitOfWork.DashboardRepository.GetDashboardDataAsync();
+        }
+        catch (Exception)
+        {
+            // Error handling
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task ExportReport()
+    {
+        try
+        {
+            isLoading = true;
+            var filePath = await ReportService.GenerateDashboardReportAsync();
+            if (System.IO.File.Exists(filePath))
+            {
+                var bytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                var base64 = Convert.ToBase64String(bytes);
+                var fileName = Path.GetFileName(filePath);
+                await JS.InvokeVoidAsync("downloadFileFromBytes", fileName, base64);
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"خطأ في التصدير: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

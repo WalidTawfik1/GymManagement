@@ -74,7 +74,10 @@ namespace Gym.Infrastructure.Services
                         column.Item().PaddingVertical(5);
                         
                         var totalRevenue = services.Sum(s => s.Price);
-                        var thisMonth = services.Count(s => s.TakenAt.Month == DateTime.Now.Month && s.TakenAt.Year == DateTime.Now.Year);
+                        var currentPeriod = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(
+                            Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth(),
+                            Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear());
+                        var thisMonth = services.Count(s => s.TakenAt >= currentPeriod.StartDate && s.TakenAt < currentPeriod.EndDate);
                         var serviceTypes = services.GroupBy(s => s.ServiceType).Count();
                         
                         column.Item().Row(row =>

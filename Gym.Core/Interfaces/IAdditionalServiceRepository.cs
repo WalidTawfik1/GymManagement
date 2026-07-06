@@ -1,4 +1,4 @@
-﻿using Gym.Core.DTO;
+using Gym.Core.DTO;
 using Gym.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace Gym.Core.Interfaces
     {
         Task<bool> AddAdditionalServiceAsync(AddAdditionalServiceDTO additionalServiceDTO);
         Task<bool> UpdateAdditionalServiceAsync(AdditionalServiceDTO additionalServiceDTO);
-        Task<IReadOnlyList<AdditionalServiceDTO>> GetAllAdditionalServicesAsync();
+        Task<IReadOnlyList<AdditionalServiceDTO>> GetAllAdditionalServicesAsync(int? month = null, int? year = null);
         Task<IReadOnlyList<AdditionalServiceDTO>> GetAdditionalServiceByTraineeIdAsync(int traineeId);
         Task<bool> DeleteAdditionalServiceAsync(int id);
         Task<IReadOnlyList<AdditionalServiceDTO>> GetAdditionalServicesByMonthAsync(int month, int year);

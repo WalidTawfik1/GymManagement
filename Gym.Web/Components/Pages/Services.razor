@@ -1,0 +1,332 @@
+@page "/services"
+@using Gym.Core.Models
+@using Gym.Core.DTO
+@using Gym.Core.Interfaces
+@using Gym.Core.Helpers
+@inject IUnitofWork UnitOfWork
+@inject IJSRuntime JS
+@inject Gym.Core.Interfaces.Services.IReportService ReportService
+@rendermode InteractiveServer
+
+<PageTitle>الخدمات الإضافية</PageTitle>
+
+<div class="container mx-auto" dir="rtl">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div>
+            <h2 class="font-bold text-2xl text-gym-primary mb-1">🛒 الخدمات الإضافية</h2>
+            <p class="text-gray-500 text-sm">إدارة الخدمات الإضافية مثل المشاية، الميزان، inBody وغيرها</p>
+        </div>
+        <div class="flex gap-2">
+            <button class="btn-outline flex items-center gap-2" @onclick="ExportReport">
+                <i class="bi bi-file-earmark-excel"></i> تصدير إكسيل
+            </button>
+            <button class="btn-primary flex items-center gap-2" @onclick="ShowAddModal">
+                <i class="bi bi-plus-lg"></i> تقديم خدمة
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="flex flex-wrap gap-4 mb-6">
+        <div class="w-full md:w-48">
+            <select class="input-modern" @bind="selectedMonth" @bind:after="LoadData">
+                @for(int i=1; i<=12; i++)
+                {
+                    <option value="@i">شهر @i</option>
+                }
+            </select>
+        </div>
+        <div class="w-full md:w-48">
+            <select class="input-modern" @bind="selectedYear" @bind:after="LoadData">
+                @for(int y=2020; y<=2050; y++)
+                {
+                    <option value="@y">سنة @y</option>
+                }
+            </select>
+        </div>
+        <div class="w-full md:flex-1 min-w-[200px]">
+            <input type="text" class="input-modern" placeholder="ابحث باسم المتدرب أو الخدمة..." @bind="SearchQuery" @bind:event="oninput" @onkeyup="SearchServices" />
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card-modern overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th class="pr-6">رقم العملية</th>
+                        <th>اسم المتدرب</th>
+                        <th>الخدمة</th>
+                        <th>تاريخ الطلب</th>
+                        <th>السعر</th>
+                        <th class="text-center">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white">
+                    @if (isLoading)
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-8">
+                                <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gym-primary"></div>
+                            </td>
+                        </tr>
+                    }
+                    else if (!filteredServices.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-8 text-gray-500">لا يوجد خدمات مسجلة لهذا الشهر.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var srv in filteredServices)
+                        {
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="pr-6 text-gray-500">#@srv.Id</td>
+                                <td class="font-bold text-gray-800">@srv.TraineeName</td>
+                                <td><span class="badge-modern bg-gray-200 text-gray-700">@srv.ServiceType</span></td>
+                                <td class="text-gray-600">@srv.TakenAt.ToString("yyyy-MM-dd hh:mm tt")</td>
+                                <td class="text-gym-success font-bold">@srv.Price ج.م</td>
+                                <td class="text-center">
+                                    <div class="flex justify-center gap-2">
+                                        <button class="btn-outline text-sm" @onclick="() => EditService(srv)">تعديل</button>
+                                        <button class="btn-danger text-sm" @onclick="() => DeleteService(srv.Id)">حذف</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Add/Edit -->
+@if (isModalOpen)
+{
+    <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col" dir="rtl">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h5 class="font-bold text-lg text-gym-primary">@(isEditMode ? "تعديل الخدمة" : "تقديم خدمة جديدة")</h5>
+                <button type="button" class="text-gray-400 hover:text-gray-700 text-2xl leading-none" @onclick="CloseModal">&times;</button>
+            </div>
+            <div class="p-6">
+                
+                @if (!isEditMode)
+                {
+                    <div class="mb-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">اختر المتدرب <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <input type="text" class="input-modern w-full" placeholder="-- ابحث بالاسم أو الرقم --" @bind="SearchTraineeText" @bind:event="oninput" @onclick="() => showTraineeDropdown = true" />
+                            @if (showTraineeDropdown)
+                            {
+                                <div class="fixed inset-0 z-40" @onclick="() => showTraineeDropdown = false"></div>
+                                <div class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-48 overflow-y-auto" dir="rtl">
+                                    @if (!traineesList.Any())
+                                    {
+                                        <div class="px-4 py-3 text-gray-500 text-sm">لا يوجد متدربين.</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="px-4 py-2 hover:bg-gym-primary hover:text-white cursor-pointer transition-colors border-b border-gray-50 last:border-0" 
+                                             @onclick='() => SelectTrainee(0, "-- بدون متدرب --")'>
+                                            -- بدون متدرب --
+                                        </div>
+                                        @foreach(var trainee in traineesList.Where(t => string.IsNullOrWhiteSpace(SearchTraineeText) || t.FullName.Contains(SearchTraineeText) || t.Id.ToString() == SearchTraineeText || t.PhoneNumber.Contains(SearchTraineeText)))
+                                        {
+                                            <div class="px-4 py-2 hover:bg-gym-primary hover:text-white cursor-pointer transition-colors border-b border-gray-50 last:border-0" 
+                                                 @onclick="() => SelectTrainee(trainee.Id, trainee.FullName)">
+                                                #@trainee.Id - @trainee.FullName - @trainee.PhoneNumber
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">الخدمات يمكن تقديمها بدون تحديد متدرب (اختر بدون متدرب).</p>
+                    </div>
+                }
+
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">نوع الخدمة <span class="text-red-500">*</span></label>
+                    <select class="input-modern" @bind="serviceName">
+                        <option value="مكملات غذائية (منتجات)">مكملات غذائية (منتجات)</option>
+                        <option value="استخدام المشاية (يومي)">استخدام المشاية (يومي)</option>
+                        <option value="إن بودي (InBody)">إن بودي (InBody)</option>
+                        <option value="أخرى">أخرى</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">السعر <span class="text-red-500">*</span></label>
+                    <input type="number" class="input-modern" @bind="price" />
+                </div>
+
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+                <button type="button" class="px-5 py-2 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors" @onclick="CloseModal">إلغاء</button>
+                <button type="button" class="btn-primary px-8" @onclick="SaveService">حفظ</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<AdditionalServiceDTO> services = new();
+    private List<AdditionalServiceDTO> filteredServices = new();
+    private List<Trainee> traineesList = new();
+    
+    private bool isLoading = true;
+    private string SearchQuery = "";
+    
+    private int selectedMonth = DateTime.Now.Month;
+    private int selectedYear = DateTime.Now.Year;
+    
+    // Modal State
+    private bool isModalOpen = false;
+    private bool isEditMode = false;
+    
+    private int currentServiceId = 0;
+    private int selectedTraineeId = 0;
+    private string SearchTraineeText = "";
+    private bool showTraineeDropdown = false;
+    private string serviceName = "إن بودي (InBody)";
+    private decimal price = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        selectedMonth = AccountingDateHelper.GetCurrentAccountingMonth();
+        selectedYear = AccountingDateHelper.GetCurrentAccountingYear();
+        
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        
+        services = (await UnitOfWork.AdditionalServiceRepository.GetAllAdditionalServicesAsync(selectedMonth, selectedYear)).ToList();
+        traineesList = (await UnitOfWork.TraineeRepository.GetAllTraineesAsync()).ToList();
+        
+        filteredServices = services.OrderByDescending(s => s.Id).ToList();
+        isLoading = false;
+    }
+
+    private void SearchServices()
+    {
+        if (string.IsNullOrWhiteSpace(SearchQuery))
+        {
+            filteredServices = services.OrderByDescending(s => s.Id).ToList();
+        }
+        else
+        {
+            filteredServices = services
+                .Where(s => (s.TraineeName != null && s.TraineeName.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)) ||
+                            (s.ServiceType != null && s.ServiceType.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)))
+                .OrderByDescending(s => s.Id)
+                .ToList();
+        }
+    }
+
+    private void ShowAddModal()
+    {
+        isEditMode = false;
+        selectedTraineeId = 0;
+        SearchTraineeText = "";
+        showTraineeDropdown = false;
+        serviceName = "مكملات غذائية (منتجات)";
+        price = 0;
+        isModalOpen = true;
+    }
+
+    private void EditService(AdditionalServiceDTO srv)
+    {
+        isEditMode = true;
+        currentServiceId = srv.Id;
+        selectedTraineeId = srv.TraineeId;
+        SearchTraineeText = srv.TraineeId > 0 ? $"{srv.TraineeId} - {srv.TraineeName}" : "-- بدون متدرب --";
+        showTraineeDropdown = false;
+        serviceName = srv.ServiceType;
+        price = srv.Price;
+        isModalOpen = true;
+    }
+
+    private void CloseModal()
+    {
+        isModalOpen = false;
+    }
+
+    private void SelectTrainee(int id, string name)
+    {
+        selectedTraineeId = id;
+        SearchTraineeText = id == 0 ? name : $"{id} - {name}";
+        showTraineeDropdown = false;
+    }
+
+    private async Task SaveService()
+    {
+        if (isEditMode)
+        {
+            var updateDto = new AdditionalServiceDTO
+            {
+                Id = currentServiceId,
+                TraineeId = selectedTraineeId,
+                TraineeName = "",
+                ServiceType = serviceName,
+                Price = price
+            };
+            await UnitOfWork.AdditionalServiceRepository.UpdateAdditionalServiceAsync(updateDto);
+        }
+        else
+        {
+            var addDto = new AddAdditionalServiceDTO
+            {
+                TraineeId = selectedTraineeId,
+                ServiceType = serviceName,
+                Price = price,
+                DurationInMinutes = null
+            };
+            await UnitOfWork.AdditionalServiceRepository.AddAdditionalServiceAsync(addDto);
+        }
+
+        isModalOpen = false;
+        await LoadData();
+    }
+    
+    private async Task ExportReport()
+    {
+        try
+        {
+            isLoading = true;
+            var filePath = await ReportService.ExportAdditionalServicesReportAsync(selectedMonth, selectedYear);
+            if (System.IO.File.Exists(filePath))
+            {
+                var bytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                var base64 = Convert.ToBase64String(bytes);
+                var fileName = Path.GetFileName(filePath);
+                await JS.InvokeVoidAsync("downloadFileFromBytes", fileName, base64);
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"خطأ في التصدير: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteService(int id)
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"هل أنت متأكد من الحذف؟");
+        if (confirmed)
+        {
+            await UnitOfWork.AdditionalServiceRepository.DeleteAdditionalServiceAsync(id);
+            await LoadData();
+        }
+    }
+}

@@ -11,8 +11,8 @@ namespace Gym.Core.Interfaces.Services
         
         // New export methods for tables
         Task<string> ExportTraineesReportAsync();
-        Task<string> ExportMembershipsReportAsync();
-        Task<string> ExportVisitsReportAsync();
-        Task<string> ExportAdditionalServicesReportAsync();
+        Task<string> ExportMembershipsReportAsync(int? month = null, int? year = null);
+        Task<string> ExportVisitsReportAsync(int? month = null, int? year = null);
+        Task<string> ExportAdditionalServicesReportAsync(int? month = null, int? year = null);
     }
 }

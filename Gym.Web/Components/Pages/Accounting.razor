@@ -1,0 +1,383 @@
+@page "/accounting"
+@using Gym.Core.Models
+@using Gym.Core.DTO
+@using Gym.Core.Interfaces
+@using Gym.Core.Helpers
+@inject IUnitofWork UnitOfWork
+@inject IJSRuntime JS
+@inject Gym.Core.Interfaces.Services.IReportService ReportService
+@rendermode InteractiveServer
+
+<PageTitle>الإيرادات والمصروفات</PageTitle>
+
+<div class="container mx-auto" dir="rtl">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div>
+            <h2 class="font-bold text-2xl text-gym-primary mb-1">💰 الإيرادات والمصروفات</h2>
+            <p class="text-gray-500 text-sm">إدارة مصروفات النادي وحساب الأرباح</p>
+        </div>
+        <div class="flex gap-2">
+            <button class="btn-outline flex items-center gap-2" @onclick="ExportReport">
+                <i class="bi bi-file-earmark-excel"></i> تصدير التقرير المالي
+            </button>
+            <button class="btn-primary flex items-center gap-2" @onclick="ShowAddModal">
+                <i class="bi bi-plus-lg"></i> إضافة مصروف
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-4 mb-6">
+        <div class="w-full md:w-48">
+            <select class="input-modern" @bind="selectedMonth" @bind:after="LoadData">
+                @for(int i=1; i<=12; i++)
+                {
+                    <option value="@i">شهر @i</option>
+                }
+            </select>
+        </div>
+        <div class="w-full md:w-48">
+            <select class="input-modern" @bind="selectedYear" @bind:after="LoadData">
+                @for(int y=2020; y<=2050; y++)
+                {
+                    <option value="@y">سنة @y</option>
+                }
+            </select>
+        </div>
+    </div>
+    
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Revenue Card -->
+        <div class="card-modern bg-gym-success text-white overflow-hidden relative">
+            <div class="absolute -right-4 -top-4 opacity-20">
+                <i class="bi bi-arrow-up-right-circle-fill text-9xl"></i>
+            </div>
+            <div class="p-6 relative z-10">
+                <h5 class="font-bold text-lg mb-2 opacity-90">إجمالي الإيرادات</h5>
+                <h2 class="text-3xl font-bold">@totalRevenue.ToString("N2") ج.م</h2>
+                <p class="text-sm opacity-75 mt-1">عضويات + خدمات إضافية</p>
+            </div>
+        </div>
+        <!-- Expense Card -->
+        <div class="card-modern bg-gym-danger text-white overflow-hidden relative">
+            <div class="absolute -right-4 -top-4 opacity-20">
+                <i class="bi bi-arrow-down-right-circle-fill text-9xl"></i>
+            </div>
+            <div class="p-6 relative z-10">
+                <h5 class="font-bold text-lg mb-2 opacity-90">إجمالي المصروفات</h5>
+                <h2 class="text-3xl font-bold">@totalExpenses.ToString("N2") ج.م</h2>
+            </div>
+        </div>
+        <!-- Profit Card -->
+        <div class="card-modern @(netProfit >= 0 ? "bg-gym-primary" : "bg-gray-600") text-white overflow-hidden relative">
+            <div class="absolute -right-4 -top-4 opacity-20">
+                <i class="bi bi-wallet2 text-9xl"></i>
+            </div>
+            <div class="p-6 relative z-10">
+                <h5 class="font-bold text-lg mb-2 opacity-90">صافي الأرباح</h5>
+                <h2 class="text-3xl font-bold">@netProfit.ToString("N2") ج.م</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Details Table (Memberships + Services) -->
+    <div class="card-modern overflow-hidden mb-6">
+        <div class="px-6 py-5 border-b border-gray-100 bg-white flex justify-between items-center">
+            <h5 class="font-bold text-lg text-gym-success">📈 سجل الإيرادات (العضويات والخدمات)</h5>
+            <span class="badge-modern bg-gym-success text-white">@(memberships.Count + additionalServices.Count) عملية</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th class="pr-6">النوع</th>
+                        <th>اسم المتدرب</th>
+                        <th>البيان</th>
+                        <th>المبلغ</th>
+                        <th>التاريخ</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white">
+                    @if (isLoading)
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-8">
+                                <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gym-success"></div>
+                            </td>
+                        </tr>
+                    }
+                    else if (!memberships.Any() && !additionalServices.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-8 text-gray-500">لا يوجد إيرادات مسجلة لهذا الشهر.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var mem in memberships)
+                        {
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="pr-6"><span class="badge-modern bg-purple-100 text-purple-700">عضوية</span></td>
+                                <td class="font-bold text-gray-800">@mem.TraineeName</td>
+                                <td class="text-gray-600">@mem.MembershipType</td>
+                                <td class="text-gym-success font-bold">@mem.Price.ToString("N2") ج.م</td>
+                                <td class="text-gray-600">@mem.StartDate.ToString("yyyy-MM-dd")</td>
+                            </tr>
+                        }
+                        @foreach (var srv in additionalServices)
+                        {
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="pr-6"><span class="badge-modern bg-blue-100 text-blue-700">خدمة</span></td>
+                                <td class="font-bold text-gray-800">@(srv.TraineeName ?? "—")</td>
+                                <td class="text-gray-600">@srv.ServiceType</td>
+                                <td class="text-gym-success font-bold">@srv.Price.ToString("N2") ج.م</td>
+                                <td class="text-gray-600">@srv.TakenAt.ToString("yyyy-MM-dd")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Expenses Table -->
+    <div class="card-modern overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100 bg-white flex justify-between items-center">
+            <h5 class="font-bold text-lg text-gym-danger">📉 سجل المصروفات</h5>
+            <span class="badge-modern bg-gym-danger text-white">@expenses.Count عملية</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th class="pr-6">رقم المصروف</th>
+                        <th>الوصف / البيان</th>
+                        <th>المبلغ</th>
+                        <th>التاريخ</th>
+                        <th class="text-center">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white">
+                    @if (isLoading)
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-8">
+                                <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gym-danger"></div>
+                            </td>
+                        </tr>
+                    }
+                    else if (!expenses.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-8 text-gray-500">لا يوجد مصروفات مسجلة لهذا الشهر.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var exp in expenses)
+                        {
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="pr-6 text-gray-500">#@exp.Id</td>
+                                <td class="font-bold text-gray-800">@exp.Description</td>
+                                <td class="text-gym-danger font-bold">@exp.Amount.ToString("N2") ج.م</td>
+                                <td class="text-gray-600">@exp.IncurredAt.ToString("yyyy-MM-dd hh:mm tt")</td>
+                                <td class="text-center">
+                                    <div class="flex justify-center gap-2">
+                                        <button class="btn-outline text-sm" @onclick="() => EditExpense(exp)">تعديل</button>
+                                        <button class="btn-danger text-sm" @onclick="() => DeleteExpense(exp.Id)">حذف</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Add/Edit Expense -->
+@if (isModalOpen)
+{
+    <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col" dir="rtl">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h5 class="font-bold text-lg text-gym-primary">@(isEditMode ? "تعديل المصروف" : "إضافة مصروف جديد")</h5>
+                <button type="button" class="text-gray-400 hover:text-gray-700 text-2xl leading-none" @onclick="CloseModal">&times;</button>
+            </div>
+            <div class="p-6">
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">نوع المصروف</label>
+                    <select class="input-modern" @bind="expenseType">
+                        <option value="أخرى">أخرى</option>
+                        <option value="فاتورة كهرباء">فاتورة كهرباء</option>
+                        <option value="فاتورة مياه">فاتورة مياه</option>
+                        <option value="إيجار">إيجار</option>
+                        <option value="صيانة أجهزة">صيانة أجهزة</option>
+                        <option value="مستلزمات نظافة">مستلزمات نظافة</option>
+                        <option value="رواتب">رواتب</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">الوصف / البيان <span class="text-red-500">*</span></label>
+                    <input type="text" class="input-modern" @bind="description" placeholder="مثال: فاتورة كهرباء شهر يوليو..." />
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">المبلغ (ج.م) <span class="text-red-500">*</span></label>
+                    <input type="number" class="input-modern" @bind="amount" />
+                </div>
+
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+                <button type="button" class="px-5 py-2 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors" @onclick="CloseModal">إلغاء</button>
+                <button type="button" class="btn-primary px-8" @onclick="SaveExpense">حفظ</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ExpenseDTO> expenses = new();
+    private List<MembershipDTO> memberships = new();
+    private List<AdditionalServiceDTO> additionalServices = new();
+    
+    private bool isLoading = true;
+    
+    private int selectedMonth = DateTime.Now.Month;
+    private int selectedYear = DateTime.Now.Year;
+    
+    private decimal totalRevenue = 0;
+    private decimal totalExpenses = 0;
+    private decimal netProfit => totalRevenue - totalExpenses;
+    
+    // Modal State
+    private bool isModalOpen = false;
+    private bool isEditMode = false;
+    
+    private int currentExpenseId = 0;
+    private string expenseType = "أخرى";
+    private string description = "";
+    private decimal amount = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        selectedMonth = AccountingDateHelper.GetCurrentAccountingMonth();
+        selectedYear = AccountingDateHelper.GetCurrentAccountingYear();
+        
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        isLoading = true;
+        
+        totalRevenue = await UnitOfWork.ExpenseAndRevenueRepository.GetTotalRevenueByMonthAsync(selectedMonth, selectedYear);
+        totalExpenses = await UnitOfWork.ExpenseAndRevenueRepository.GetTotalExpensesByMonthAsync(selectedMonth, selectedYear);
+        expenses = (await UnitOfWork.ExpenseAndRevenueRepository.GetExpensesByMonthAsync(selectedMonth, selectedYear)).OrderByDescending(e => e.Id).ToList();
+        
+        // Load revenue breakdown - memberships and additional services for this month
+        memberships = (await UnitOfWork.MembershipRepository.GetAllMembershipsAsync(selectedMonth, selectedYear))
+                        .OrderByDescending(m => m.StartDate).ToList();
+        additionalServices = (await UnitOfWork.AdditionalServiceRepository.GetAllAdditionalServicesAsync(selectedMonth, selectedYear))
+                        .OrderByDescending(s => s.TakenAt).ToList();
+        
+        isLoading = false;
+    }
+
+    private void ShowAddModal()
+    {
+        isEditMode = false;
+        expenseType = "أخرى";
+        description = "";
+        amount = 0;
+        isModalOpen = true;
+    }
+
+    private void EditExpense(ExpenseDTO exp)
+    {
+        isEditMode = true;
+        currentExpenseId = exp.Id;
+        expenseType = exp.ExpenseType ?? "أخرى";
+        description = exp.Description;
+        amount = exp.Amount;
+        isModalOpen = true;
+    }
+
+    private void CloseModal()
+    {
+        isModalOpen = false;
+    }
+
+    private async Task SaveExpense()
+    {
+        if (string.IsNullOrWhiteSpace(description) || amount <= 0)
+        {
+            await JS.InvokeVoidAsync("alert", "يرجى إدخال الوصف والمبلغ بشكل صحيح.");
+            return;
+        }
+
+        if (isEditMode)
+        {
+            var updateDto = new ExpenseDTO
+            {
+                Id = currentExpenseId,
+                ExpenseType = expenseType,
+                Description = description,
+                Amount = amount
+            };
+            await UnitOfWork.ExpenseAndRevenueRepository.UpdateExpenseAsync(updateDto);
+        }
+        else
+        {
+            var addDto = new AddExpenseDTO
+            {
+                ExpenseType = expenseType,
+                Description = description,
+                Amount = amount
+            };
+            await UnitOfWork.ExpenseAndRevenueRepository.AddExpenseAsync(addDto);
+        }
+
+        isModalOpen = false;
+        await LoadData();
+    }
+    
+    private async Task ExportReport()
+    {
+        try
+        {
+            isLoading = true;
+            var filePath = await ReportService.GenerateFinancialReportAsync(selectedMonth, selectedYear);
+            if (System.IO.File.Exists(filePath))
+            {
+                var bytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                var base64 = Convert.ToBase64String(bytes);
+                var fileName = Path.GetFileName(filePath);
+                await JS.InvokeVoidAsync("downloadFileFromBytes", fileName, base64);
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"خطأ في التصدير: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteExpense(int id)
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"هل أنت متأكد من الحذف؟");
+        if (confirmed)
+        {
+            await UnitOfWork.ExpenseAndRevenueRepository.DeleteExpenseAsync(id);
+            await LoadData();
+        }
+    }
+}

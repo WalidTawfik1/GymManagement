@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Gym.Core.DTO;
 using Gym.Core.Interfaces;
 using Gym.Core.Models;
@@ -103,14 +103,28 @@ namespace Gym.Infrastructure.Repositores
             return true;
         }
 
-        public async Task<IReadOnlyList<MembershipDTO>> GetAllMembershipsAsync()
+        public async Task DeactivateExpiredMembershipsAsync()
         {
-            var memberships = await _context.Memberships
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            await _context.Memberships
+                .Where(m => m.IsActive && !m.IsDeleted && (m.RemainingSessions <= 0 || m.EndDate < today))
+                .ExecuteUpdateAsync(s => s.SetProperty(m => m.IsActive, false));
+        }
+
+        public async Task<IReadOnlyList<MembershipDTO>> GetAllMembershipsAsync(int? month = null, int? year = null)
+        {
+            await DeactivateExpiredMembershipsAsync();
+            var targetMonth = month ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth();
+            var targetYear = year ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear();
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriodDateOnly(targetMonth, targetYear);
+            
+            var memberships = await Task.Run(() => _context.Memberships
+                .Where(m => !m.IsDeleted && m.StartDate >= period.StartDate && m.StartDate < period.EndDate)
                 .Include(m => m.Trainee)
-                .Where(m => !m.IsDeleted)
-                .ToListAsync();
-            var membershipsDTO = _mapper.Map<IReadOnlyList<MembershipDTO>>(memberships);
-            return membershipsDTO;
+                .OrderByDescending(m => m.StartDate)
+                .ToList());
+            
+            return _mapper.Map<IReadOnlyList<MembershipDTO>>(memberships);
         }
 
         public async Task<MembershipDTO?> GetMembershipByTraineeIdAsync(int id)
@@ -135,11 +149,12 @@ namespace Gym.Infrastructure.Repositores
 
         public async Task<IReadOnlyList<MembershipDTO>> GetMembershipsByMonthAsync(int month, int year)
         {
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriodDateOnly(month, year);
             var memberships = await _context.Memberships
                 .Include(m => m.Trainee)
                 .Where(m => !m.IsDeleted && 
-                           m.StartDate.Month == month && 
-                           m.StartDate.Year == year)
+                           m.StartDate >= period.StartDate && 
+                           m.StartDate < period.EndDate)
                 .ToListAsync();
             var membershipsDTO = _mapper.Map<IReadOnlyList<MembershipDTO>>(memberships);
             return membershipsDTO;

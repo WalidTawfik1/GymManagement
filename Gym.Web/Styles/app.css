@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html, body {
+        @apply bg-gray-50 font-sans text-gym-dark;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+}
+
+@layer components {
+    .glass-sidebar {
+        @apply bg-gradient-to-b from-gym-primary to-[#4a2e8c] text-white shadow-xl;
+    }
+    
+    .card-modern {
+        @apply bg-white rounded-2xl shadow-sm border-0 transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+    }
+    
+    .btn-primary {
+        @apply bg-gym-primary hover:bg-[#5a3aa6] text-white font-bold py-2 px-4 rounded-xl shadow-md hover:shadow-lg transition-all;
+    }
+
+    .btn-accent {
+        @apply bg-gym-accent hover:bg-[#e0a800] text-gym-dark font-bold py-2 px-4 rounded-xl shadow-md hover:shadow-lg transition-all;
+    }
+    
+    .btn-outline {
+        @apply border-2 border-gym-primary text-gym-primary hover:bg-gym-primary hover:text-white font-bold py-1.5 px-4 rounded-xl transition-all;
+    }
+    
+    .btn-danger {
+        @apply border-2 border-gym-danger text-gym-danger hover:bg-gym-danger hover:text-white font-bold py-1.5 px-4 rounded-xl transition-all;
+    }
+    
+    .table-modern {
+        @apply w-full text-right;
+    }
+    
+    .table-modern thead th {
+        @apply bg-gray-100 text-gray-500 uppercase text-xs font-bold py-4 px-4 border-b border-gray-200;
+    }
+    
+    .table-modern tbody td {
+        @apply py-4 px-4 border-b border-gray-100 align-middle;
+    }
+    
+    .input-modern {
+        @apply w-full rounded-xl border-gray-300 shadow-sm focus:border-gym-primary focus:ring focus:ring-gym-primary focus:ring-opacity-50 py-2.5 px-4 outline-none border transition-all;
+    }
+
+    .badge-modern {
+        @apply px-3 py-1 rounded-full text-xs font-bold inline-block;
+    }
+}

@@ -60,6 +60,22 @@ namespace Gym.UI.ViewModels
             UpdateLocalizedLabels();
         }
 
+        protected override void OnMonthChanged(int value)
+        {
+            if (value > 0)
+            {
+                _ = LoadAdditionalServices();
+            }
+        }
+
+        protected override void OnYearChanged(int value)
+        {
+            if (value > 0)
+            {
+                _ = LoadAdditionalServices();
+            }
+        }
+
         [ObservableProperty]
         private ObservableCollection<Trainee> _trainees = new();
 
@@ -101,7 +117,7 @@ namespace Gym.UI.ViewModels
             try
             {
                 IsBusy = true;
-                var services = await _unitOfWork.AdditionalServiceRepository.GetAllAdditionalServicesAsync();
+                var services = await _unitOfWork.AdditionalServiceRepository.GetAllAdditionalServicesAsync(SelectedMonth, SelectedYear);
                 AdditionalServices.Clear();
                 
                 foreach (var service in services)

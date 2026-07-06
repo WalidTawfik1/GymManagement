@@ -55,8 +55,7 @@ namespace Gym.UI.ViewModels
         [ObservableProperty]
         private bool _isBusy = false;
 
-        [ObservableProperty]
-        private int _selectedMonth;
+
 
         [ObservableProperty]
         private decimal _totalExpenses = 0m;
@@ -108,26 +107,7 @@ namespace Gym.UI.ViewModels
         private string _refreshLabel = string.Empty;
 
         [ObservableProperty]
-        private string _selectedMonthName = string.Empty;
-
-        [ObservableProperty]
         private bool _isNetProfitPositive = true;
-
-        public List<KeyValuePair<int, string>> Months { get; } = new()
-        {
-            new(1, "يناير"),
-            new(2, "فبراير"),
-            new(3, "مارس"),
-            new(4, "أبريل"),
-            new(5, "مايو"),
-            new(6, "يونيو"),
-            new(7, "يوليو"),
-            new(8, "أغسطس"),
-            new(9, "سبتمبر"),
-            new(10, "أكتوبر"),
-            new(11, "نوفمبر"),
-            new(12, "ديسمبر")
-        };
 
         public ExpenseRevenueViewModel(IUnitofWork unitOfWork, IMapper mapper, ILocalizationService localizationService, 
             IDialogService dialogService, IReportService reportService) 
@@ -137,9 +117,6 @@ namespace Gym.UI.ViewModels
             _mapper = mapper;
             _dialogService = dialogService;
             _reportService = reportService;
-            
-            // Set default month to current month without triggering property change
-            _selectedMonth = DateTime.Now.Month;
             
             UpdateLocalizedLabels();
             
@@ -179,7 +156,16 @@ namespace Gym.UI.ViewModels
             UpdateLocalizedLabels();
         }
 
-        partial void OnSelectedMonthChanged(int value)
+        protected override void OnMonthChanged(int value)
+        {
+            if (value > 0)
+            {
+                UpdateSelectedMonthName();
+                _ = LoadDataSequentiallyAsync();
+            }
+        }
+
+        protected override void OnYearChanged(int value)
         {
             if (value > 0)
             {
@@ -207,7 +193,7 @@ namespace Gym.UI.ViewModels
             try
             {
                 IsBusy = true;
-                var expenses = await _unitOfWork.ExpenseAndRevenueRepository.GetAllExpensesByMonthAsync(SelectedMonth);
+                var expenses = await _unitOfWork.ExpenseAndRevenueRepository.GetAllExpensesByMonthAsync(SelectedMonth, SelectedYear);
                 
                 App.Current.Dispatcher.Invoke(() =>
                 {
@@ -253,7 +239,7 @@ namespace Gym.UI.ViewModels
             try
             {
                 // Load expenses
-                var expenses = await _unitOfWork.ExpenseAndRevenueRepository.GetAllExpensesByMonthAsync(SelectedMonth);
+                var expenses = await _unitOfWork.ExpenseAndRevenueRepository.GetAllExpensesByMonthAsync(SelectedMonth, SelectedYear);
                 
                 App.Current.Dispatcher.Invoke(() =>
                 {
@@ -265,8 +251,8 @@ namespace Gym.UI.ViewModels
                 });
                 
                 // Calculate financials
-                var totalExpenses = await _unitOfWork.ExpenseAndRevenueRepository.GetTotalExpensesByMonthAsync(SelectedMonth);
-                var totalRevenue = await _unitOfWork.ExpenseAndRevenueRepository.GetTotalRevenueByMonthAsync(SelectedMonth);
+                var totalExpenses = await _unitOfWork.ExpenseAndRevenueRepository.GetTotalExpensesByMonthAsync(SelectedMonth, SelectedYear);
+                var totalRevenue = await _unitOfWork.ExpenseAndRevenueRepository.GetTotalRevenueByMonthAsync(SelectedMonth, SelectedYear);
                 
                 App.Current.Dispatcher.Invoke(() =>
                 {
@@ -296,8 +282,8 @@ namespace Gym.UI.ViewModels
             {
                 IsBusy = true;
                 
-                var totalExpenses = await _unitOfWork.ExpenseAndRevenueRepository.GetTotalExpensesByMonthAsync(SelectedMonth);
-                var totalRevenue = await _unitOfWork.ExpenseAndRevenueRepository.GetTotalRevenueByMonthAsync(SelectedMonth);
+                var totalExpenses = await _unitOfWork.ExpenseAndRevenueRepository.GetTotalExpensesByMonthAsync(SelectedMonth, SelectedYear);
+                var totalRevenue = await _unitOfWork.ExpenseAndRevenueRepository.GetTotalRevenueByMonthAsync(SelectedMonth, SelectedYear);
                 
                 App.Current.Dispatcher.Invoke(() =>
                 {
@@ -488,8 +474,7 @@ namespace Gym.UI.ViewModels
         {
             try
             {
-                var currentYear = DateTime.Now.Year;
-                NavigateToDetails?.Invoke(SelectedMonth, currentYear);
+                NavigateToDetails?.Invoke(SelectedMonth, SelectedYear);
             }
             catch (Exception ex)
             {
@@ -497,6 +482,9 @@ namespace Gym.UI.ViewModels
                 Console.WriteLine($"Error navigating to details: {ex.Message}");
             }
         }
+
+        [ObservableProperty]
+        private string _selectedMonthName = string.Empty;
 
         private void UpdateSelectedMonthName()
         {
@@ -520,7 +508,7 @@ namespace Gym.UI.ViewModels
             {
                 IsBusy = true;
                 
-                var filePath = await _reportService.GenerateFinancialReportAsync(SelectedMonth, DateTime.Now.Year);
+                var filePath = await _reportService.GenerateFinancialReportAsync(SelectedMonth, SelectedYear);
                 
                 await _dialogService.ShowAsync($"تم إنشاء التقرير المالي بنجاح وحفظه في:\n{filePath}", "تصدير التقرير المالي", DialogType.Success);
                 

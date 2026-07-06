@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,6 +12,7 @@ namespace Gym.Core.Models
         public string FullName { get; set; }
         public string PhoneNumber { get; set; }
         public DateOnly JoinDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        public string? IdCardPhotoPath { get; set; }
 
         public ICollection<Membership> Memberships { get; set; }
         public ICollection<Visit> Visits { get; set; }

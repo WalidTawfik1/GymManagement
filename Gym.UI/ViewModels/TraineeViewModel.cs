@@ -47,6 +47,9 @@ namespace Gym.UI.ViewModels
         private DateOnly _joinDate = DateOnly.FromDateTime(DateTime.Today);
 
         [ObservableProperty]
+        private string? _idCardPhotoPath;
+
+        [ObservableProperty]
         private bool _isEditMode;
 
         [ObservableProperty]
@@ -199,7 +202,8 @@ namespace Gym.UI.ViewModels
                 var traineeDto = new TraineeDTO
                 {
                     FullName = FullName,
-                    PhoneNumber = PhoneNumber
+                    PhoneNumber = PhoneNumber,
+                    IdCardPhotoPath = IdCardPhotoPath
                 };
 
                 var success = await _unitOfWork.TraineeRepository.AddTraineeAsync(traineeDto);
@@ -241,7 +245,8 @@ namespace Gym.UI.ViewModels
                     Id = EditTraineeId,
                     FullName = FullName,
                     PhoneNumber = PhoneNumber,
-                    JoinDate = JoinDate
+                    JoinDate = JoinDate,
+                    IdCardPhotoPath = IdCardPhotoPath
                 };
 
                 var success = await _unitOfWork.TraineeRepository.UpdateTraineeAsync(updateDto);
@@ -305,6 +310,7 @@ namespace Gym.UI.ViewModels
             FullName = trainee.FullName;
             PhoneNumber = trainee.PhoneNumber;
             JoinDate = trainee.JoinDate;
+            IdCardPhotoPath = trainee.IdCardPhotoPath;
         }
 
         [RelayCommand]
@@ -315,6 +321,7 @@ namespace Gym.UI.ViewModels
             FullName = string.Empty;
             PhoneNumber = string.Empty;
             JoinDate = DateOnly.FromDateTime(DateTime.Today);
+            IdCardPhotoPath = null;
             SelectedTrainee = null;
         }
 
@@ -346,6 +353,40 @@ namespace Gym.UI.ViewModels
             finally
             {
                 IsBusy = false;
+            }
+        }
+        [RelayCommand]
+        private void SelectIdCardPhoto()
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Image Files (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp|All files (*.*)|*.*",
+                Title = "اختر صورة البطاقة"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    // Copy file to local AppData folder to ensure it persists
+                    string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GymManagement", "TraineePhotos");
+                    if (!Directory.Exists(appDataPath))
+                    {
+                        Directory.CreateDirectory(appDataPath);
+                    }
+
+                    string extension = Path.GetExtension(openFileDialog.FileName);
+                    string newFileName = $"{Guid.NewGuid()}{extension}";
+                    string newFilePath = Path.Combine(appDataPath, newFileName);
+
+                    File.Copy(openFileDialog.FileName, newFilePath);
+                    
+                    IdCardPhotoPath = newFilePath;
+                }
+                catch (Exception ex)
+                {
+                    _dialog.ShowAsync($"خطأ في حفظ الصورة: {ex.Message}", "خطأ", DialogType.Error);
+                }
             }
         }
     }

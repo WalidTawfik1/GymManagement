@@ -34,6 +34,7 @@ namespace Gym.Infrastructure.Repositores
 
         public async Task<DashboardDTO> GetDashboardDataAsync()
         {
+            await _membershipRepository.DeactivateExpiredMembershipsAsync();
             var dashboard = new DashboardDTO
             {
                 TotalActiveMembers = await GetTotalActiveMembersAsync(),
@@ -44,8 +45,8 @@ namespace Gym.Infrastructure.Repositores
                 MembershipDistribution = await GetMembershipDistributionAsync(),
                 MonthlyComparison = await GetMonthlyComparisonAsync(),
                 UpcomingExpirations = (await _membershipRepository.GetNearFinishMemberships()).ToList(),
-                TotalRevenueThisMonth = await _expenseRevenueRepository.GetTotalRevenueByMonthAsync(DateTime.Now.Month),
-                TotalExpensesThisMonth = await _expenseRevenueRepository.GetTotalExpensesByMonthAsync(DateTime.Now.Month),
+                TotalRevenueThisMonth = await _expenseRevenueRepository.GetTotalRevenueByMonthAsync(Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth(), Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear()),
+                TotalExpensesThisMonth = await _expenseRevenueRepository.GetTotalExpensesByMonthAsync(Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth(), Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear()),
                 NewMembersThisMonth = await GetNewMembersThisMonthAsync(),
                 TotalTrainees = await GetTotalTraineesAsync()
             };
@@ -56,13 +57,14 @@ namespace Gym.Infrastructure.Repositores
         public async Task<int> GetTotalActiveMembersAsync()
         {
             return await _context.Memberships
-                .CountAsync(m => m.IsActive && !m.IsDeleted);
+                .Include(m => m.Trainee)
+                .CountAsync(m => m.IsActive && !m.IsDeleted && !m.Trainee.IsDeleted);
         }
 
         public async Task<int> GetTotalVisitsThisMonthAsync()
         {
-            var currentMonth = DateTime.Now.Month;
-            var currentYear = DateTime.Now.Year;
+            var currentMonth = Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth();
+            var currentYear = Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear();
             return await _visitRepository.GetVisitsCountByMonthAsync(currentMonth, currentYear);
         }
 
@@ -74,24 +76,29 @@ namespace Gym.Infrastructure.Repositores
 
         public async Task<decimal> GetNetProfitThisMonthAsync()
         {
-            var currentMonth = DateTime.Now.Month;
-            var revenue = await _expenseRevenueRepository.GetTotalRevenueByMonthAsync(currentMonth);
-            var expenses = await _expenseRevenueRepository.GetTotalExpensesByMonthAsync(currentMonth);
+            var currentMonth = Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth();
+            var currentYear = Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear();
+            var revenue = await _expenseRevenueRepository.GetTotalRevenueByMonthAsync(currentMonth, currentYear);
+            var expenses = await _expenseRevenueRepository.GetTotalExpensesByMonthAsync(currentMonth, currentYear);
             return revenue - expenses;
         }
 
         public async Task<decimal> GetNetProfitLastMonthAsync()
         {
-            var lastMonth = DateTime.Now.Month == 1 ? 12 : DateTime.Now.Month - 1;
-            var revenue = await _expenseRevenueRepository.GetTotalRevenueByMonthAsync(lastMonth);
-            var expenses = await _expenseRevenueRepository.GetTotalExpensesByMonthAsync(lastMonth);
+            var currentAccountingMonth = Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth();
+            var currentAccountingYear = Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear();
+            var lastMonth = currentAccountingMonth == 1 ? 12 : currentAccountingMonth - 1;
+            var lastMonthYear = currentAccountingMonth == 1 ? currentAccountingYear - 1 : currentAccountingYear;
+            var revenue = await _expenseRevenueRepository.GetTotalRevenueByMonthAsync(lastMonth, lastMonthYear);
+            var expenses = await _expenseRevenueRepository.GetTotalExpensesByMonthAsync(lastMonth, lastMonthYear);
             return revenue - expenses;
         }
 
         public async Task<MembershipDistributionDTO> GetMembershipDistributionAsync()
         {
             var activeMemberships = await _context.Memberships
-                .Where(m => !m.IsDeleted)
+                .Include(m => m.Trainee)
+                .Where(m => !m.IsDeleted && !m.Trainee.IsDeleted)
                 .ToListAsync();
 
             return new MembershipDistributionDTO
@@ -110,14 +117,14 @@ namespace Gym.Infrastructure.Repositores
 
         public async Task<MonthlyComparisonDTO> GetMonthlyComparisonAsync()
         {
-            var currentMonth = DateTime.Now.Month;
-            var currentYear = DateTime.Now.Year;
+            var currentMonth = Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth();
+            var currentYear = Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear();
             var lastMonth = currentMonth == 1 ? 12 : currentMonth - 1;
             var lastMonthYear = currentMonth == 1 ? currentYear - 1 : currentYear;
 
             // Revenue comparison
-            var currentRevenue = await _expenseRevenueRepository.GetTotalRevenueByMonthAsync(currentMonth);
-            var lastRevenue = await _expenseRevenueRepository.GetTotalRevenueByMonthAsync(lastMonth);
+            var currentRevenue = await _expenseRevenueRepository.GetTotalRevenueByMonthAsync(currentMonth, currentYear);
+            var lastRevenue = await _expenseRevenueRepository.GetTotalRevenueByMonthAsync(lastMonth, lastMonthYear);
 
             // Profit comparison
             var currentProfit = await GetNetProfitThisMonthAsync();
@@ -142,8 +149,8 @@ namespace Gym.Infrastructure.Repositores
 
         private async Task<int> GetNewMembersThisMonthAsync()
         {
-            var currentMonth = DateTime.Now.Month;
-            var currentYear = DateTime.Now.Year;
+            var currentMonth = Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth();
+            var currentYear = Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear();
             return await GetNewMembersByMonthAsync(currentMonth, currentYear);
         }
 

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Gym.Core.DTO;
 using Gym.Core.Interfaces;
 using Gym.Core.Models;
@@ -49,49 +49,53 @@ namespace Gym.Infrastructure.Repositores
             return true;
         }
 
-        public async Task<IEnumerable<ExpenseDTO>> GetAllExpensesByMonthAsync(int month)
+        public async Task<IEnumerable<ExpenseDTO>> GetAllExpensesByMonthAsync(int month, int year)
         {
             if (month < 1 || month > 12)
             {
                 throw new ArgumentOutOfRangeException("Month must be between 1 and 12.");
             }
-            var currentYear = DateTime.Now.Year;
+            var currentYear = year;
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(month, currentYear);
             var expenses = await Task.Run(() => _context.Expenses
-                .Where(e => e.IncurredAt.Month == month && e.IncurredAt.Year == currentYear)
+                .Where(e => e.IncurredAt >= period.StartDate && e.IncurredAt < period.EndDate)
                 .ToList());
             return _mapper.Map<IEnumerable<ExpenseDTO>>(expenses);
         }
 
-        public async Task<decimal> GetTotalExpensesByMonthAsync(int month)
+        public async Task<decimal> GetTotalExpensesByMonthAsync(int month, int year)
         {
             if (month < 1 || month > 12)
             {
                 throw new ArgumentOutOfRangeException("Month must be between 1 and 12.");
             }
-            var currentYear = DateTime.Now.Year;
+            var currentYear = year;
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(month, currentYear);
             var total = await Task.Run(() => _context.Expenses
-                .Where(e => e.IncurredAt.Month == month && e.IncurredAt.Year == currentYear && !e.IsDeleted)
+                .Where(e => e.IncurredAt >= period.StartDate && e.IncurredAt < period.EndDate && !e.IsDeleted)
                 .Sum(e => e.Amount));
             return total;
         }
 
-        public async Task<decimal> GetTotalRevenueByMonthAsync(int month)
+        public async Task<decimal> GetTotalRevenueByMonthAsync(int month, int year)
         {
             if (month < 1 || month > 12)
             {
                 throw new ArgumentOutOfRangeException("Month must be between 1 and 12.");
             }
 
-            var currentYear = DateTime.Now.Year;
+            var currentYear = year;
+            var dateOnlyPeriod = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriodDateOnly(month, currentYear);
+            var dateTimePeriod = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(month, currentYear);
 
-            // Calculate membership revenue for the month and year (memberships that started in this month of current year)
+            // Calculate membership revenue for the month and year
             var membershipRevenue = await _context.Memberships
-                .Where(m => m.StartDate.Month == month && m.StartDate.Year == currentYear && !m.IsDeleted)
+                .Where(m => m.StartDate >= dateOnlyPeriod.StartDate && m.StartDate < dateOnlyPeriod.EndDate && !m.IsDeleted)
                 .SumAsync(m => m.Price);
 
             // Calculate additional services revenue for the month and year
             var additionalServiceRevenue = await _context.AdditionalServices
-                .Where(a => a.TakenAt.Month == month && a.TakenAt.Year == currentYear && !a.IsDeleted)
+                .Where(a => a.TakenAt >= dateTimePeriod.StartDate && a.TakenAt < dateTimePeriod.EndDate && !a.IsDeleted)
                 .SumAsync(a => a.Price);
 
             // Total revenue = Membership revenue + Additional service revenue
@@ -115,8 +119,9 @@ namespace Gym.Infrastructure.Repositores
 
         public async Task<IEnumerable<ExpenseDTO>> GetExpensesByMonthAsync(int month, int year)
         {
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(month, year);
             var expenses = await Task.Run(() => _context.Expenses
-                .Where(e => e.IncurredAt.Month == month && e.IncurredAt.Year == year && !e.IsDeleted)
+                .Where(e => e.IncurredAt >= period.StartDate && e.IncurredAt < period.EndDate && !e.IsDeleted)
                 .ToList());
             return _mapper.Map<IEnumerable<ExpenseDTO>>(expenses);
         }

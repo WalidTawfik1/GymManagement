@@ -265,6 +265,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
@@ -291,8 +292,18 @@
                                  Style="{StaticResource ModernTextBoxStyle}"/>
                     </StackPanel>
                     
+                    <!-- ID Card Photo Input -->
+                    <StackPanel Grid.Row="3" Margin="0,0,0,16">
+                        <TextBlock Text="صورة البطاقة (اختياري):" FontWeight="SemiBold" FontSize="14"
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        <Button Content="اختر الصورة" Command="{Binding SelectIdCardPhotoCommand}" 
+                                Style="{StaticResource ModernButtonStyle}" Background="#3B82F6" 
+                                Padding="12,8" FontSize="12" Margin="0,0,0,8" Foreground="White" />
+                        <Image Source="{Binding IdCardPhotoPath}" Stretch="Uniform" MaxHeight="100" HorizontalAlignment="Left" />
+                    </StackPanel>
+
                     <!-- Join Date Input (Only visible in edit mode) -->
-                    <StackPanel Grid.Row="3" Margin="0,0,0,20"
+                    <StackPanel Grid.Row="4" Margin="0,0,0,20"
                                 Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TextBlock Text="{Binding JoinDateLabel}" FontWeight="SemiBold" FontSize="14"
                                    Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
@@ -301,7 +312,7 @@
                     </StackPanel>
                     
                     <!-- Action Buttons -->
-                    <StackPanel Grid.Row="4" Margin="0,0,0,16">
+                    <StackPanel Grid.Row="5" Margin="0,0,0,16">
                         <Button Content="{Binding AddTraineeLabel}" Command="{Binding AddTraineeCommand}" 
                                 Style="{StaticResource SecondaryButtonStyle}"
                                 Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVisibilityConverter}}"
@@ -319,7 +330,7 @@
                     </StackPanel>
                     
                     <!-- Progress Bar -->
-                    <ProgressBar Grid.Row="5" IsIndeterminate="{Binding IsBusy}" 
+                    <ProgressBar Grid.Row="6" IsIndeterminate="{Binding IsBusy}" 
                                  Style="{StaticResource ModernProgressBarStyle}" 
                                  Margin="0,16,0,0"/>
                 </Grid>

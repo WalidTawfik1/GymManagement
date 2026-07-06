@@ -1,4 +1,4 @@
-﻿using Gym.Core.DTO;
+using Gym.Core.DTO;
 using Gym.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -15,9 +15,10 @@ namespace Gym.Core.Interfaces
         Task<bool> HasActiveMembershipAsync(int traineeId);
         Task<bool> DecrementRemainingSessionsAsync(int traineeId, bool saveChanges = true);
         Task<bool> IsTraineeCheckedInAsync(int traineeId);
-        Task<IReadOnlyList<VisitDTO>> GetAllVisitsAsync();
+        Task<IReadOnlyList<VisitDTO>> GetAllVisitsAsync(int? month = null, int? year = null);
         Task<IReadOnlyList<VisitResponseDTO>> GetAllVisitsWithResponseAsync();
         Task<IReadOnlyList<VisitDTO>> GetTodayVisits(DateOnly today);
         Task<int> GetVisitsCountByMonthAsync(int month, int year);
+        Task<bool> DeleteVisitAndRestoreSessionAsync(int visitId);
     }
 }

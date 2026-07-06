@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Gym.Core.DTO;
 using Gym.Core.Interfaces;
 using Gym.Core.Models;
@@ -27,7 +27,8 @@ namespace Gym.Infrastructure.Repositores
             var entity = new Trainee
             {
                 FullName = trainee.FullName,
-                PhoneNumber = trainee.PhoneNumber
+                PhoneNumber = trainee.PhoneNumber,
+                IdCardPhotoPath = trainee.IdCardPhotoPath
             };
             await context.Trainees.AddAsync(entity);
             await context.SaveChangesAsync();

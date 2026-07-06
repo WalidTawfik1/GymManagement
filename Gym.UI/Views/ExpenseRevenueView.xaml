@@ -52,6 +52,13 @@
                                       Style="{StaticResource ModernComboBoxStyle}" 
                                       Width="120" Height="32" FontSize="12"/>
                             <TextBlock Text="الشهر" 
+                                       FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Margin="8,0,8,0"/>
+                            
+                            <ComboBox ItemsSource="{Binding Years}" 
+                                      SelectedValue="{Binding SelectedYear}" 
+                                      Style="{StaticResource ModernComboBoxStyle}" 
+                                      Width="80" Height="32" FontSize="12"/>
+                            <TextBlock Text="السنة" 
                                        FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Margin="8,0,0,0"/>
                         </StackPanel>
                     </Border>

@@ -83,7 +83,23 @@ namespace Gym.UI.ViewModels
         private bool _showLastVisitInfo = false;
 
         [ObservableProperty]
-        private int _todayVisitsCount = 0;
+        private int _monthVisitsCount = 0;
+
+        protected override void OnMonthChanged(int value)
+        {
+            if (value > 0)
+            {
+                _ = LoadVisits();
+            }
+        }
+
+        protected override void OnYearChanged(int value)
+        {
+            if (value > 0)
+            {
+                _ = LoadVisits();
+            }
+        }
 
         [RelayCommand]
         private async Task LoadVisits()
@@ -91,18 +107,16 @@ namespace Gym.UI.ViewModels
             try
             {
                 IsBusy = true;
-                var today = DateOnly.FromDateTime(DateTime.Now);
-                
-                // Get today's visits only
-                var todayVisits = await _unitOfWork.VisitRepository.GetTodayVisits(today);
+                // Get month's visits
+                var monthVisits = await _unitOfWork.VisitRepository.GetAllVisitsAsync(SelectedMonth, SelectedYear);
                 Visits.Clear();
-                foreach (var visit in todayVisits)
+                foreach (var visit in monthVisits)
                 {
                     Visits.Add(visit);
                 }
                 
-                // Get today's visit count
-                TodayVisitsCount = await _unitOfWork.VisitRepository.GetTodayVisitsCountAsync();
+                // Get month's visit count
+                MonthVisitsCount = await _unitOfWork.VisitRepository.GetVisitsCountByMonthAsync(SelectedMonth, SelectedYear);
             }
             catch (Exception ex)
             {

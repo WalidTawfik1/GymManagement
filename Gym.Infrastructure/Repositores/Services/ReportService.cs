@@ -78,8 +78,8 @@ namespace Gym.Infrastructure.Services
                 OneMonthMemberships = dashboardData.MembershipDistribution.OneMonthMemberships,
                 ThreeMonthMemberships = dashboardData.MembershipDistribution.ThreeMonthMemberships,
                 TwelveSessionMemberships = dashboardData.MembershipDistribution.TwelveSessionMemberships,
-                CurrentMonthName = GetMonthName(DateTime.Now.Month),
-                LastMonthName = GetMonthName(DateTime.Now.Month == 1 ? 12 : DateTime.Now.Month - 1)
+                CurrentMonthName = GetMonthName(Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth()),
+                LastMonthName = GetMonthName(Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth() == 1 ? 12 : Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth() - 1)
             };
 
             // تحويل العضويات المنتهية قريباً
@@ -108,8 +108,8 @@ namespace Gym.Infrastructure.Services
             };
 
             // الحصول على البيانات المالية
-            reportModel.TotalRevenue = await _unitOfWork.ExpenseAndRevenueRepository.GetTotalRevenueByMonthAsync(month);
-            reportModel.TotalExpenses = await _unitOfWork.ExpenseAndRevenueRepository.GetTotalExpensesByMonthAsync(month);
+            reportModel.TotalRevenue = await _unitOfWork.ExpenseAndRevenueRepository.GetTotalRevenueByMonthAsync(month, year);
+            reportModel.TotalExpenses = await _unitOfWork.ExpenseAndRevenueRepository.GetTotalExpensesByMonthAsync(month, year);
             reportModel.NetProfit = reportModel.TotalRevenue - reportModel.TotalExpenses;
 
             // الحصول على تفاصيل المصروفات
@@ -184,9 +184,9 @@ namespace Gym.Infrastructure.Services
             return filePath;
         }
 
-        public async Task<string> ExportMembershipsReportAsync()
+        public async Task<string> ExportMembershipsReportAsync(int? month = null, int? year = null)
         {
-            var membershipsDto = await _unitOfWork.MembershipRepository.GetAllMembershipsAsync();
+            var membershipsDto = await _unitOfWork.MembershipRepository.GetAllMembershipsAsync(month, year);
             
             var fileName = $"تقرير_العضويات_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
             var filePath = Path.Combine(_reportsDirectory, fileName);
@@ -196,9 +196,9 @@ namespace Gym.Infrastructure.Services
             return filePath;
         }
 
-        public async Task<string> ExportVisitsReportAsync()
+        public async Task<string> ExportVisitsReportAsync(int? month = null, int? year = null)
         {
-            var visitsDto = await _unitOfWork.VisitRepository.GetAllVisitsAsync();
+            var visitsDto = await _unitOfWork.VisitRepository.GetAllVisitsAsync(month, year);
             
             var fileName = $"تقرير_الزيارات_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
             var filePath = Path.Combine(_reportsDirectory, fileName);
@@ -208,9 +208,9 @@ namespace Gym.Infrastructure.Services
             return filePath;
         }
 
-        public async Task<string> ExportAdditionalServicesReportAsync()
+        public async Task<string> ExportAdditionalServicesReportAsync(int? month = null, int? year = null)
         {
-            var services = await _unitOfWork.AdditionalServiceRepository.GetAllAdditionalServicesAsync();
+            var services = await _unitOfWork.AdditionalServiceRepository.GetAllAdditionalServicesAsync(month, year);
             
             var fileName = $"تقرير_الخدمات_الإضافية_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
             var filePath = Path.Combine(_reportsDirectory, fileName);

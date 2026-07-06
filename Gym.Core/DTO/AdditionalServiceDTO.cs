@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +10,7 @@ namespace Gym.Core.DTO
     {
         public int TraineeId { get; set; }
         public string ServiceType { get; set; }
+        public decimal Price { get; set; }
         public int? DurationInMinutes { get; set; }
     }
     public record AdditionalServiceDTO

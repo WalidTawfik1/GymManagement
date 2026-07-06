@@ -42,9 +42,21 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <Border Background="White" CornerRadius="20" Padding="12,8" Opacity="0.9">
                         <StackPanel Orientation="Horizontal">
-                            <Ellipse Width="8" Height="8" Fill="Black" Margin="0,0,8,0"/>
-                            <TextBlock Text="إدارة الزيارات" FontSize="12" FontWeight="SemiBold" 
-                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <ComboBox ItemsSource="{Binding Months}" 
+                                      SelectedValue="{Binding SelectedMonth}" 
+                                      DisplayMemberPath="Value" 
+                                      SelectedValuePath="Key"
+                                      Style="{StaticResource ModernComboBoxStyle}" 
+                                      Width="120" Height="32" FontSize="12"/>
+                            <TextBlock Text="الشهر" 
+                                       FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Margin="8,0,8,0"/>
+                            
+                            <ComboBox ItemsSource="{Binding Years}" 
+                                      SelectedValue="{Binding SelectedYear}" 
+                                      Style="{StaticResource ModernComboBoxStyle}" 
+                                      Width="80" Height="32" FontSize="12"/>
+                            <TextBlock Text="السنة" 
+                                       FontWeight="Bold" Foreground="Black" VerticalAlignment="Center" Margin="8,0,0,0"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -77,7 +89,7 @@
                         
                         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                             <Ellipse Width="20" Height="20" Fill="Black" Margin="0,0,12,0"/>
-                            <TextBlock Text="زيارات اليوم" FontSize="18" FontWeight="Bold" 
+                            <TextBlock Text="زيارات الشهر" FontSize="18" FontWeight="Bold" 
                                        Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                         </StackPanel>
                         
@@ -87,7 +99,7 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="عدد الزيارات:" FontSize="12" FontWeight="SemiBold" 
                                            Foreground="White" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                <TextBlock Text="{Binding TodayVisitsCount}" FontSize="14" FontWeight="Bold" 
+                                <TextBlock Text="{Binding MonthVisitsCount}" FontSize="14" FontWeight="Bold" 
                                            Foreground="White" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Border>

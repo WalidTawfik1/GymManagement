@@ -1,0 +1,27 @@
+@inherits LayoutComponentBase
+
+<div class="flex h-screen bg-gray-50 overflow-hidden" dir="rtl">
+    <!-- Sidebar -->
+    <div class="w-64 flex-shrink-0 glass-sidebar h-full overflow-y-auto hidden md:block">
+        <NavMenu />
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden">
+        <div class="bg-white shadow-sm flex items-center justify-between p-4 z-10 border-b border-gray-100">
+            <h1 class="text-xl font-bold text-gym-primary flex items-center gap-2">
+                <i class="bi bi-diagram-3-fill text-gym-accent"></i> Mambela Gym
+            </h1>
+        </div>
+
+        <article class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50">
+            @Body
+        </article>
+    </main>
+</div>
+
+<div id="blazor-error-ui" class="hidden bg-red-100 border-t-4 border-red-500 text-red-700 p-4 fixed bottom-0 w-full z-50">
+    لقد حدث خطأ غير متوقع.
+    <a href="" class="font-bold underline ml-4">إعادة التحميل</a>
+    <a class="dismiss cursor-pointer float-left font-bold text-xl">🗙</a>
+</div>

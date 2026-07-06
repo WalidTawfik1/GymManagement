@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +15,7 @@ namespace Gym.Core.DTO
     }
     public record VisitResponseDTO
     {
+        public int Id { get; set; }
         public string TraineeName { get; set; }
         public string MembershipType { get; set; }
         public int? RemainingSessions { get; set; }

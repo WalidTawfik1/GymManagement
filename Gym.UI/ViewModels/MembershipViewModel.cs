@@ -60,6 +60,22 @@ namespace Gym.UI.ViewModels
             UpdateLocalizedLabels();
         }
 
+        protected override void OnMonthChanged(int value)
+        {
+            if (value > 0)
+            {
+                _ = LoadMemberships();
+            }
+        }
+
+        protected override void OnYearChanged(int value)
+        {
+            if (value > 0)
+            {
+                _ = LoadMemberships();
+            }
+        }
+
     [ObservableProperty]
     private ObservableCollection<Trainee> _trainees = new();
 
@@ -115,7 +131,7 @@ namespace Gym.UI.ViewModels
             try
             {
                 IsBusy = true;
-                var membershipDTOs = await _unitOfWork.MembershipRepository.GetAllMembershipsAsync();
+                var membershipDTOs = await _unitOfWork.MembershipRepository.GetAllMembershipsAsync(SelectedMonth, SelectedYear);
                 
                 Memberships.Clear();
                 foreach (var membershipDTO in membershipDTOs)

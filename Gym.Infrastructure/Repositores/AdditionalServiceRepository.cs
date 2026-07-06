@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Gym.Core.DTO;
 using Gym.Core.Interfaces;
 using Gym.Core.Models;
@@ -25,42 +25,15 @@ namespace Gym.Infrastructure.Repositores
 
         public async Task<bool> AddAdditionalServiceAsync(AddAdditionalServiceDTO additionalServiceDTO)
         {
-            if (additionalServiceDTO.ServiceType == "مشاية") {
-
-                var additionalService = new AdditionalService
-                {
-                    TraineeId = additionalServiceDTO.TraineeId,
-                    ServiceType = additionalServiceDTO.ServiceType,
-                    DurationInMinutes = additionalServiceDTO.DurationInMinutes,
-                    Price = (decimal)(1.5 * (additionalServiceDTO.DurationInMinutes ?? 0)),
-                    TakenAt = DateTime.Now,
-                };
-                await _context.AdditionalServices.AddAsync(additionalService);
-            }
-            else if (additionalServiceDTO.ServiceType == "ميزان") 
+            var additionalService = new AdditionalService
             {
-                var additionalService = new AdditionalService
-                {
-                    TraineeId = additionalServiceDTO.TraineeId,
-                    ServiceType = additionalServiceDTO.ServiceType,
-                    DurationInMinutes = null,
-                    Price = 5,
-                    TakenAt = DateTime.Now,
-                };
-                await _context.AdditionalServices.AddAsync(additionalService);
-            }
-            else if (additionalServiceDTO.ServiceType == "InBody") 
-            {
-                var additionalService = new AdditionalService
-                {
-                    TraineeId = additionalServiceDTO.TraineeId,
-                    ServiceType = additionalServiceDTO.ServiceType,
-                    DurationInMinutes = null,
-                    Price = 10,
-                    TakenAt = DateTime.Now,
-                };
-                await _context.AdditionalServices.AddAsync(additionalService);
-            }
+                TraineeId = additionalServiceDTO.TraineeId,
+                ServiceType = additionalServiceDTO.ServiceType,
+                DurationInMinutes = additionalServiceDTO.DurationInMinutes,
+                Price = additionalServiceDTO.Price,
+                TakenAt = DateTime.Now,
+            };
+            await _context.AdditionalServices.AddAsync(additionalService);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -74,6 +47,21 @@ namespace Gym.Infrastructure.Repositores
             return true;
         }
 
+        public async Task<IReadOnlyList<AdditionalServiceDTO>> GetAllAdditionalServicesAsync(int? month = null, int? year = null)
+        {
+            var targetMonth = month ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth();
+            var targetYear = year ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear();
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(targetMonth, targetYear);
+            
+            var additionalServices = await Task.Run(() => _context.AdditionalServices
+                .Where(a => !a.IsDeleted && a.TakenAt >= period.StartDate && a.TakenAt < period.EndDate)
+                .Include(a => a.Trainee)
+                .OrderByDescending(a => a.TakenAt)
+                .ToList());
+            var additionalServicesDTOs = _mapper.Map<IReadOnlyList<AdditionalServiceDTO>>(additionalServices);
+            return additionalServicesDTOs;
+        }
+
         public async Task<IReadOnlyList<AdditionalServiceDTO>> GetAdditionalServiceByTraineeIdAsync(int traineeId)
         {
             var additionalServices = await _context.AdditionalServices
@@ -84,15 +72,7 @@ namespace Gym.Infrastructure.Repositores
             return additionalServicesDTO;
         }
 
-        public async Task<IReadOnlyList<AdditionalServiceDTO>> GetAllAdditionalServicesAsync()
-        {
-            var additionalServices = await _context.AdditionalServices
-                .Where(a => !a.IsDeleted)
-                .Include(a => a.Trainee)
-                .ToListAsync();
-            var additionalServicesDTO = _mapper.Map<IReadOnlyList<AdditionalServiceDTO>>(additionalServices);
-            return additionalServicesDTO;
-        }
+
 
         public async Task<bool> UpdateAdditionalServiceAsync(AdditionalServiceDTO additionalServiceDTO)
         {
@@ -108,11 +88,12 @@ namespace Gym.Infrastructure.Repositores
 
         public async Task<IReadOnlyList<AdditionalServiceDTO>> GetAdditionalServicesByMonthAsync(int month, int year)
         {
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(month, year);
             var services = await _context.AdditionalServices
                 .Include(a => a.Trainee)
                 .Where(a => !a.IsDeleted &&
-                           a.TakenAt.Month == month &&
-                           a.TakenAt.Year == year)
+                           a.TakenAt >= period.StartDate &&
+                           a.TakenAt < period.EndDate)
                 .ToListAsync();
             var servicesDTO = _mapper.Map<IReadOnlyList<AdditionalServiceDTO>>(services);
             return servicesDTO;
