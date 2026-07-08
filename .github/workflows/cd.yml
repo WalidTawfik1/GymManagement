@@ -39,15 +39,15 @@ jobs:
       run: |
         $appsettings = @"
         {
-          ""Logging"": {
-            ""LogLevel"": {
-              ""Default"": ""Information"",
-              ""Microsoft.AspNetCore"": ""Warning""
+          "Logging": {
+            "LogLevel": {
+              "Default": "Information",
+              "Microsoft.AspNetCore": "Warning"
             }
           },
-          ""AllowedHosts"": ""*"",
-          ""ConnectionStrings"": {
-            ""MambelaDatabase"": ""${{ secrets.PROD_DB_CONNECTION }}""
+          "AllowedHosts": "*",
+          "ConnectionStrings": {
+            "MambelaDatabase": "${{ secrets.PROD_DB_CONNECTION }}"
           }
         }
         "@
