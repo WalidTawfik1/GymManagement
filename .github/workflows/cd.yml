@@ -1,0 +1,46 @@
+name: .NET CD (Deploy to MonsterASP)
+
+on:
+  workflow_run:
+    workflows: [".NET CI"]
+    types:
+      - completed
+    branches:
+      - main
+      - master
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install npm dependencies for Tailwind
+      run: npm install
+      working-directory: ./Gym.Web
+        
+    - name: Restore dependencies
+      run: dotnet restore Gym.Web/Gym.Web.csproj
+      
+    - name: Publish
+      run: dotnet publish Gym.Web/Gym.Web.csproj -c Release -o ./publish
+      
+    - name: FTP Deploy to MonsterASP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./publish/
