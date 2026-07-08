@@ -3,6 +3,7 @@ using Gym.Infrastructure;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Environment.EnvironmentName = "Development";
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
