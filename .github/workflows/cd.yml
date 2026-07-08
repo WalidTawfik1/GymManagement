@@ -34,14 +34,13 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore Gym.Web/Gym.Web.csproj
       
-    - name: Publish
-      run: dotnet publish Gym.Web/Gym.Web.csproj -c Release -o ./publish
-      
-    - name: FTP Deploy to MonsterASP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-      with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./publish/
-        server-dir: /wwwroot/
+    - name: Publish and Deploy via WebDeploy
+      run: >
+        dotnet publish Gym.Web/Gym.Web.csproj -c Release 
+        /p:WebPublishMethod=MSDeploy 
+        /p:MSDeployServiceURL="${{ secrets.WEBDEPLOY_URL }}" 
+        /p:DeployIisAppPath="${{ secrets.WEBDEPLOY_SITENAME }}" 
+        /p:Username="${{ secrets.WEBDEPLOY_USERNAME }}" 
+        /p:Password="${{ secrets.WEBDEPLOY_PASSWORD }}" 
+        /p:AllowUntrustedCertificate=True 
+        /p:EnableMSDeployAppOffline=True
