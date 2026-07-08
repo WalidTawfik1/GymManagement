@@ -1,6 +1,6 @@
-# Gym Management System UI
+# Gym Management System
 
-A comprehensive WPF application for managing gym operations including trainee management, membership tracking, visit recording, financial management, and business analytics.
+A comprehensive solution featuring a WPF desktop application and a modern Blazor Web application for managing gym operations including trainee management, membership tracking, visit recording, financial management, and business analytics.
 
 ## Features
 
@@ -148,6 +148,20 @@ The application follows the Model-View-ViewModel (MVVM) pattern:
 - **Profit/Loss Indicators**: Color-coded financial health indicators
 - **Export Integration**: One-click report generation from any view
 
+## Web Application (Blazor) ⭐ *NEW*
+
+The newly introduced `Gym.Web` project brings the management system to the browser using Blazor and Tailwind CSS:
+- **Responsive Design**: Fully optimized for mobile phones, tablets (1024x600), and desktop screens.
+- **Modern UI Components**: Custom-built Toast Notifications and sleek Confirmation Dialogs that replace native browser alerts.
+- **Tailwind CSS**: Utility-first styling with custom animations and a professional color scheme.
+- **Unified Backend**: Shares the same `Gym.Core` and `Gym.Infrastructure` logic as the WPF application.
+
+## CI/CD Pipeline ⭐ *NEW*
+
+The repository is equipped with robust GitHub Actions workflows:
+- **Continuous Integration (.NET CI)**: Automatically builds the solution, restores Node.js dependencies for Tailwind CSS, and checks for compilation errors on every push or pull request to `main`.
+- **Continuous Deployment (.NET CD)**: Automatically publishes the `Gym.Web` project and deploys it directly to MonsterASP using FTP when the CI pipeline succeeds.
+
 ## Setup Instructions
 
 ### Prerequisites
@@ -212,7 +226,16 @@ dotnet publish Gym.UI -c Release --self-contained true -r win-x64
 ## Project Structure
 
 ```
-Gym.UI/
+Gym.Web/                    # Blazor Web Application ⭐ *NEW*
+├── Components/             # Razor Components
+│   ├── Pages/              # Web Views (Home, Trainees, Memberships, etc.)
+│   ├── Layout/             # Responsive Layouts & Navigation
+│   └── Shared/             # Reusable UI (ToastContainer, ConfirmContainer)
+├── Services/               # Web-specific Services (ToastService, ConfirmService)
+├── Styles/                 # Tailwind CSS configuration
+└── wwwroot/                # Static web assets
+
+Gym.UI/                     # WPF Desktop Application
 ├── Views/                     # XAML Views
 │   ├── MainMenuView.xaml      # Modern navigation interface ⭐ *NEW*
 │   ├── TraineeView.xaml
