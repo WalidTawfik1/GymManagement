@@ -37,7 +37,8 @@ jobs:
     - name: Generate appsettings.json
       shell: pwsh
       run: |
-        $appsettings = @"{
+        $appsettings = @"
+        {
           ""Logging"": {
             ""LogLevel"": {
               ""Default"": ""Information"",
@@ -48,7 +49,8 @@ jobs:
           ""ConnectionStrings"": {
             ""MambelaDatabase"": ""${{ secrets.PROD_DB_CONNECTION }}""
           }
-        }"@
+        }
+        "@
         Set-Content -Path "Gym.Web/appsettings.json" -Value $appsettings
 
     - name: Publish and Deploy via WebDeploy
