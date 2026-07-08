@@ -18,6 +18,15 @@ jobs:
       with:
         dotnet-version: '8.0.x'
         
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install npm dependencies for Tailwind
+      run: npm install
+      working-directory: ./Gym.Web
+      
     - name: Restore dependencies
       run: dotnet restore
       
