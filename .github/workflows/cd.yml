@@ -34,6 +34,23 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore Gym.Web/Gym.Web.csproj
       
+    - name: Generate appsettings.json
+      shell: pwsh
+      run: |
+        $appsettings = @"{
+          ""Logging"": {
+            ""LogLevel"": {
+              ""Default"": ""Information"",
+              ""Microsoft.AspNetCore"": ""Warning""
+            }
+          },
+          ""AllowedHosts"": ""*"",
+          ""ConnectionStrings"": {
+            ""MambelaDatabase"": ""${{ secrets.PROD_DB_CONNECTION }}""
+          }
+        }"@
+        Set-Content -Path "Gym.Web/appsettings.json" -Value $appsettings
+
     - name: Publish and Deploy via WebDeploy
       run: >
         dotnet publish Gym.Web/Gym.Web.csproj -c Release 
