@@ -232,6 +232,106 @@ namespace Gym.Infrastructure.Repositores
             return _mapper.Map<IReadOnlyList<VisitDTO>>(visits);
         }
 
+        public async Task<PagedResult<VisitDTO>> GetVisitsPagedAsync(int pageNumber, int pageSize, int? month = null, int? year = null, string searchQuery = "", string sortOrder = "Newest")
+        {
+            var targetMonth = month ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth();
+            var targetYear = year ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear();
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(targetMonth, targetYear);
+            
+            var query = _context.Visits
+                .Where(v => !v.IsDeleted && v.VisitDate >= period.StartDate && v.VisitDate < period.EndDate)
+                .Include(v => v.Trainee)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                query = query.Where(v => v.Trainee != null && (v.Trainee.FullName.Contains(searchQuery) || v.Trainee.PhoneNumber.Contains(searchQuery)));
+            }
+
+            if (sortOrder == "Newest")
+            {
+                query = query.OrderByDescending(v => v.VisitDate).ThenByDescending(v => v.Id);
+            }
+            else
+            {
+                query = query.OrderBy(v => v.VisitDate).ThenBy(v => v.Id);
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            var dtos = _mapper.Map<IReadOnlyList<VisitDTO>>(items);
+
+            return new PagedResult<VisitDTO>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<PagedResult<VisitResponseDTO>> GetVisitsWithResponsePagedAsync(int pageNumber, int pageSize, int? month = null, int? year = null, string searchQuery = "", string sortOrder = "Newest")
+        {
+            var targetMonth = month ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth();
+            var targetYear = year ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear();
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(targetMonth, targetYear);
+            
+            var query = _context.Visits
+                .Where(v => !v.IsDeleted && v.VisitDate >= period.StartDate && v.VisitDate < period.EndDate)
+                .Include(v => v.Trainee)
+                .ThenInclude(t => t.Memberships.Where(m => m.IsActive && !m.IsDeleted))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                query = query.Where(v => v.Trainee != null && (v.Trainee.FullName.Contains(searchQuery) || v.Trainee.PhoneNumber.Contains(searchQuery)));
+            }
+
+            if (sortOrder == "Newest")
+            {
+                query = query.OrderByDescending(v => v.VisitDate).ThenByDescending(v => v.Id);
+            }
+            else
+            {
+                query = query.OrderBy(v => v.VisitDate).ThenBy(v => v.Id);
+            }
+
+            var totalCount = await query.CountAsync();
+            var visits = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            var visitResponses = new List<VisitResponseDTO>();
+
+            foreach (var visit in visits)
+            {
+                var activeMembership = visit.Trainee?.Memberships
+                    .Where(m => m.IsActive && !m.IsDeleted && m.EndDate >= DateOnly.FromDateTime(DateTime.Now) && (m.RemainingSessions == null || m.RemainingSessions > 0))
+                    .OrderBy(m => m.EndDate)
+                    .FirstOrDefault();
+
+                var response = new VisitResponseDTO
+                {
+                    Id = visit.Id,
+                    TraineeName = visit.Trainee?.FullName ?? "غير محدد",
+                    MembershipType = activeMembership?.MembershipType ?? "لا يوجد اشتراك",
+                    RemainingSessions = activeMembership?.RemainingSessions,
+                    IsActive = activeMembership?.IsActive ?? false,
+                    VisitDate = visit.VisitDate,
+                    Message = activeMembership != null ? "زيارة مسجلة" : "لا يوجد اشتراك نشط"
+                };
+
+                visitResponses.Add(response);
+            }
+
+            return new PagedResult<VisitResponseDTO>
+            {
+                Items = visitResponses,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
         public async Task<IReadOnlyList<VisitResponseDTO>> GetAllVisitsWithResponseAsync()
         {
             var visits = await _context.Visits

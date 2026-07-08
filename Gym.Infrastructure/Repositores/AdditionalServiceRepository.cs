@@ -62,6 +62,39 @@ namespace Gym.Infrastructure.Repositores
             return additionalServicesDTOs;
         }
 
+        public async Task<PagedResult<AdditionalServiceDTO>> GetAdditionalServicesPagedAsync(int pageNumber, int pageSize, int? month = null, int? year = null, string searchQuery = "")
+        {
+            var targetMonth = month ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth();
+            var targetYear = year ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear();
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(targetMonth, targetYear);
+            
+            var query = _context.AdditionalServices
+                .Where(a => !a.IsDeleted && a.TakenAt >= period.StartDate && a.TakenAt < period.EndDate)
+                .Include(a => a.Trainee)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                query = query.Where(a => (a.Trainee != null && a.Trainee.FullName.Contains(searchQuery)) ||
+                                         a.ServiceType.Contains(searchQuery));
+            }
+
+            query = query.OrderByDescending(a => a.TakenAt).ThenByDescending(a => a.Id);
+
+            var totalCount = await query.CountAsync();
+            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            var dtos = _mapper.Map<IReadOnlyList<AdditionalServiceDTO>>(items);
+
+            return new PagedResult<AdditionalServiceDTO>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
         public async Task<IReadOnlyList<AdditionalServiceDTO>> GetAdditionalServiceByTraineeIdAsync(int traineeId)
         {
             var additionalServices = await _context.AdditionalServices

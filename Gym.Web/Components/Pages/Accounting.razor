@@ -5,6 +5,8 @@
 @using Gym.Core.Helpers
 @inject IUnitofWork UnitOfWork
 @inject IJSRuntime JS
+@inject ToastService ToastService
+@inject ConfirmService ConfirmService
 @inject Gym.Core.Interfaces.Services.IReportService ReportService
 @rendermode InteractiveServer
 
@@ -17,28 +19,28 @@
             <h2 class="font-bold text-2xl text-gym-primary mb-1">💰 الإيرادات والمصروفات</h2>
             <p class="text-gray-500 text-sm">إدارة مصروفات النادي وحساب الأرباح</p>
         </div>
-        <div class="flex gap-2">
-            <button class="btn-outline flex items-center gap-2" @onclick="ExportReport">
+        <div class="flex flex-wrap sm:flex-nowrap gap-2 w-full md:w-auto">
+            <button class="btn-outline flex-1 justify-center flex items-center gap-2 whitespace-nowrap" @onclick="ExportReport">
                 <i class="bi bi-file-earmark-excel"></i> تصدير التقرير المالي
             </button>
-            <button class="btn-primary flex items-center gap-2" @onclick="ShowAddModal">
+            <button class="btn-primary flex-1 justify-center flex items-center gap-2 whitespace-nowrap" @onclick="ShowAddModal">
                 <i class="bi bi-plus-lg"></i> إضافة مصروف
             </button>
         </div>
     </div>
 
     <!-- Filters -->
-    <div class="flex flex-wrap gap-4 mb-6">
-        <div class="w-full md:w-48">
-            <select class="input-modern" @bind="selectedMonth" @bind:after="LoadData">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="w-full">
+            <select class="input-modern w-full" @bind="selectedMonth" @bind:after="LoadData">
                 @for(int i=1; i<=12; i++)
                 {
                     <option value="@i">شهر @i</option>
                 }
             </select>
         </div>
-        <div class="w-full md:w-48">
-            <select class="input-modern" @bind="selectedYear" @bind:after="LoadData">
+        <div class="w-full">
+            <select class="input-modern w-full" @bind="selectedYear" @bind:after="LoadData">
                 @for(int y=2020; y<=2050; y++)
                 {
                     <option value="@y">سنة @y</option>
@@ -195,6 +197,33 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- Pagination Controls -->
+        @if (pagedExpenses != null && pagedExpenses.TotalPages > 1)
+        {
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gray-50">
+                <div class="text-sm text-gray-600 w-full sm:w-auto text-center sm:text-right">
+                    إجمالي نتائج البحث: <span class="font-bold">@pagedExpenses.TotalCount</span>
+                </div>
+                <div class="flex gap-2 w-full sm:w-auto justify-center">
+                    <button class="btn-outline px-3 py-1 text-sm disabled:opacity-50" 
+                            disabled="@(!pagedExpenses.HasPreviousPage)" 
+                            @onclick="() => LoadExpensesPage(CurrentExpensePage - 1)">
+                        السابق
+                    </button>
+                    
+                    <span class="px-4 py-1 text-sm font-bold text-gray-700 bg-white border border-gray-200 rounded-lg">
+                        صفحة @pagedExpenses.PageNumber من @pagedExpenses.TotalPages
+                    </span>
+
+                    <button class="btn-outline px-3 py-1 text-sm disabled:opacity-50" 
+                            disabled="@(!pagedExpenses.HasNextPage)" 
+                            @onclick="() => LoadExpensesPage(CurrentExpensePage + 1)">
+                        التالي
+                    </button>
+                </div>
+            </div>
+        }
     </div>
 </div>
 
@@ -202,12 +231,12 @@
 @if (isModalOpen)
 {
     <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col" dir="rtl">
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <div class="bg-white rounded-2xl shadow-2xl w-[95%] sm:w-full max-w-lg max-h-[95vh] overflow-hidden flex flex-col" dir="rtl">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                 <h5 class="font-bold text-lg text-gym-primary">@(isEditMode ? "تعديل المصروف" : "إضافة مصروف جديد")</h5>
                 <button type="button" class="text-gray-400 hover:text-gray-700 text-2xl leading-none" @onclick="CloseModal">&times;</button>
             </div>
-            <div class="p-6">
+            <div class="p-4 sm:p-6 overflow-y-auto">
                 
                 <div class="mb-4">
                     <label class="block text-sm font-bold text-gray-700 mb-2">نوع المصروف</label>
@@ -233,20 +262,24 @@
                 </div>
 
             </div>
-            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-                <button type="button" class="px-5 py-2 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors" @onclick="CloseModal">إلغاء</button>
-                <button type="button" class="btn-primary px-8" @onclick="SaveExpense">حفظ</button>
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+                <button type="button" class="flex-1 sm:flex-none px-5 py-2 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors" @onclick="CloseModal">إلغاء</button>
+                <button type="button" class="flex-1 sm:flex-none btn-primary px-8" @onclick="SaveExpense">حفظ</button>
             </div>
         </div>
     </div>
 }
 
 @code {
+    private PagedResult<ExpenseDTO> pagedExpenses = new();
     private List<ExpenseDTO> expenses = new();
     private List<MembershipDTO> memberships = new();
     private List<AdditionalServiceDTO> additionalServices = new();
     
     private bool isLoading = true;
+    
+    private int CurrentExpensePage = 1;
+    private int ExpensePageSize = 10;
     
     private int selectedMonth = DateTime.Now.Month;
     private int selectedYear = DateTime.Now.Year;
@@ -278,7 +311,6 @@
         
         totalRevenue = await UnitOfWork.ExpenseAndRevenueRepository.GetTotalRevenueByMonthAsync(selectedMonth, selectedYear);
         totalExpenses = await UnitOfWork.ExpenseAndRevenueRepository.GetTotalExpensesByMonthAsync(selectedMonth, selectedYear);
-        expenses = (await UnitOfWork.ExpenseAndRevenueRepository.GetExpensesByMonthAsync(selectedMonth, selectedYear)).OrderByDescending(e => e.Id).ToList();
         
         // Load revenue breakdown - memberships and additional services for this month
         memberships = (await UnitOfWork.MembershipRepository.GetAllMembershipsAsync(selectedMonth, selectedYear))
@@ -286,7 +318,21 @@
         additionalServices = (await UnitOfWork.AdditionalServiceRepository.GetAllAdditionalServicesAsync(selectedMonth, selectedYear))
                         .OrderByDescending(s => s.TakenAt).ToList();
         
+        await LoadExpensesPage(1);
+    }
+    
+    private async Task LoadExpensesPage(int page)
+    {
+        isLoading = true;
+        CurrentExpensePage = page;
+        
+        pagedExpenses = await UnitOfWork.ExpenseAndRevenueRepository.GetExpensesPagedAsync(
+            CurrentExpensePage, ExpensePageSize, selectedMonth, selectedYear
+        );
+        expenses = pagedExpenses.Items.ToList();
+        
         isLoading = false;
+        StateHasChanged();
     }
 
     private void ShowAddModal()
@@ -317,7 +363,7 @@
     {
         if (string.IsNullOrWhiteSpace(description) || amount <= 0)
         {
-            await JS.InvokeVoidAsync("alert", "يرجى إدخال الوصف والمبلغ بشكل صحيح.");
+            ToastService.ShowWarning("يرجى إدخال الوصف والمبلغ بشكل صحيح.");
             return;
         }
 
@@ -363,7 +409,7 @@
         }
         catch (Exception ex)
         {
-            await JS.InvokeVoidAsync("alert", $"خطأ في التصدير: {ex.Message}");
+            ToastService.ShowError($"خطأ في التصدير: {ex.Message}");
         }
         finally
         {
@@ -373,7 +419,7 @@
 
     private async Task DeleteExpense(int id)
     {
-        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"هل أنت متأكد من الحذف؟");
+        bool confirmed = await ConfirmService.ShowConfirmAsync($"هل أنت متأكد من الحذف؟");
         if (confirmed)
         {
             await UnitOfWork.ExpenseAndRevenueRepository.DeleteExpenseAsync(id);

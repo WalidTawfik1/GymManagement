@@ -16,6 +16,8 @@ namespace Gym.Core.Interfaces
         Task<bool> DecrementRemainingSessionsAsync(int traineeId, bool saveChanges = true);
         Task<bool> IsTraineeCheckedInAsync(int traineeId);
         Task<IReadOnlyList<VisitDTO>> GetAllVisitsAsync(int? month = null, int? year = null);
+        Task<PagedResult<VisitDTO>> GetVisitsPagedAsync(int pageNumber, int pageSize, int? month = null, int? year = null, string searchQuery = "", string sortOrder = "Newest");
+        Task<PagedResult<VisitResponseDTO>> GetVisitsWithResponsePagedAsync(int pageNumber, int pageSize, int? month = null, int? year = null, string searchQuery = "", string sortOrder = "Newest");
         Task<IReadOnlyList<VisitResponseDTO>> GetAllVisitsWithResponseAsync();
         Task<IReadOnlyList<VisitDTO>> GetTodayVisits(DateOnly today);
         Task<int> GetVisitsCountByMonthAsync(int month, int year);

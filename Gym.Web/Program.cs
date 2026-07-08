@@ -10,6 +10,8 @@ builder.Services.AddRazorComponents()
 
 // Register infrastructure services (DbContext, Repositories, etc.)
 builder.Services.InfrastructureConfiguration(builder.Configuration);
+builder.Services.AddScoped<Gym.Web.Services.ToastService>();
+builder.Services.AddScoped<Gym.Web.Services.ConfirmService>();
 
 // Register AutoMapper (AutoMapper 15.1.1)
 builder.Services.AddAutoMapper(cfg =>

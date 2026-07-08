@@ -8,7 +8,7 @@ namespace Gym.Core.Interfaces.Services
         Task<string> GenerateFinancialReportAsync(int month, int year);
         Task<DashboardReportModel> GetDashboardReportDataAsync();
         Task<FinancialReportModel> GetFinancialReportDataAsync(int month, int year);
-        
+
         // New export methods for tables
         Task<string> ExportTraineesReportAsync();
         Task<string> ExportMembershipsReportAsync(int? month = null, int? year = null);

@@ -5,7 +5,10 @@
 @using Gym.Core.Helpers
 @inject IUnitofWork UnitOfWork
 @inject IJSRuntime JS
+@inject ToastService ToastService
+@inject ConfirmService ConfirmService
 @inject Gym.Core.Interfaces.Services.IReportService ReportService
+@implements IDisposable
 @rendermode InteractiveServer
 
 <PageTitle>إدارة الزيارات</PageTitle>
@@ -17,115 +20,150 @@
             <h2 class="font-bold text-2xl text-gym-primary mb-1">🕒 إدارة الزيارات</h2>
             <p class="text-gray-500 text-sm">تتبع زيارات النادي وسجلات الحضور</p>
         </div>
-        <div class="flex gap-2">
-            <button class="btn-outline flex items-center gap-2" @onclick="ExportReport">
+        <div class="flex flex-wrap sm:flex-nowrap gap-2 w-full md:w-auto">
+            <button class="btn-outline flex-1 justify-center flex items-center gap-2 whitespace-nowrap" @onclick="ExportReport">
                 <i class="bi bi-file-earmark-excel"></i> تصدير إكسيل
             </button>
-            <button class="btn-primary flex items-center gap-2" @onclick="ShowAddModal">
+            <button class="btn-primary flex-1 justify-center flex items-center gap-2 whitespace-nowrap" @onclick="ShowAddModal">
                 <i class="bi bi-person-check-fill"></i> تسجيل زيارة
             </button>
         </div>
     </div>
 
     <!-- Filters & Search -->
-    <div class="flex flex-wrap gap-4 mb-6">
-        <div class="w-full md:w-48">
-            <select class="input-modern" @bind="selectedMonth" @bind:after="LoadData">
-                @for(int i=1; i<=12; i++)
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="w-full">
+            <select class="input-modern w-full" @bind="selectedMonth" @bind:after="LoadData">
+                @for (int i=1; i<=12; i++)
                 {
                     <option value="@i">شهر @i</option>
                 }
             </select>
         </div>
-        <div class="w-full md:w-48">
-            <select class="input-modern" @bind="selectedYear" @bind:after="LoadData">
-                @for(int y=2020; y<=2050; y++)
+        <div class="w-full">
+            <select class="input-modern w-full" @bind="selectedYear" @bind:after="LoadData">
+                @for (int y=2020; y<=2050; y++)
                 {
                     <option value="@y">سنة @y</option>
                 }
             </select>
         </div>
-        <div class="w-full md:flex-1 min-w-[200px]">
-            <input type="text" class="input-modern" placeholder="ابحث باسم المتدرب..." @bind="SearchQuery" @bind:event="oninput" @onkeyup="SearchVisits" />
+        <div class="w-full sm:col-span-2 lg:col-span-1">
+            <input type="text" class="input-modern w-full" placeholder="ابحث باسم المتدرب..." @oninput="OnSearchInput" />
         </div>
+        <div class="w-full">
+            <select class="input-modern w-full" @bind="PageSize" @bind:after="() => SearchVisits(1)">
+            <option value="10">10 لكل صفحة</option>
+            <option value="25">25 لكل صفحة</option>
+            <option value="50">50 لكل صفحة</option>
+            <option value="100">100 لكل صفحة</option>
+        </select>
     </div>
+</div>
 
-    <!-- Table -->
-    <div class="card-modern overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="table-modern">
-                <thead>
+<!-- Table -->
+<div class="card-modern overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th class="pr-6">#</th>
+                    <th>اسم المتدرب</th>
+                    <th>وقت الدخول</th>
+                    <th>تاريخ الدخول</th>
+                    <th>نوع العضوية</th>
+                    <th>الحصص المتبقية</th>
+                    <th class="text-center">الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white">
+                @if (isLoading)
+                {
                     <tr>
-                        <th class="pr-6">#</th>
-                        <th>اسم المتدرب</th>
-                        <th>وقت الدخول</th>
-                        <th>تاريخ الدخول</th>
-                        <th>نوع العضوية</th>
-                        <th>الحصص المتبقية</th>
-                        <th class="text-center">الإجراءات</th>
+                        <td colspan="7" class="text-center py-8">
+                            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gym-primary"></div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="bg-white">
-                    @if (isLoading)
+                }
+                else if (!filteredVisits.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-8 text-gray-500">لا يوجد زيارات مسجلة لهذا الشهر.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var visit in filteredVisits)
                     {
-                        <tr>
-                            <td colspan="7" class="text-center py-8">
-                                <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gym-primary"></div>
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="pr-6 text-gray-500">#</td>
+                            <td class="font-bold text-gray-800">@visit.TraineeName</td>
+                            <td class="text-gray-600">@visit.VisitDate.ToString("hh:mm tt")</td>
+                            <td class="text-gray-600">@visit.VisitDate.ToString("yyyy-MM-dd")</td>
+                            <td><span class="badge-modern bg-gym-info text-white">@visit.MembershipType</span></td>
+                            <td>
+                                @if (visit.RemainingSessions.HasValue)
+                                {
+                                    <span class="badge-modern bg-gym-warning text-white">@visit.RemainingSessions حصة</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-modern bg-gym-success text-white">مفتوح</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <button class="btn-danger text-sm" @onclick="() => DeleteVisit(visit.Id)">حذف الزيارة</button>
                             </td>
                         </tr>
                     }
-                    else if (!filteredVisits.Any())
-                    {
-                        <tr>
-                            <td colspan="7" class="text-center py-8 text-gray-500">لا يوجد زيارات مسجلة لهذا الشهر.</td>
-                        </tr>
-                    }
-                    else
-                    {
-                        @foreach (var visit in filteredVisits)
-                        {
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="pr-6 text-gray-500">#</td>
-                                <td class="font-bold text-gray-800">@visit.TraineeName</td>
-                                <td class="text-gray-600">@visit.VisitDate.ToString("hh:mm tt")</td>
-                                <td class="text-gray-600">@visit.VisitDate.ToString("yyyy-MM-dd")</td>
-                                <td><span class="badge-modern bg-gym-info text-white">@visit.MembershipType</span></td>
-                                <td>
-                                    @if(visit.RemainingSessions.HasValue)
-                                    {
-                                        <span class="badge-modern bg-gym-warning text-white">@visit.RemainingSessions حصة</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge-modern bg-gym-success text-white">مفتوح</span>
-                                    }
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn-danger text-sm" @onclick="() => DeleteVisit(visit.Id)">حذف الزيارة</button>
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
+                }
+            </tbody>
+        </table>
     </div>
+
+    <!-- Pagination Controls -->
+    @if (pagedVisits != null && pagedVisits.TotalPages > 1)
+    {
+        <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gray-50">
+            <div class="text-sm text-gray-600 w-full sm:w-auto text-center sm:text-right">
+                إجمالي نتائج البحث: <span class="font-bold">@pagedVisits.TotalCount</span>
+            </div>
+            <div class="flex gap-2 w-full sm:w-auto justify-center">
+                <button class="btn-outline px-3 py-1 text-sm disabled:opacity-50"
+                disabled="@(!pagedVisits.HasPreviousPage)"
+                @onclick="() => SearchVisits(CurrentPage - 1)">
+                السابق
+            </button>
+
+            <span class="px-4 py-1 text-sm font-bold text-gray-700 bg-white border border-gray-200 rounded-lg">
+                صفحة @pagedVisits.PageNumber من @pagedVisits.TotalPages
+            </span>
+
+            <button class="btn-outline px-3 py-1 text-sm disabled:opacity-50"
+            disabled="@(!pagedVisits.HasNextPage)"
+            @onclick="() => SearchVisits(CurrentPage + 1)">
+            التالي
+        </button>
+    </div>
+</div>
+}
+</div>
 </div>
 
 <!-- Modal for Add Visit -->
 @if (isModalOpen)
 {
     <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col" dir="rtl">
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <div class="bg-white rounded-2xl shadow-2xl w-[95%] sm:w-full max-w-lg max-h-[95vh] overflow-hidden flex flex-col" dir="rtl">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                 <h5 class="font-bold text-lg text-gym-primary">تسجيل زيارة (حضور متدرب)</h5>
                 <button type="button" class="text-gray-400 hover:text-gray-700 text-2xl leading-none" @onclick="CloseModal">&times;</button>
             </div>
-            <div class="p-6">
+            <div class="p-4 sm:p-6 overflow-y-auto">
                 <div class="mb-4">
                     <label class="block text-sm font-bold text-gray-700 mb-2">اختر المتدرب <span class="text-red-500">*</span></label>
                     <div class="relative">
-                        <input type="text" class="input-modern w-full" placeholder="-- ابحث بالاسم أو الرقم --" @bind="SearchTraineeText" @bind:event="oninput" @onclick="() => showTraineeDropdown = true" />
+                        <input type="text" class="input-modern w-full" placeholder="-- ابحث بالاسم أو الرقم --" value="@SearchTraineeText" @oninput="OnTraineeSearchInput"/>
                         @if (showTraineeDropdown)
                         {
                             <div class="fixed inset-0 z-40" @onclick="() => showTraineeDropdown = false"></div>
@@ -136,90 +174,117 @@
                                 }
                                 else
                                 {
-                                    @foreach(var trainee in activeTraineesList.Where(t => string.IsNullOrWhiteSpace(SearchTraineeText) || t.FullName.Contains(SearchTraineeText) || t.Id.ToString() == SearchTraineeText || t.PhoneNumber.Contains(SearchTraineeText)))
+                                    @foreach (var trainee in activeTraineesList)
                                     {
-                                        <div class="px-4 py-2 hover:bg-gym-primary hover:text-white cursor-pointer transition-colors border-b border-gray-50 last:border-0" 
-                                             @onclick="() => SelectTrainee(trainee.Id, trainee.FullName)">
-                                            #@trainee.Id - @trainee.FullName - @trainee.PhoneNumber
-                                        </div>
-                                    }
+                                        <div class="px-4 py-2 hover:bg-gym-primary hover:text-white cursor-pointer transition-colors border-b border-gray-50 last:border-0"
+                                        @onclick="() => SelectTrainee(trainee.Id, trainee.FullName)">
+                                        #@trainee.Id - @trainee.FullName - @trainee.PhoneNumber
+                                    </div>
                                 }
-                            </div>
-                        }
-                    </div>
+                            }
+                        </div>
+                    }
                 </div>
             </div>
-            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-                <button type="button" class="px-5 py-2 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors" @onclick="CloseModal">إلغاء</button>
-                <button type="button" class="btn-primary px-8" @onclick="SaveVisit">تسجيل الدخول</button>
-            </div>
+        </div>
+        <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+            <button type="button" class="flex-1 sm:flex-none px-5 py-2 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors" @onclick="CloseModal">إلغاء</button>
+            <button type="button" class="flex-1 sm:flex-none btn-primary px-8" @onclick="SaveVisit">تسجيل الدخول</button>
         </div>
     </div>
+</div>
 }
 
 @code {
-    private List<VisitResponseDTO> visits = new();
+    private PagedResult<VisitResponseDTO> pagedVisits = new();
     private List<VisitResponseDTO> filteredVisits = new();
     private List<Trainee> activeTraineesList = new();
-    
+
     private bool isLoading = true;
     private string SearchQuery = "";
-    
+    private int CurrentPage = 1;
+    private int PageSize = 10;
+
     private int selectedMonth = DateTime.Now.Month;
     private int selectedYear = DateTime.Now.Year;
-    
+
     // Modal State
     private bool isModalOpen = false;
     private int selectedTraineeId = 0;
     private string SearchTraineeText = "";
     private bool showTraineeDropdown = false;
 
+    private System.Timers.Timer? _debounceTimer;
+
     protected override async Task OnInitializedAsync()
     {
+        _debounceTimer = new System.Timers.Timer(500);
+        _debounceTimer.Elapsed += OnTimerElapsed;
+        _debounceTimer.AutoReset = false;
+
         // Use custom accounting dates matching WPF App
         selectedMonth = AccountingDateHelper.GetCurrentAccountingMonth();
         selectedYear = AccountingDateHelper.GetCurrentAccountingYear();
-        
+
         await LoadData();
+    }
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        SearchQuery = e.Value?.ToString() ?? "";
+        _debounceTimer?.Stop();
+        _debounceTimer?.Start();
+    }
+
+    private System.Timers.Timer? _traineeSearchTimer;
+
+    private void OnTraineeSearchInput(ChangeEventArgs e)
+    {
+        SearchTraineeText = e.Value?.ToString() ?? "";
+        showTraineeDropdown = true;
+
+        if (_traineeSearchTimer == null)
+        {
+            _traineeSearchTimer = new System.Timers.Timer(400);
+            _traineeSearchTimer.AutoReset = false;
+        }
+
+        _traineeSearchTimer.Stop();
+        _traineeSearchTimer.Start();
+    }
+
+    private async void OnTimerElapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+        await InvokeAsync(async () => await SearchVisits(1));
+    }
+
+    public void Dispose()
+    {
+        _debounceTimer?.Dispose();
     }
 
     private async Task LoadData()
     {
         isLoading = true;
-        
-        var allVisits = await UnitOfWork.VisitRepository.GetAllVisitsWithResponseAsync();
-        
-        // Filter in memory for month/year (VisitRepository currently supports this via normal DTO, but for ResponseDTO we filter here)
-        var (startPeriod, endPeriod) = AccountingDateHelper.GetAccountingPeriod(selectedMonth, selectedYear);
-        
-        visits = allVisits.Where(v => v.VisitDate >= startPeriod 
-                                   && v.VisitDate < endPeriod)
-                          .OrderByDescending(v => v.VisitDate)
-                          .ToList();
-                          
-        filteredVisits = visits;
-        
-        // Active Trainees for Dropdown
-        activeTraineesList = (await UnitOfWork.TraineeRepository.GetAllTraineesAsync()).ToList();
-        
-        isLoading = false;
+        await SearchVisits(1);
     }
 
-    private void SearchVisits()
+    private async Task SearchVisits(int page = 1)
     {
-        if (string.IsNullOrWhiteSpace(SearchQuery))
-        {
-            filteredVisits = visits;
-        }
-        else
-        {
-            filteredVisits = visits
-                .Where(v => v.TraineeName.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
+        isLoading = true;
+        CurrentPage = page;
+
+        pagedVisits = await UnitOfWork.VisitRepository.GetVisitsWithResponsePagedAsync(
+            CurrentPage, PageSize, selectedMonth, selectedYear, SearchQuery, "Newest"
+        );
+
+        filteredVisits = pagedVisits.Items.ToList();
+
+        isLoading = false;
+        StateHasChanged();
     }
 
-    private void ShowAddModal()
+    private async Task ShowAddModal()
     {
         selectedTraineeId = 0;
         SearchTraineeText = "";
@@ -243,27 +308,27 @@
     {
         if (selectedTraineeId == 0)
         {
-            await JS.InvokeVoidAsync("alert", "يرجى اختيار المتدرب من القائمة المنسدلة.");
+            ToastService.ShowWarning("يرجى اختيار المتدرب من القائمة المنسدلة.");
             return;
         }
 
         var response = await UnitOfWork.VisitRepository.AddVisitAsync(selectedTraineeId);
-        
+
         if (response != null)
         {
             // Success
-            await JS.InvokeVoidAsync("alert", $"تم تسجيل دخول: {response.TraineeName}\nالعضوية: {response.MembershipType}");
+            ToastService.ShowSuccess($"تم تسجيل دخول: {response.TraineeName}\nالعضوية: {response.MembershipType}");
         }
         else
         {
             // Failed
-            await JS.InvokeVoidAsync("alert", "عفواً، لا يوجد اشتراك نشط أو انتهت صلاحية/حصص هذا المتدرب.");
+            ToastService.ShowError("عفواً، لا يوجد اشتراك نشط أو انتهت صلاحية/حصص هذا المتدرب.");
         }
 
         isModalOpen = false;
         await LoadData();
     }
-    
+
     private async Task ExportReport()
     {
         try
@@ -280,7 +345,7 @@
         }
         catch (Exception ex)
         {
-            await JS.InvokeVoidAsync("alert", $"خطأ في التصدير: {ex.Message}");
+            ToastService.ShowError($"خطأ في التصدير: {ex.Message}");
         }
         finally
         {
@@ -290,7 +355,7 @@
 
     private async Task DeleteVisit(int visitId)
     {
-        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"هل أنت متأكد من إلغاء هذه الزيارة ورجوع الحصة للمتدرب (إذا كان على نظام الحصص)؟");
+        bool confirmed = await ConfirmService.ShowConfirmAsync($"هل أنت متأكد من إلغاء هذه الزيارة ورجوع الحصة للمتدرب (إذا كان على نظام الحصص)؟");
         if (confirmed)
         {
             await UnitOfWork.VisitRepository.DeleteVisitAndRestoreSessionAsync(visitId);

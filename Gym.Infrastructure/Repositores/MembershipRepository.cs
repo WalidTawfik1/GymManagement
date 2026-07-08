@@ -127,6 +127,61 @@ namespace Gym.Infrastructure.Repositores
             return _mapper.Map<IReadOnlyList<MembershipDTO>>(memberships);
         }
 
+        public async Task<PagedResult<MembershipDTO>> GetMembershipsPagedAsync(int pageNumber, int pageSize, int? month = null, int? year = null, string searchQuery = "", string sortOrder = "Newest")
+        {
+            await DeactivateExpiredMembershipsAsync();
+            var targetMonth = month ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingMonth();
+            var targetYear = year ?? Gym.Core.Helpers.AccountingDateHelper.GetCurrentAccountingYear();
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriodDateOnly(targetMonth, targetYear);
+            
+            var query = _context.Memberships
+                .Where(m => !m.IsDeleted && m.StartDate >= period.StartDate && m.StartDate < period.EndDate)
+                .Include(m => m.Trainee)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                query = query.Where(m => (m.Trainee != null && m.Trainee.FullName.Contains(searchQuery)) ||
+                                         m.MembershipType.Contains(searchQuery));
+            }
+
+            if (sortOrder == "Newest")
+            {
+                query = query.OrderByDescending(m => m.StartDate).ThenByDescending(m => m.Id);
+            }
+            else
+            {
+                query = query.OrderBy(m => m.StartDate).ThenBy(m => m.Id);
+            }
+
+            var totalCount = await query.CountAsync();
+            var memberships = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            var dtos = _mapper.Map<IReadOnlyList<MembershipDTO>>(memberships);
+
+            return new PagedResult<MembershipDTO>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
+        public async Task<(int TotalCount, int ActiveCount, decimal TotalRevenue)> GetMembershipsSummaryAsync(int month, int year)
+        {
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriodDateOnly(month, year);
+            
+            var query = _context.Memberships
+                .Where(m => !m.IsDeleted && m.StartDate >= period.StartDate && m.StartDate < period.EndDate);
+
+            var totalCount = await query.CountAsync();
+            var activeCount = await query.CountAsync(m => m.IsActive);
+            var totalRevenue = await query.SumAsync(m => m.Price);
+
+            return (totalCount, activeCount, totalRevenue);
+        }
+
         public async Task<MembershipDTO?> GetMembershipByTraineeIdAsync(int id)
         {
             var membership = await _context.Memberships

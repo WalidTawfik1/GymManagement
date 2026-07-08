@@ -1,0 +1,124 @@
+@using Gym.Web.Services
+@inject ToastService ToastService
+@implements IDisposable
+@rendermode InteractiveServer
+
+<style>
+    @@keyframes shrink-toast {
+        from { width: 100%; }
+        to { width: 0%; }
+    }
+    .animate-shrink-toast {
+        animation: shrink-toast 5s linear forwards;
+    }
+</style>
+
+<div class="fixed top-4 left-4 z-[100] flex flex-col gap-2 w-full max-w-sm pointer-events-none" dir="rtl">
+    @foreach (var toast in toasts)
+    {
+        <div @key="toast.Id" class="pointer-events-auto w-full bg-white rounded-xl shadow-lg border-r-4 @GetBorderClass(toast.Level) overflow-hidden transition-all duration-300 relative group">
+            <div class="p-4 flex items-start gap-3">
+                <div class="@GetIconColorClass(toast.Level) text-xl">
+                    <i class="@GetIconClass(toast.Level)"></i>
+                </div>
+                <div class="flex-1 pt-0.5">
+                    <h6 class="font-bold text-gray-800 text-sm m-0">@toast.Title</h6>
+                    <p class="text-sm text-gray-600 mt-1 mb-0">@toast.Message</p>
+                </div>
+                <button @onclick="() => RemoveToast(toast.Id)" class="text-gray-400 hover:text-gray-700 transition-colors">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <!-- Progress Bar -->
+            <div class="h-1 w-full bg-gray-100 absolute bottom-0 left-0">
+                <div class="h-full @GetProgressBarClass(toast.Level) animate-shrink-toast"></div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<ToastMessage> toasts = new();
+    private System.Timers.Timer? _timer;
+
+    protected override void OnInitialized()
+    {
+        ToastService.OnShow += ShowToast;
+        _timer = new System.Timers.Timer(100);
+        _timer.Elapsed += CheckToasts;
+        _timer.Start();
+    }
+
+    private void ShowToast(ToastMessage toast)
+    {
+        InvokeAsync(() =>
+        {
+            toasts.Add(toast);
+            StateHasChanged();
+        });
+    }
+
+    private void RemoveToast(Guid id)
+    {
+        var toast = toasts.FirstOrDefault(x => x.Id == id);
+        if (toast != null)
+        {
+            toasts.Remove(toast);
+            StateHasChanged();
+        }
+    }
+
+    private void CheckToasts(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+        var toRemove = toasts.Where(t => (DateTime.Now - t.Timestamp).TotalSeconds > 5).ToList();
+        if (toRemove.Any())
+        {
+            InvokeAsync(() =>
+            {
+                foreach (var t in toRemove)
+                {
+                    toasts.Remove(t);
+                }
+                StateHasChanged();
+            });
+        }
+    }
+
+    private string GetBorderClass(ToastLevel level) => level switch
+    {
+        ToastLevel.Success => "border-gym-success",
+        ToastLevel.Error => "border-gym-danger",
+        ToastLevel.Warning => "border-gym-warning",
+        _ => "border-gym-primary"
+    };
+
+    private string GetIconColorClass(ToastLevel level) => level switch
+    {
+        ToastLevel.Success => "text-gym-success",
+        ToastLevel.Error => "text-gym-danger",
+        ToastLevel.Warning => "text-gym-warning",
+        _ => "text-gym-primary"
+    };
+
+    private string GetProgressBarClass(ToastLevel level) => level switch
+    {
+        ToastLevel.Success => "bg-gym-success",
+        ToastLevel.Error => "bg-gym-danger",
+        ToastLevel.Warning => "bg-gym-warning",
+        _ => "bg-gym-primary"
+    };
+
+    private string GetIconClass(ToastLevel level) => level switch
+    {
+        ToastLevel.Success => "bi-check-circle-fill",
+        ToastLevel.Error => "bi-x-circle-fill",
+        ToastLevel.Warning => "bi-exclamation-triangle-fill",
+        _ => "bi-info-circle-fill"
+    };
+
+    public void Dispose()
+    {
+        ToastService.OnShow -= ShowToast;
+        _timer?.Dispose();
+    }
+}

@@ -125,5 +125,25 @@ namespace Gym.Infrastructure.Repositores
                 .ToList());
             return _mapper.Map<IEnumerable<ExpenseDTO>>(expenses);
         }
+
+        public async Task<PagedResult<ExpenseDTO>> GetExpensesPagedAsync(int pageNumber, int pageSize, int month, int year)
+        {
+            var period = Gym.Core.Helpers.AccountingDateHelper.GetAccountingPeriod(month, year);
+            
+            var query = _context.Expenses
+                .Where(e => e.IncurredAt >= period.StartDate && e.IncurredAt < period.EndDate && !e.IsDeleted)
+                .OrderByDescending(e => e.Id);
+                
+            var totalCount = await query.CountAsync();
+            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PagedResult<ExpenseDTO>
+            {
+                Items = _mapper.Map<IReadOnlyList<ExpenseDTO>>(items),
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
     }
 }

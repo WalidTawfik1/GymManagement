@@ -1,15 +1,29 @@
 @inherits LayoutComponentBase
 
 <div class="flex h-screen bg-gray-50 overflow-hidden" dir="rtl">
+    
+    <!-- Mobile overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity hidden" onclick="closeSidebar()"></div>
+
     <!-- Sidebar -->
-    <div class="w-64 flex-shrink-0 glass-sidebar h-full overflow-y-auto hidden md:block">
-        <NavMenu />
+    <div id="sidebar" class="fixed inset-y-0 right-0 transform translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-50 w-64 flex-shrink-0 glass-sidebar h-full overflow-y-auto">
+        <div class="md:hidden flex justify-end p-4">
+            <button onclick="closeSidebar()" class="text-white/80 hover:text-white text-2xl transition-colors">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div onclick="if(window.innerWidth < 768) closeSidebar()">
+            <NavMenu />
+        </div>
     </div>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden">
-        <div class="bg-white shadow-sm flex items-center justify-between p-4 z-10 border-b border-gray-100">
-            <h1 class="text-xl font-bold text-gym-primary flex items-center gap-2">
+    <main class="flex-1 flex flex-col h-full overflow-hidden w-full">
+        <div class="bg-white shadow-sm flex items-center p-4 z-10 border-b border-gray-100 gap-4">
+            <button class="md:hidden text-gym-primary text-2xl hover:text-gym-accent transition-colors" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+            <h1 class="text-xl font-bold text-gym-primary flex items-center gap-2 m-0">
                 <i class="bi bi-diagram-3-fill text-gym-accent"></i> Mambela Gym
             </h1>
         </div>
@@ -19,6 +33,9 @@
         </article>
     </main>
 </div>
+
+<ToastContainer />
+<ConfirmContainer />
 
 <div id="blazor-error-ui" class="hidden bg-red-100 border-t-4 border-red-500 text-red-700 p-4 fixed bottom-0 w-full z-50">
     لقد حدث خطأ غير متوقع.

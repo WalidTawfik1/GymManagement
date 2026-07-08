@@ -4,8 +4,11 @@
 @using Gym.Core.Interfaces
 @inject IUnitofWork UnitOfWork
 @inject IJSRuntime JS
+@inject ToastService ToastService
+@inject ConfirmService ConfirmService
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment WebHostEnvironment
 @inject Gym.Core.Interfaces.Services.IReportService ReportService
+@implements IDisposable
 @rendermode InteractiveServer
 
 <PageTitle>إدارة المتدربين</PageTitle>
@@ -17,107 +20,142 @@
             <h2 class="font-bold text-2xl text-gym-primary mb-1">🏃‍♂️ إدارة المتدربين</h2>
             <p class="text-gray-500 text-sm">إدارة معلومات أعضاء النادي والمتدربين</p>
         </div>
-        <div class="flex gap-2">
-            <button class="btn-outline flex items-center gap-2" @onclick="ExportReport">
+        <div class="flex flex-wrap sm:flex-nowrap gap-2 w-full md:w-auto">
+            <button class="btn-outline flex-1 justify-center flex items-center gap-2 whitespace-nowrap" @onclick="ExportReport">
                 <i class="bi bi-file-earmark-excel"></i> تصدير إكسيل
             </button>
-            <button class="btn-primary flex items-center gap-2" @onclick="ShowAddModal">
+            <button class="btn-primary flex-1 justify-center flex items-center gap-2 whitespace-nowrap" @onclick="ShowAddModal">
                 <i class="bi bi-plus-lg"></i> إضافة متدرب
             </button>
         </div>
     </div>
 
     <!-- Search Bar -->
-    <div class="flex flex-wrap gap-4 mb-6">
-        <div class="w-full md:w-1/2">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="w-full sm:col-span-2">
             <div class="relative">
-                <input type="text" class="input-modern w-full pr-10" placeholder="ابحث باسم المتدرب..." @bind="SearchQuery" @bind:event="oninput" @onkeyup="SearchTrainees" />
+                <input type="text" class="input-modern w-full pr-10" placeholder="ابحث باسم المتدرب..." @bind="SearchQuery" @oninput="OnSearchInput" />
                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                     <i class="bi bi-search text-gray-400"></i>
                 </div>
             </div>
         </div>
-        <div class="w-full md:w-1/4">
-            <select class="input-modern" @bind="SortOrder" @bind:after="SearchTrainees">
-                <option value="Newest">الأحدث أولاً</option>
-                <option value="Oldest">الأقدم أولاً</option>
-            </select>
-        </div>
+        <div class="w-full">
+            <select class="input-modern w-full" @bind="SortOrder" @bind:after="() => SearchTrainees(1)">
+            <option value="Newest">الأحدث أولاً</option>
+            <option value="Oldest">الأقدم أولاً</option>
+        </select>
     </div>
+    <div class="w-full">
+        <select class="input-modern w-full" @bind="PageSize" @bind:after="() => SearchTrainees(1)">
+        <option value="10">10 لكل صفحة</option>
+        <option value="25">25 لكل صفحة</option>
+        <option value="50">50 لكل صفحة</option>
+        <option value="100">100 لكل صفحة</option>
+    </select>
+</div>
+</div>
 
-    <!-- Table -->
-    <div class="card-modern overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="table-modern">
-                <thead>
+<!-- Table -->
+<div class="card-modern overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th class="pr-6">الرقم</th>
+                    <th>الاسم الكامل</th>
+                    <th>رقم الهاتف</th>
+                    <th>تاريخ الانضمام</th>
+                    <th>الصورة</th>
+                    <th class="text-center">الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white">
+                @if (isLoading)
+                {
                     <tr>
-                        <th class="pr-6">الرقم</th>
-                        <th>الاسم الكامل</th>
-                        <th>رقم الهاتف</th>
-                        <th>تاريخ الانضمام</th>
-                        <th>الصورة</th>
-                        <th class="text-center">الإجراءات</th>
+                        <td colspan="6" class="text-center py-8">
+                            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gym-primary"></div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="bg-white">
-                    @if (isLoading)
+                }
+                else if (!filteredTrainees.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-8 text-gray-500">لا يوجد متدربين.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var trainee in filteredTrainees)
                     {
-                        <tr>
-                            <td colspan="6" class="text-center py-8">
-                                <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gym-primary"></div>
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="pr-6 text-gray-500">#@trainee.Id</td>
+                            <td class="font-bold text-gray-800">@trainee.FullName</td>
+                            <td class="text-gray-600">@trainee.PhoneNumber</td>
+                            <td class="text-gray-600">@trainee.JoinDate.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(trainee.IdCardPhotoPath))
+                                {
+                                    <a href="@trainee.IdCardPhotoPath" target="_blank" class="badge-modern bg-gym-success text-white hover:bg-green-600">عرض الصورة</a>
+                                }
+                                else
+                                {
+                                    <span class="badge-modern bg-gray-200 text-gray-600">لا يوجد</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <div class="flex justify-center gap-2">
+                                    <button class="btn-outline text-sm" @onclick="() => EditTrainee(trainee)">تعديل</button>
+                                    <button class="btn-danger text-sm" @onclick="() => DeleteTrainee(trainee)">حذف</button>
+                                </div>
                             </td>
                         </tr>
                     }
-                    else if (!filteredTrainees.Any())
-                    {
-                        <tr>
-                            <td colspan="6" class="text-center py-8 text-gray-500">لا يوجد متدربين.</td>
-                        </tr>
-                    }
-                    else
-                    {
-                        @foreach (var trainee in filteredTrainees)
-                        {
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="pr-6 text-gray-500">#@trainee.Id</td>
-                                <td class="font-bold text-gray-800">@trainee.FullName</td>
-                                <td class="text-gray-600">@trainee.PhoneNumber</td>
-                                <td class="text-gray-600">@trainee.JoinDate.ToString("yyyy-MM-dd")</td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(trainee.IdCardPhotoPath))
-                                    {
-                                        <a href="@trainee.IdCardPhotoPath" target="_blank" class="badge-modern bg-gym-success text-white hover:bg-green-600">عرض الصورة</a>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge-modern bg-gray-200 text-gray-600">لا يوجد</span>
-                                    }
-                                </td>
-                                <td class="text-center">
-                                    <div class="flex justify-center gap-2">
-                                        <button class="btn-outline text-sm" @onclick="() => EditTrainee(trainee)">تعديل</button>
-                                        <button class="btn-danger text-sm" @onclick="() => DeleteTrainee(trainee)">حذف</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
+                }
+            </tbody>
+        </table>
     </div>
+
+    <!-- Pagination Controls -->
+    @if (pagedTrainees != null && pagedTrainees.TotalPages > 1)
+    {
+        <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gray-50">
+            <div class="text-sm text-gray-600 w-full sm:w-auto text-center sm:text-right">
+                إجمالي المتدربين: <span class="font-bold">@pagedTrainees.TotalCount</span>
+            </div>
+            <div class="flex gap-2 w-full sm:w-auto justify-center">
+                <button class="btn-outline px-3 py-1 text-sm disabled:opacity-50"
+                disabled="@(!pagedTrainees.HasPreviousPage)"
+                @onclick="() => SearchTrainees(CurrentPage - 1)">
+                السابق
+            </button>
+
+            <span class="px-4 py-1 text-sm font-bold text-gray-700 bg-white border border-gray-200 rounded-lg">
+                صفحة @pagedTrainees.PageNumber من @pagedTrainees.TotalPages
+            </span>
+
+            <button class="btn-outline px-3 py-1 text-sm disabled:opacity-50"
+            disabled="@(!pagedTrainees.HasNextPage)"
+            @onclick="() => SearchTrainees(CurrentPage + 1)">
+            التالي
+        </button>
+    </div>
+</div>
+}
+</div>
 </div>
 
 <!-- Modal for Add/Edit -->
 @if (isModalOpen)
 {
     <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col" dir="rtl">
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <div class="bg-white rounded-2xl shadow-2xl w-[95%] sm:w-full max-w-lg max-h-[95vh] overflow-hidden flex flex-col" dir="rtl">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                 <h5 class="font-bold text-lg text-gym-primary">@(isEditMode ? "تعديل المتدرب" : "إضافة متدرب جديد")</h5>
                 <button type="button" class="text-gray-400 hover:text-gray-700 text-2xl leading-none" @onclick="CloseModal">&times;</button>
             </div>
-            <div class="p-6">
+            <div class="p-4 sm:p-6 overflow-y-auto">
                 <div class="mb-4">
                     <label class="block text-sm font-bold text-gray-700 mb-2">الاسم الكامل <span class="text-red-500">*</span></label>
                     <input type="text" class="input-modern" @bind="currentTrainee.FullName" />
@@ -126,8 +164,8 @@
                     <label class="block text-sm font-bold text-gray-700 mb-2">رقم الهاتف <span class="text-red-500">*</span></label>
                     <input type="text" class="input-modern" @bind="currentTrainee.PhoneNumber" />
                 </div>
-                
-                @if(isEditMode)
+
+                @if (isEditMode)
                 {
                     <div class="mb-4">
                         <label class="block text-sm font-bold text-gray-700 mb-2">تاريخ الانضمام</label>
@@ -146,21 +184,23 @@
                     }
                 </div>
             </div>
-            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-                <button type="button" class="px-5 py-2 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors" @onclick="CloseModal">إلغاء</button>
-                <button type="button" class="btn-primary px-8" @onclick="SaveTrainee">حفظ</button>
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+                <button type="button" class="flex-1 sm:flex-none px-5 py-2 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors" @onclick="CloseModal">إلغاء</button>
+                <button type="button" class="flex-1 sm:flex-none btn-primary px-8" @onclick="SaveTrainee">حفظ</button>
             </div>
         </div>
     </div>
 }
 
 @code {
-    private List<Trainee> trainees = new();
+    private PagedResult<Trainee> pagedTrainees = new();
     private List<Trainee> filteredTrainees = new();
     private bool isLoading = true;
     private string SearchQuery = "";
     private string SortOrder = "Newest";
-    
+    private int CurrentPage = 1;
+    private int PageSize = 10;
+
     // Modal State
     private bool isModalOpen = false;
     private bool isEditMode = false;
@@ -168,38 +208,49 @@
     private DateTime currentTraineeJoinDate = DateTime.Today;
 
     private Microsoft.AspNetCore.Components.Forms.IBrowserFile? selectedFile;
+    private System.Timers.Timer? _debounceTimer;
 
     protected override async Task OnInitializedAsync()
     {
+        _debounceTimer = new System.Timers.Timer(500);
+        _debounceTimer.Elapsed += OnTimerElapsed;
+        _debounceTimer.AutoReset = false;
+
         await LoadData();
+    }
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        SearchQuery = e.Value?.ToString() ?? "";
+        _debounceTimer?.Stop();
+        _debounceTimer?.Start();
+    }
+
+    private async void OnTimerElapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+        await InvokeAsync(async () => await SearchTrainees(1));
+    }
+
+    public void Dispose()
+    {
+        _debounceTimer?.Dispose();
     }
 
     private async Task LoadData()
     {
-        isLoading = true;
-        trainees = (await UnitOfWork.TraineeRepository.GetAllTraineesAsync()).ToList();
-        SearchTrainees();
-        isLoading = false;
+        await SearchTrainees(1);
     }
 
-    private void SearchTrainees()
+    private async Task SearchTrainees(int page = 1)
     {
-        var query = trainees.AsEnumerable();
+        isLoading = true;
+        CurrentPage = page;
 
-        if (!string.IsNullOrWhiteSpace(SearchQuery))
-        {
-            query = query.Where(t => t.FullName.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) || 
-                                     t.PhoneNumber.Contains(SearchQuery));
-        }
+        pagedTrainees = await UnitOfWork.TraineeRepository.GetTraineesPagedAsync(CurrentPage, PageSize, SearchQuery, SortOrder);
+        filteredTrainees = pagedTrainees.Items.ToList();
 
-        if (SortOrder == "Newest")
-        {
-            filteredTrainees = query.OrderByDescending(t => t.Id).ToList();
-        }
-        else
-        {
-            filteredTrainees = query.OrderBy(t => t.Id).ToList();
-        }
+        isLoading = false;
+        StateHasChanged();
     }
 
     private void ShowAddModal()
@@ -225,7 +276,7 @@
         isModalOpen = false;
         selectedFile = null;
     }
-    
+
     private void HandleFileSelected(Microsoft.AspNetCore.Components.Forms.InputFileChangeEventArgs e)
     {
         selectedFile = e.File;
@@ -235,10 +286,10 @@
     {
         if (string.IsNullOrWhiteSpace(currentTrainee.FullName) || string.IsNullOrWhiteSpace(currentTrainee.PhoneNumber))
         {
-            await JS.InvokeVoidAsync("alert", "يرجى تعبئة جميع الحقول المطلوبة.");
+            ToastService.ShowWarning("يرجى تعبئة جميع الحقول المطلوبة.");
             return;
         }
-        
+
         string? imagePath = currentTrainee.IdCardPhotoPath;
         if (selectedFile != null)
         {
@@ -249,21 +300,21 @@
                 {
                     Directory.CreateDirectory(uploadsDir);
                 }
-                
+
                 var ext = Path.GetExtension(selectedFile.Name);
                 var newFileName = $"{Guid.NewGuid()}{ext}";
                 var filePath = Path.Combine(uploadsDir, newFileName);
-                
+
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await selectedFile.OpenReadStream(10485760).CopyToAsync(stream); // max 10MB
                 }
-                
+
                 imagePath = $"/uploads/{newFileName}";
             }
             catch (Exception ex)
             {
-                await JS.InvokeVoidAsync("alert", $"حدث خطأ أثناء حفظ الصورة: {ex.Message}");
+                ToastService.ShowError($"حدث خطأ أثناء حفظ الصورة: {ex.Message}");
                 return;
             }
         }
@@ -294,7 +345,7 @@
         isModalOpen = false;
         await LoadData();
     }
-    
+
     private async Task ExportReport()
     {
         try
@@ -311,7 +362,7 @@
         }
         catch (Exception ex)
         {
-            await JS.InvokeVoidAsync("alert", $"خطأ في التصدير: {ex.Message}");
+            ToastService.ShowError($"خطأ في التصدير: {ex.Message}");
         }
         finally
         {
@@ -321,7 +372,7 @@
 
     private async Task DeleteTrainee(Trainee trainee)
     {
-        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"هل أنت متأكد من حذف المتدرب {trainee.FullName}؟");
+        bool confirmed = await ConfirmService.ShowConfirmAsync($"هل أنت متأكد من حذف المتدرب {trainee.FullName}؟");
         if (confirmed)
         {
             trainee.IsDeleted = true;
