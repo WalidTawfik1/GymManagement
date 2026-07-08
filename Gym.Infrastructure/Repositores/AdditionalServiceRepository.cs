@@ -34,7 +34,7 @@ namespace Gym.Infrastructure.Repositores
                 TakenAt = DateTime.Now,
             };
             await _context.AdditionalServices.AddAsync(additionalService);
-            await _context.SaveChangesAsync();
+
             return true;
         }
 
@@ -43,7 +43,7 @@ namespace Gym.Infrastructure.Repositores
             var additionalService = await _context.AdditionalServices.FindAsync(id);
             if (additionalService == null) return false;
             additionalService.IsDeleted = true;
-            await _context.SaveChangesAsync();
+
             return true;
         }
 
@@ -115,7 +115,7 @@ namespace Gym.Infrastructure.Repositores
             _mapper.Map(additionalServiceDTO, additionalService);
             additionalService.TakenAt = lastDate;
             additionalService.UpdatedAt = DateTime.Now;
-            await _context.SaveChangesAsync();
+
             return true;
         }
 

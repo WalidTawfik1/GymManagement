@@ -222,6 +222,7 @@ namespace Gym.UI.ViewModels
                         "3 شهور" or "3 Months" => "MembershipAddedSuccess3Months", 
                         _ => "MembershipAddedSuccessGeneric"
                     };
+                    await _unitOfWork.CompleteAsync();
                     await _dialog.ShowAsync(GetLocalizedString(successKey), GetLocalizedString("SuccessTitle"), DialogType.Success);
                     ClearForm();
                     await LoadMemberships();
@@ -268,6 +269,7 @@ namespace Gym.UI.ViewModels
                 var success = await _unitOfWork.MembershipRepository.UpdateMembership(membershipDto);
                 if (success)
                 {
+                    await _unitOfWork.CompleteAsync();
                     await _dialog.ShowAsync(GetLocalizedString("MembershipUpdatedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
                     ClearForm();
                     await LoadMemberships();
@@ -306,6 +308,7 @@ namespace Gym.UI.ViewModels
                         membership.IsDeleted = true;
                         membership.UpdatedAt = DateTime.Now;
                         await _unitOfWork.MembershipRepository.UpdateAsync(membership);
+                        await _unitOfWork.CompleteAsync();
                         
                         await _dialog.ShowAsync(GetLocalizedString("MembershipDeletedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
                         await LoadMemberships();

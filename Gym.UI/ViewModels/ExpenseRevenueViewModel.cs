@@ -347,6 +347,7 @@ namespace Gym.UI.ViewModels
                 
                 if (result)
                 {
+                    await _unitOfWork.CompleteAsync();
                     ClearForm();
                     await RefreshDataSilentAsync();
                     await _dialogService.ShowAsync("تم إضافة المصروف بنجاح", "نجح", DialogType.Success);
@@ -403,6 +404,7 @@ namespace Gym.UI.ViewModels
                 
                 if (result)
                 {
+                    await _unitOfWork.CompleteAsync();
                     ClearForm();
                     await RefreshDataSilentAsync();
                     await _dialogService.ShowAsync("تم تحديث المصروف بنجاح", "نجح", DialogType.Success);
@@ -447,6 +449,7 @@ namespace Gym.UI.ViewModels
                     
                     if (result)
                     {
+                        await _unitOfWork.CompleteAsync();
                         ClearForm();
                         await RefreshDataSilentAsync();
                         await _dialogService.ShowAsync("تم حذف المصروف بنجاح", "نجح", DialogType.Success);

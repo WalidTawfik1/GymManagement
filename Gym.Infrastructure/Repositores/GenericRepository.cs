@@ -1,4 +1,4 @@
-﻿using Gym.Core.Interfaces;
+using Gym.Core.Interfaces;
 using Gym.Core.Models;
 using Gym.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +22,7 @@ namespace Gym.Infrastructure.Repositores
         public async Task AddAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
-            await _context.SaveChangesAsync();
+
             // Detach to prevent long-lived tracked instances (desktop app single scope)
             _context.Entry(entity).State = EntityState.Detached;
         }
@@ -39,13 +39,13 @@ namespace Gym.Infrastructure.Repositores
             {
                 baseEntity.IsDeleted = true;
                 _context.Update(baseEntity);
-                await _context.SaveChangesAsync();
+
             }
             else
             {
                 // fallback to hard delete if entity doesn’t support soft delete
                 _context.Set<T>().Remove(entity);
-                await _context.SaveChangesAsync();
+
             }
         }
 
@@ -124,9 +124,6 @@ namespace Gym.Infrastructure.Repositores
                 }
             }
             _context.Entry(entity).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            // Optionally detach after update to keep context lean
-            _context.Entry(entity).State = EntityState.Detached;
         }
     }
 }

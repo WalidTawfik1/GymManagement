@@ -33,7 +33,7 @@ namespace Gym.Infrastructure.Repositores
                 IncurredAt = DateTime.Now,
             };
             _context.Expenses.Add(expenseEntity);
-            await _context.SaveChangesAsync();
+
             return true;
         }
 
@@ -45,7 +45,7 @@ namespace Gym.Infrastructure.Repositores
                 return false;
             }
             _context.Expenses.Remove(expense);
-            await _context.SaveChangesAsync();
+
             return true;
         }
 
@@ -113,7 +113,7 @@ namespace Gym.Infrastructure.Repositores
             }
             _mapper.Map(expense, existingExpense);
             existingExpense.UpdatedAt = DateTime.Now;
-            await _context.SaveChangesAsync();
+
             return true;
         }
 

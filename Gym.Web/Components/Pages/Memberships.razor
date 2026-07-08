@@ -262,7 +262,9 @@
         </div>
         <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
             <button type="button" class="flex-1 sm:flex-none px-5 py-2 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors" @onclick="CloseModal">إلغاء</button>
-            <button type="button" class="flex-1 sm:flex-none btn-primary px-8" @onclick="SaveMembership">حفظ</button>
+            <button type="button" class="flex-1 sm:flex-none btn-primary px-8 disabled:opacity-50" @onclick="SaveMembership" disabled="@isSaving">
+                @(isSaving ? "جاري الحفظ..." : "حفظ")
+            </button>
         </div>
     </div>
 </div>
@@ -296,8 +298,7 @@
     private decimal price = 0;
     private int? remainingSessions = null;
     private bool isActive = true;
-
-    private string? errorMessage = null;
+    private bool isSaving = false;
     private System.Timers.Timer? _debounceTimer;
 
     protected override async Task OnInitializedAsync()
@@ -348,7 +349,6 @@
     private async Task LoadData()
     {
         isLoading = true;
-        errorMessage = null;
 
         SummaryData = await UnitOfWork.MembershipRepository.GetMembershipsSummaryAsync(selectedMonth, selectedYear);
         traineesList = (await UnitOfWork.TraineeRepository.GetAllTraineesAsync()).ToList();
@@ -382,7 +382,6 @@
         price = 0;
         remainingSessions = null;
         isActive = true;
-        errorMessage = null;
         isModalOpen = true;
     }
 
@@ -399,14 +398,12 @@
         price = mem.Price;
         remainingSessions = mem.RemainingSessions;
         isActive = mem.IsActive;
-        errorMessage = null;
         isModalOpen = true;
     }
 
     private void CloseModal()
     {
         isModalOpen = false;
-        errorMessage = null;
     }
 
     private void SelectTrainee(int id, string name)
@@ -418,57 +415,65 @@
 
     private async Task SaveMembership()
     {
-        errorMessage = null;
-
-        if (!isEditMode)
+        if (isSaving) return;
+        isSaving = true;
+        try
         {
-            if (selectedTraineeId == 0)
+            if (!isEditMode)
             {
-                ToastService.ShowWarning("يرجى اختيار المتدرب من القائمة المنسدلة.");
+                if (selectedTraineeId == 0)
+                {
+                    ToastService.ShowWarning("يرجى اختيار المتدرب من القائمة المنسدلة.");
+                    return;
+                }
+            }
+
+            if (price <= 0)
+            {
+                ToastService.ShowWarning("يرجى إدخال سعر صحيح.");
                 return;
             }
-        }
 
-        if (price <= 0)
-        {
-            ToastService.ShowWarning("يرجى إدخال سعر صحيح.");
-            return;
-        }
-
-        if (isEditMode)
-        {
-            var updateDto = new MembershipDTO
+            if (isEditMode)
             {
-                Id = currentMembershipId,
-                TraineeId = selectedTraineeId,
-                TraineeName = "",
-                MembershipType = currentMembershipType,
-                StartDate = DateOnly.FromDateTime(startDate),
-                EndDate = DateOnly.FromDateTime(endDate),
-                Price = price,
-                RemainingSessions = remainingSessions,
-                IsActive = isActive
-            };
-            await UnitOfWork.MembershipRepository.UpdateMembership(updateDto);
-        }
-        else
-        {
-            var addDto = new AddMembershipDTO
-            {
-                TraineeId = selectedTraineeId,
-                MembershipType = currentMembershipType,
-                Price = price
-            };
-            var success = await UnitOfWork.MembershipRepository.AddMembership(addDto);
-            if (!success)
-            {
-                ToastService.ShowError("لم يتم إضافة الاشتراك. تأكد أن المتدرب لا يملك اشتراكاً نشطاً بالفعل.");
-                return;
+                var updateDto = new MembershipDTO
+                {
+                    Id = currentMembershipId,
+                    TraineeId = selectedTraineeId,
+                    TraineeName = "",
+                    MembershipType = currentMembershipType,
+                    StartDate = DateOnly.FromDateTime(startDate),
+                    EndDate = DateOnly.FromDateTime(endDate),
+                    Price = price,
+                    RemainingSessions = remainingSessions,
+                    IsActive = isActive
+                };
+                await UnitOfWork.MembershipRepository.UpdateMembership(updateDto);
             }
-        }
+            else
+            {
+                var addDto = new AddMembershipDTO
+                {
+                    TraineeId = selectedTraineeId,
+                    MembershipType = currentMembershipType,
+                    Price = price
+                };
+                var success = await UnitOfWork.MembershipRepository.AddMembership(addDto);
+                if (!success)
+                {
+                    ToastService.ShowError("لم يتم إضافة الاشتراك. تأكد أن المتدرب لا يملك اشتراكاً نشطاً بالفعل.");
+                    return;
+                }
+            }
 
-        isModalOpen = false;
-        await LoadData();
+            await UnitOfWork.CompleteAsync();
+            isModalOpen = false;
+            await LoadData();
+        }
+        finally
+        {
+            isSaving = false;
+        }
     }
 
     private async Task ExportReport()
@@ -505,6 +510,7 @@
             {
                 membership.IsDeleted = true;
                 await UnitOfWork.MembershipRepository.UpdateAsync(membership);
+                await UnitOfWork.CompleteAsync();
                 await LoadData();
             }
         }

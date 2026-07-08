@@ -1,4 +1,4 @@
-﻿using DotNetEnv;
+using DotNetEnv;
 using Gym.Core.Interfaces;
 using Gym.Core.Interfaces.Services;
 using Gym.Infrastructure.Data;
@@ -47,9 +47,15 @@ namespace Gym.Infrastructure
             services.AddScoped<IUnitofWork, UnitofWork>();
             services.AddScoped<IReportService, ReportService>();
 
-            services.AddDbContext<MambelaDbContext>((options) =>
+            services.AddDbContextPool<MambelaDbContext>((options) =>
             {
-                options.UseSqlServer(connStr);
+                options.UseSqlServer(connStr, sqlOptions =>
+                {
+                    sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorNumbersToAdd: null);
+                });
             });
 
 

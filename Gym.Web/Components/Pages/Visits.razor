@@ -154,12 +154,12 @@
 @if (isModalOpen)
 {
     <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl w-[95%] sm:w-full max-w-lg max-h-[95vh] overflow-hidden flex flex-col" dir="rtl">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <div class="bg-white rounded-2xl shadow-2xl w-[95%] sm:w-full max-w-lg flex flex-col" dir="rtl">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl">
                 <h5 class="font-bold text-lg text-gym-primary">تسجيل زيارة (حضور متدرب)</h5>
                 <button type="button" class="text-gray-400 hover:text-gray-700 text-2xl leading-none" @onclick="CloseModal">&times;</button>
             </div>
-            <div class="p-4 sm:p-6 overflow-y-auto">
+            <div class="p-4 sm:p-6 overflow-visible">
                 <div class="mb-4">
                     <label class="block text-sm font-bold text-gray-700 mb-2">اختر المتدرب <span class="text-red-500">*</span></label>
                     <div class="relative">
@@ -174,7 +174,7 @@
                                 }
                                 else
                                 {
-                                    @foreach (var trainee in activeTraineesList)
+                                    @foreach (var trainee in activeTraineesList.Where(t => string.IsNullOrWhiteSpace(SearchTraineeText) || t.FullName.Contains(SearchTraineeText) || t.Id.ToString() == SearchTraineeText || t.PhoneNumber.Contains(SearchTraineeText)))
                                     {
                                         <div class="px-4 py-2 hover:bg-gym-primary hover:text-white cursor-pointer transition-colors border-b border-gray-50 last:border-0"
                                         @onclick="() => SelectTrainee(trainee.Id, trainee.FullName)">
@@ -187,9 +187,11 @@
                 </div>
             </div>
         </div>
-        <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+        <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
             <button type="button" class="flex-1 sm:flex-none px-5 py-2 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors" @onclick="CloseModal">إلغاء</button>
-            <button type="button" class="flex-1 sm:flex-none btn-primary px-8" @onclick="SaveVisit">تسجيل الدخول</button>
+            <button type="button" class="flex-1 sm:flex-none btn-primary px-8 disabled:opacity-50" @onclick="SaveVisit" disabled="@isSaving">
+                @(isSaving ? "جاري التسجيل..." : "تسجيل الدخول")
+            </button>
         </div>
     </div>
 </div>
@@ -213,6 +215,7 @@
     private int selectedTraineeId = 0;
     private string SearchTraineeText = "";
     private bool showTraineeDropdown = false;
+    private bool isSaving = false;
 
     private System.Timers.Timer? _debounceTimer;
 
@@ -266,6 +269,7 @@
     private async Task LoadData()
     {
         isLoading = true;
+        activeTraineesList = (await UnitOfWork.TraineeRepository.GetAllTraineesAsync()).Where(t => !t.IsDeleted).ToList();
         await SearchVisits(1);
     }
 
@@ -306,27 +310,42 @@
 
     private async Task SaveVisit()
     {
-        if (selectedTraineeId == 0)
+        if (isSaving) return;
+        
+        isSaving = true;
+        try
         {
-            ToastService.ShowWarning("يرجى اختيار المتدرب من القائمة المنسدلة.");
-            return;
+            if (selectedTraineeId == 0)
+            {
+                ToastService.ShowWarning("يرجى اختيار المتدرب من القائمة المنسدلة.");
+                return;
+            }
+
+            var response = await UnitOfWork.VisitRepository.AddVisitAsync(selectedTraineeId);
+
+            if (response != null && response.Message == "تم تسجيل الزيارة بنجاح")
+            {
+                // Success
+                ToastService.ShowSuccess($"تم تسجيل دخول: {response.TraineeName}\nالعضوية: {response.MembershipType}");
+            }
+            else if (response != null)
+            {
+                // Failed due to business rules (already checked in, no active membership)
+                ToastService.ShowError(response.Message);
+            }
+            else
+            {
+                // General Failure
+                ToastService.ShowError("عفواً، حدث خطأ أثناء التسجيل.");
+            }
+
+            isModalOpen = false;
+            await LoadData();
         }
-
-        var response = await UnitOfWork.VisitRepository.AddVisitAsync(selectedTraineeId);
-
-        if (response != null)
+        finally
         {
-            // Success
-            ToastService.ShowSuccess($"تم تسجيل دخول: {response.TraineeName}\nالعضوية: {response.MembershipType}");
+            isSaving = false;
         }
-        else
-        {
-            // Failed
-            ToastService.ShowError("عفواً، لا يوجد اشتراك نشط أو انتهت صلاحية/حصص هذا المتدرب.");
-        }
-
-        isModalOpen = false;
-        await LoadData();
     }
 
     private async Task ExportReport()
@@ -359,6 +378,7 @@
         if (confirmed)
         {
             await UnitOfWork.VisitRepository.DeleteVisitAndRestoreSessionAsync(visitId);
+            await UnitOfWork.CompleteAsync();
             await LoadData();
         }
     }

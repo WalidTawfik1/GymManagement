@@ -209,6 +209,7 @@ namespace Gym.UI.ViewModels
                 var success = await _unitOfWork.TraineeRepository.AddTraineeAsync(traineeDto);
                 if (success)
                 {
+                    await _unitOfWork.CompleteAsync();
                     await _dialog.ShowAsync(GetLocalizedString("TraineeAddedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
                     ClearForm();
                     await LoadTrainees();
@@ -252,6 +253,7 @@ namespace Gym.UI.ViewModels
                 var success = await _unitOfWork.TraineeRepository.UpdateTraineeAsync(updateDto);
                 if (success)
                 {
+                    await _unitOfWork.CompleteAsync();
                     await _dialog.ShowAsync(GetLocalizedString("TraineeUpdatedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
                     ClearForm();
                     await LoadTrainees();
@@ -286,6 +288,7 @@ namespace Gym.UI.ViewModels
                     trainee.IsDeleted = true;
                     trainee.UpdatedAt = DateTime.Now;
                     await _unitOfWork.TraineeRepository.UpdateAsync(trainee);
+                    await _unitOfWork.CompleteAsync();
             await _dialog.ShowAsync(GetLocalizedString("TraineeDeletedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
                     await LoadTrainees();
                 }

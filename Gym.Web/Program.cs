@@ -1,4 +1,8 @@
 using System.Reflection;
+using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 using Gym.Infrastructure;
 using Gym.Web.Components;
 
@@ -6,7 +10,42 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents(options =>
+    {
+        options.DetailedErrors = builder.Environment.IsDevelopment();
+        options.DisconnectedCircuitMaxRetained = 100;
+        options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3);
+        options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(1);
+    })
+    .AddHubOptions(options =>
+    {
+        options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+        options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+        options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+        options.MaximumParallelInvocationsPerClient = 1;
+        options.MaximumReceiveMessageSize = 32 * 1024;
+    });
+
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" });
+});
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 1000,
+                QueueLimit = 100,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+});
 
 // Register infrastructure services (DbContext, Repositories, etc.)
 builder.Services.InfrastructureConfiguration(builder.Configuration);
@@ -20,6 +59,9 @@ builder.Services.AddAutoMapper(cfg =>
 });
 
 var app = builder.Build();
+
+app.UseResponseCompression();
+app.UseRateLimiter();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

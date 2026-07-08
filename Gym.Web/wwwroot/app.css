@@ -1001,6 +1001,10 @@ html, body {
   max-height: 95vh;
 }
 
+.min-h-\[350px\] {
+  min-height: 350px;
+}
+
 .w-12 {
   width: 3rem;
 }
@@ -1144,6 +1148,10 @@ html, body {
 
 .overflow-hidden {
   overflow: hidden;
+}
+
+.overflow-visible {
+  overflow: visible;
 }
 
 .overflow-x-auto {

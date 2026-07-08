@@ -36,9 +36,9 @@ namespace Gym.Infrastructure.Repositores
                     MembershipType = membershipDTO.MembershipType,
                     Price = membershipDTO.Price,
                     StartDate = DateOnly.FromDateTime(DateTime.Now),
-                    EndDate = DateOnly.FromDateTime(DateTime.Now),
-                    RemainingSessions = null,
-                    IsActive = false
+                    EndDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
+                    RemainingSessions = 1,
+                    IsActive = true
                 };
                 await _context.Memberships.AddAsync(membership);
             }
@@ -98,7 +98,7 @@ namespace Gym.Infrastructure.Repositores
                 };
                 await _context.Memberships.AddAsync(membership);
             }
-            await _context.SaveChangesAsync();
+
 
             return true;
         }
@@ -198,7 +198,7 @@ namespace Gym.Infrastructure.Repositores
             if (membership == null) return false;
             _mapper.Map(membershipDTO, membership);
             membership.UpdatedAt = DateTime.Now;
-            await _context.SaveChangesAsync();
+
             return true;
         }
 

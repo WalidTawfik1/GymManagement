@@ -207,6 +207,7 @@ namespace Gym.UI.ViewModels
                 
                 if (success)
                 {
+                    await _unitOfWork.CompleteAsync();
                     await _dialog.ShowAsync("تم إضافة الخدمة الإضافية بنجاح", "نجح", DialogType.Success);
                     ClearForm();
                     await LoadAdditionalServices();
@@ -259,6 +260,7 @@ namespace Gym.UI.ViewModels
                 
                 if (success)
                 {
+                    await _unitOfWork.CompleteAsync();
                     await _dialog.ShowAsync("تم تحديث الخدمة الإضافية بنجاح", "نجح", DialogType.Success);
                     ClearForm();
                     await LoadAdditionalServices();
@@ -293,6 +295,7 @@ namespace Gym.UI.ViewModels
                     
                     if (success)
                     {
+                        await _unitOfWork.CompleteAsync();
                         await _dialog.ShowAsync("تم حذف الخدمة الإضافية بنجاح", "نجح", DialogType.Success);
                         await LoadAdditionalServices();
                     }

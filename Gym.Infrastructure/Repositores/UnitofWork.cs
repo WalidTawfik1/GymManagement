@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Gym.Core.Interfaces;
 using Gym.Infrastructure.Data;
 using System;
@@ -36,6 +36,9 @@ namespace Gym.Infrastructure.Repositores
             DashboardRepository = new DashboardRepository(_context, _mapper, MembershipRepository, VisitRepository, ExpenseAndRevenueRepository);
         }
 
-
+        public async Task<int> CompleteAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
     }
 }

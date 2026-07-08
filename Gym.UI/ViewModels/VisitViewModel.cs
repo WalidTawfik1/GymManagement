@@ -229,6 +229,7 @@ namespace Gym.UI.ViewModels
                         visit.IsDeleted = true;
                         visit.UpdatedAt = DateTime.Now;
                         await _unitOfWork.VisitRepository.UpdateAsync(visit);
+                        await _unitOfWork.CompleteAsync();
                         
                         await _dialog.ShowAsync(GetLocalizedString("VisitDeletedSuccess"), GetLocalizedString("SuccessTitle"), DialogType.Success);
                         await LoadVisits();

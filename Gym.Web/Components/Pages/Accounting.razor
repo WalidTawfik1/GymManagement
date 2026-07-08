@@ -262,9 +262,11 @@
                 </div>
 
             </div>
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
                 <button type="button" class="flex-1 sm:flex-none px-5 py-2 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors" @onclick="CloseModal">إلغاء</button>
-                <button type="button" class="flex-1 sm:flex-none btn-primary px-8" @onclick="SaveExpense">حفظ</button>
+                <button type="button" class="flex-1 sm:flex-none btn-primary px-8 disabled:opacity-50" @onclick="SaveExpense" disabled="@isSaving">
+                    @(isSaving ? "جاري الحفظ..." : "حفظ")
+                </button>
             </div>
         </div>
     </div>
@@ -293,9 +295,10 @@
     private bool isEditMode = false;
     
     private int currentExpenseId = 0;
-    private string expenseType = "أخرى";
+    private string expenseType = "فواتير كهرباء";
     private string description = "";
     private decimal amount = 0;
+    private bool isSaving = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -349,7 +352,7 @@
         isEditMode = true;
         currentExpenseId = exp.Id;
         expenseType = exp.ExpenseType ?? "أخرى";
-        description = exp.Description;
+        description = exp.Description ?? "";
         amount = exp.Amount;
         isModalOpen = true;
     }
@@ -361,36 +364,46 @@
 
     private async Task SaveExpense()
     {
-        if (string.IsNullOrWhiteSpace(description) || amount <= 0)
+        if (isSaving) return;
+        isSaving = true;
+        try
         {
-            ToastService.ShowWarning("يرجى إدخال الوصف والمبلغ بشكل صحيح.");
-            return;
-        }
-
-        if (isEditMode)
-        {
-            var updateDto = new ExpenseDTO
+            if (string.IsNullOrWhiteSpace(description) || amount <= 0)
             {
-                Id = currentExpenseId,
-                ExpenseType = expenseType,
-                Description = description,
-                Amount = amount
-            };
-            await UnitOfWork.ExpenseAndRevenueRepository.UpdateExpenseAsync(updateDto);
-        }
-        else
-        {
-            var addDto = new AddExpenseDTO
-            {
-                ExpenseType = expenseType,
-                Description = description,
-                Amount = amount
-            };
-            await UnitOfWork.ExpenseAndRevenueRepository.AddExpenseAsync(addDto);
-        }
+                ToastService.ShowWarning("يرجى إدخال الوصف والمبلغ بشكل صحيح.");
+                return;
+            }
 
-        isModalOpen = false;
-        await LoadData();
+            if (isEditMode)
+            {
+                var updateDto = new ExpenseDTO
+                {
+                    Id = currentExpenseId,
+                    ExpenseType = expenseType,
+                    Description = description,
+                    Amount = amount
+                };
+                await UnitOfWork.ExpenseAndRevenueRepository.UpdateExpenseAsync(updateDto);
+            }
+            else
+            {
+                var addDto = new AddExpenseDTO
+                {
+                    ExpenseType = expenseType,
+                    Description = description,
+                    Amount = amount
+                };
+                await UnitOfWork.ExpenseAndRevenueRepository.AddExpenseAsync(addDto);
+            }
+            
+            await UnitOfWork.CompleteAsync();
+            isModalOpen = false;
+            await LoadData();
+        }
+        finally
+        {
+            isSaving = false;
+        }
     }
     
     private async Task ExportReport()
@@ -423,6 +436,7 @@
         if (confirmed)
         {
             await UnitOfWork.ExpenseAndRevenueRepository.DeleteExpenseAsync(id);
+            await UnitOfWork.CompleteAsync();
             await LoadData();
         }
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,5 +14,6 @@ namespace Gym.Core.Interfaces
         IAdditionalServiceRepository AdditionalServiceRepository { get; }
         IExpenseAndRevenueRepository ExpenseAndRevenueRepository { get; }
         IDashboardRepository DashboardRepository { get; }
+        Task<int> CompleteAsync();
     }
 }

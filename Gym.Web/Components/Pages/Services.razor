@@ -146,12 +146,12 @@
 @if (isModalOpen)
 {
     <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl w-[95%] sm:w-full max-w-lg max-h-[95vh] overflow-hidden flex flex-col" dir="rtl">
-            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <div class="bg-white rounded-2xl shadow-2xl w-[95%] sm:w-full max-w-lg flex flex-col" dir="rtl">
+            <div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl">
                 <h5 class="font-bold text-lg text-gym-primary">@(isEditMode ? "تعديل الخدمة" : "تقديم خدمة جديدة")</h5>
                 <button type="button" class="text-gray-400 hover:text-gray-700 text-2xl leading-none" @onclick="CloseModal">&times;</button>
             </div>
-            <div class="p-4 sm:p-6 overflow-y-auto">
+            <div class="p-4 sm:p-6 overflow-visible min-h-[350px]">
 
                 @if (!isEditMode)
                 {
@@ -204,9 +204,11 @@
         </div>
 
     </div>
-    <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+    <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
         <button type="button" class="flex-1 sm:flex-none px-5 py-2 rounded-xl font-bold text-gray-600 hover:bg-gray-200 transition-colors" @onclick="CloseModal">إلغاء</button>
-        <button type="button" class="flex-1 sm:flex-none btn-primary px-8" @onclick="SaveService">حفظ</button>
+        <button type="button" class="flex-1 sm:flex-none btn-primary px-8 disabled:opacity-50" @onclick="SaveService" disabled="@isSaving">
+            @(isSaving ? "جاري الحفظ..." : "حفظ")
+        </button>
     </div>
 </div>
 </div>
@@ -235,6 +237,7 @@
     private bool showTraineeDropdown = false;
     private string serviceName = "إن بودي (InBody)";
     private decimal price = 0;
+    private bool isSaving = false;
 
     private System.Timers.Timer? _debounceTimer;
 
@@ -287,6 +290,7 @@
     private async Task LoadData()
     {
         isLoading = true;
+        traineesList = (await UnitOfWork.TraineeRepository.GetAllTraineesAsync()).ToList();
         await SearchServices(1);
     }
 
@@ -342,32 +346,42 @@
 
     private async Task SaveService()
     {
-        if (isEditMode)
+        if (isSaving) return;
+        isSaving = true;
+        try
         {
-            var updateDto = new AdditionalServiceDTO
+            if (isEditMode)
             {
-                Id = currentServiceId,
-                TraineeId = selectedTraineeId,
-                TraineeName = "",
-                ServiceType = serviceName,
-                Price = price
-            };
-            await UnitOfWork.AdditionalServiceRepository.UpdateAdditionalServiceAsync(updateDto);
-        }
-        else
-        {
-            var addDto = new AddAdditionalServiceDTO
+                var updateDto = new AdditionalServiceDTO
+                {
+                    Id = currentServiceId,
+                    TraineeId = selectedTraineeId,
+                    TraineeName = "",
+                    ServiceType = serviceName,
+                    Price = price
+                };
+                await UnitOfWork.AdditionalServiceRepository.UpdateAdditionalServiceAsync(updateDto);
+            }
+            else
             {
-                TraineeId = selectedTraineeId,
-                ServiceType = serviceName,
-                Price = price,
-                DurationInMinutes = null
-            };
-            await UnitOfWork.AdditionalServiceRepository.AddAdditionalServiceAsync(addDto);
-        }
+                var addDto = new AddAdditionalServiceDTO
+                {
+                    TraineeId = selectedTraineeId,
+                    ServiceType = serviceName,
+                    Price = price,
+                    DurationInMinutes = null
+                };
+                await UnitOfWork.AdditionalServiceRepository.AddAdditionalServiceAsync(addDto);
+            }
 
-        isModalOpen = false;
-        await LoadData();
+            await UnitOfWork.CompleteAsync();
+            isModalOpen = false;
+            await LoadData();
+        }
+        finally
+        {
+            isSaving = false;
+        }
     }
 
     private async Task ExportReport()
@@ -400,6 +414,7 @@
         if (confirmed)
         {
             await UnitOfWork.AdditionalServiceRepository.DeleteAdditionalServiceAsync(id);
+            await UnitOfWork.CompleteAsync();
             await LoadData();
         }
     }

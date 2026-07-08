@@ -31,7 +31,7 @@ namespace Gym.Infrastructure.Repositores
                 IdCardPhotoPath = trainee.IdCardPhotoPath
             };
             await context.Trainees.AddAsync(entity);
-            await context.SaveChangesAsync();
+
 
             return true;
         }
@@ -58,7 +58,7 @@ namespace Gym.Infrastructure.Repositores
             if (entity == null) return false;
             mapper.Map(trainee, entity);
             entity.UpdatedAt = DateTime.Now;
-            await context.SaveChangesAsync();
+
             return true;
         }
 
