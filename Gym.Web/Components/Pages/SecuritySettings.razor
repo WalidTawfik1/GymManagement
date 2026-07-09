@@ -1,0 +1,97 @@
+@page "/security-settings"
+@rendermode InteractiveServer
+@inject Gym.Web.Services.SecurityService SecurityService
+@inject Gym.Web.Services.ToastService ToastService
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+
+<PageTitle>إعدادات الحماية</PageTitle>
+
+<div class="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
+        <div class="md:grid md:grid-cols-3 md:gap-6">
+            <div class="md:col-span-1">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">حماية النظام</h3>
+                <p class="mt-1 text-sm text-gray-500">
+                    تحديث كلمة المرور المستخدمة لحماية النظام بأكمله.
+                </p>
+            </div>
+            <div class="mt-5 md:mt-0 md:col-span-2">
+                <form @onsubmit="ChangePassword">
+                    <div class="grid grid-cols-6 gap-6">
+                        <div class="col-span-6 sm:col-span-4">
+                            <label for="current_password" class="block text-sm font-medium text-gray-700">كلمة المرور الحالية</label>
+                            <input type="password" name="current_password" id="current_password" @bind="CurrentPassword" required
+                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md py-2 px-3 border">
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-4">
+                            <label for="new_password" class="block text-sm font-medium text-gray-700">كلمة المرور الجديدة</label>
+                            <input type="password" name="new_password" id="new_password" @bind="NewPassword" required
+                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md py-2 px-3 border">
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-4">
+                            <label for="confirm_password" class="block text-sm font-medium text-gray-700">تأكيد كلمة المرور الجديدة</label>
+                            <input type="password" name="confirm_password" id="confirm_password" @bind="ConfirmPassword" required
+                                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md py-2 px-3 border">
+                        </div>
+                    </div>
+
+                    @if (ErrorMessage != null)
+                    {
+                        <div class="mt-4 text-red-600 text-sm">
+                            @ErrorMessage
+                        </div>
+                    }
+
+                    <div class="mt-6 flex justify-end">
+                        <button type="submit"
+                                class="bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            حفظ التغييرات
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string CurrentPassword { get; set; } = "";
+    private string NewPassword { get; set; } = "";
+    private string ConfirmPassword { get; set; } = "";
+    private string? ErrorMessage { get; set; }
+
+    private async Task ChangePassword()
+    {
+        ErrorMessage = null;
+
+        if (NewPassword != ConfirmPassword)
+        {
+            ErrorMessage = "كلمة المرور الجديدة غير مطابقة مع التأكيد.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(NewPassword) || NewPassword.Length < 4)
+        {
+            ErrorMessage = "كلمة المرور الجديدة يجب أن تكون 4 أحرف على الأقل.";
+            return;
+        }
+
+        var isCurrentValid = await SecurityService.VerifyPasswordAsync(CurrentPassword);
+        if (!isCurrentValid)
+        {
+            ErrorMessage = "كلمة المرور الحالية غير صحيحة.";
+            return;
+        }
+
+        await SecurityService.ChangePasswordAsync(NewPassword);
+        
+        ToastService.ShowSuccess("تم تحديث كلمة المرور بنجاح.");
+        
+        // Reset fields
+        CurrentPassword = "";
+        NewPassword = "";
+        ConfirmPassword = "";
+    }
+}

@@ -51,6 +51,15 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.InfrastructureConfiguration(builder.Configuration);
 builder.Services.AddScoped<Gym.Web.Services.ToastService>();
 builder.Services.AddScoped<Gym.Web.Services.ConfirmService>();
+builder.Services.AddScoped<Gym.Web.Services.SecurityService>();
+
+// Add Custom Auth
+builder.Services.AddAuthentication("Cookies").AddCookie("Cookies", options =>
+{
+    options.LoginPath = "/login";
+});
+builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
 
 // Register AutoMapper (AutoMapper 15.1.1)
 builder.Services.AddAutoMapper(cfg =>
@@ -75,8 +84,33 @@ app.UseHttpsRedirection();
 
 app.UseAntiforgery();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.MapPost("/api/auth/login", async (HttpContext context, [Microsoft.AspNetCore.Mvc.FromForm] string password, Gym.Web.Services.SecurityService securityService) =>
+{
+    if (await securityService.VerifyPasswordAsync(password))
+    {
+        var identity = new System.Security.Claims.ClaimsIdentity(new[] { new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, "Admin") }, "Cookies");
+        var user = new System.Security.Claims.ClaimsPrincipal(identity);
+        await Microsoft.AspNetCore.Authentication.AuthenticationHttpContextExtensions.SignInAsync(context, "Cookies", user, new Microsoft.AspNetCore.Authentication.AuthenticationProperties
+        {
+            IsPersistent = true,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(1)
+        });
+        return Microsoft.AspNetCore.Http.Results.Redirect("/");
+    }
+    return Microsoft.AspNetCore.Http.Results.Redirect("/login?error=true");
+}).DisableAntiforgery();
+
+app.MapPost("/api/auth/logout", async (HttpContext context) =>
+{
+    await Microsoft.AspNetCore.Authentication.AuthenticationHttpContextExtensions.SignOutAsync(context, "Cookies");
+    return Microsoft.AspNetCore.Http.Results.Redirect("/login");
+}).DisableAntiforgery();
 
 app.Run();

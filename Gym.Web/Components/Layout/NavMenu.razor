@@ -45,4 +45,25 @@
             <span class="font-semibold text-[15px]">الإيرادات والمصروفات</span>
         </NavLink>
     </div>
+
+    <div class="nav-item">
+        <NavLink class="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-all" href="security-settings">
+            <i class="bi bi-shield-lock-fill text-xl text-gym-accent"></i>
+            <span class="font-semibold text-[15px]">إعدادات الحماية</span>
+        </NavLink>
+    </div>
+
+    <div class="nav-item mt-4">
+        <form action="/api/auth/logout" method="post">
+            <AntiforgeryToken />
+            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-white/10 rounded-xl transition-all">
+                <i class="bi bi-box-arrow-right text-xl"></i>
+                <span class="font-semibold text-[15px]">تسجيل الخروج</span>
+            </button>
+        </form>
+    </div>
 </nav>
+
+@code {
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+}
